@@ -1,0 +1,19 @@
+{
+  "name": "@lodestar/tests",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@lodestar/types": "workspace:*",
+    "@lodestar/config": "workspace:*",
+    "@lodestar/core": "workspace:*",
+    "@lodestar/cli": "workspace:*",
+    "@lodestar/plugin-structure": "workspace:*",
+    "vitest": "^4.1.0",
+    "typescript": "^5.6.0"
+  }
+}

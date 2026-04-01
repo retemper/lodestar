@@ -1,0 +1,36 @@
+{
+  "name": "@lodestar/cli",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "CLI for Lodestar architecture rule engine",
+  "license": "MIT",
+  "bin": {
+    "lodestar": "./dist/bin.js"
+  },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@lodestar/types": "workspace:*",
+    "@lodestar/config": "workspace:*",
+    "@lodestar/core": "workspace:*",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/yargs": "^17.0.33",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.0"
+  },
+  "sideEffects": false,
+  "publishConfig": { "access": "public" }
+}

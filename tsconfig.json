@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "packages/types" },
+    { "path": "packages/config" },
+    { "path": "packages/core" },
+    { "path": "packages/cli" },
+    { "path": "packages/plugin-structure" },
+    { "path": "packages/plugin-boundary" },
+    { "path": "packages/plugin-deps" },
+    { "path": "packages/adapter-eslint" },
+    { "path": "packages/adapter-husky" },
+    { "path": "packages/adapter-prettier" },
+    { "path": "packages/preset-lib" },
+    { "path": "packages/preset-app" },
+    { "path": "packages/preset-server" },
+    { "path": "packages/lodestar" }
+  ]
+}

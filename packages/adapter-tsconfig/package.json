@@ -1,0 +1,15 @@
+{
+  "name": "@lodestar/tsconfig",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Shared TypeScript config presets for Lodestar projects",
+  "license": "MIT",
+  "exports": {
+    "./base": "./base.json",
+    "./web": "./web.json",
+    "./server": "./server.json",
+    "./universal": "./universal.json"
+  },
+  "files": ["*.json", "!package.json", "!tsconfig.json"],
+  "publishConfig": { "access": "public" }
+}

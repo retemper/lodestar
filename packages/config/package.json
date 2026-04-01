@@ -1,0 +1,29 @@
+{
+  "name": "@lodestar/config",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Configuration loading and normalization for Lodestar",
+  "license": "MIT",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@lodestar/types": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.0"
+  },
+  "sideEffects": false,
+  "publishConfig": { "access": "public" }
+}
