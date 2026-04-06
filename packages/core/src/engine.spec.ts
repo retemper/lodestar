@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { run, createProviders } from './engine';
-import type { ResolvedConfig, Plugin, RuleDefinition, ToolAdapter, Violation } from '@lodestar/types';
+import type { ResolvedConfig, Plugin, RuleDefinition, ToolAdapter } from '@lodestar/types';
 
 /** 테스트용 최소 ResolvedConfig 생성 */
 function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {

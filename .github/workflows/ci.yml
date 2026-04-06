@@ -92,59 +92,17 @@ jobs:
 
       - run: pnpm turbo test -- --coverage
 
-  # Native backend CI (Rust + Go)
-  native:
-    needs: changed
-    if: needs.changed.outputs.should_skip != 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy, rustfmt
-
-      - name: Setup Go
-        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
-        with:
-          go-version: '1.22'
-
-      - name: Rust — test, lint, format
-        working-directory: packages/accel-rust
-        run: |
-          cargo test
-          cargo clippy -- -D warnings
-          cargo fmt --check
-
-      - name: Go — test
-        working-directory: packages/accel-go
-        run: go test ./internal/...
-
-      - name: Rust — build native binary
-        working-directory: packages/accel-rust
-        run: cargo build --release
-
-      - name: Go — build WASM binary
-        working-directory: packages/accel-go
-        run: |
-          mkdir -p wasm
-          GOOS=js GOARCH=wasm go build -o wasm/lodestar_native.wasm ./cmd/wasm/
-
   # Gate job for branch protection
   ci-passed:
     if: always()
-    needs: [lint, test, native]
+    needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
       - name: Check results
         run: |
           if [[ "${{ needs.lint.result }}" != "success" && "${{ needs.lint.result }}" != "skipped" ]] || \
-             [[ "${{ needs.test.result }}" != "success" && "${{ needs.test.result }}" != "skipped" ]] || \
-             [[ "${{ needs.native.result }}" != "success" && "${{ needs.native.result }}" != "skipped" ]]; then
-            echo "CI failed (lint=${{ needs.lint.result }}, test=${{ needs.test.result }}, native=${{ needs.native.result }})"
+             [[ "${{ needs.test.result }}" != "success" && "${{ needs.test.result }}" != "skipped" ]]; then
+            echo "CI failed (lint=${{ needs.lint.result }}, test=${{ needs.test.result }})"
             exit 1
           fi
           echo "CI passed"

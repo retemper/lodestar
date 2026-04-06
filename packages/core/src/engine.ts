@@ -4,7 +4,6 @@ import type {
   RunSummary,
   Reporter,
   RuleProviders,
-  ScopedRuleConfig,
   ResolvedRuleConfig,
 } from '@lodestar/types';
 import { createFileSystemProvider } from './providers/fs';
