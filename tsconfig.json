@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "packages/types" },
+    { "path": "packages/accel-typescript" },
+    { "path": "packages/config" },
+    { "path": "packages/core" },
+    { "path": "packages/accel-rust" },
+    { "path": "packages/accel-go" },
+    { "path": "packages/accel" },
+    { "path": "packages/cli" },
+    { "path": "plugins/fs-layout" },
+    { "path": "plugins/naming-convention" },
+    { "path": "plugins/import-boundary" },
+    { "path": "plugins/architecture" },
+    { "path": "plugins/dependency-graph" },
+    { "path": "plugins/source-content" },
+    { "path": "packages/adapter-eslint" },
+    { "path": "packages/test-utils" },
+    { "path": "packages/lodestar" }
+  ]
+}

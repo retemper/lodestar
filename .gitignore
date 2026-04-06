@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+*.tsbuildinfo
+.DS_Store
+.context/
+
+# Generated adapter config files (created by lodestar check --fix)
+examples/**/eslint.config.js
+examples/**/.prettierrc
+examples/**/.husky/
+examples/**/.lintstagedrc.json
+examples/**/.commitlintrc.json
+examples/**/knip.json
+examples/**/.stylelintrc.json
+examples/**/biome.json

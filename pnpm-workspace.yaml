@@ -1,0 +1,11 @@
+packages:
+  - packages/*
+  - plugins/*
+  - internal/*
+  - docs
+  - examples/*
+
+approveBuilds: esbuild
+
+ignoredBuiltDependencies:
+  - esbuild

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/retemper/lodestar/discussions
+    about: Use GitHub Discussions for questions and general help. Issues are reserved for bug reports and feature requests.

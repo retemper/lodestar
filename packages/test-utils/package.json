@@ -1,0 +1,31 @@
+{
+  "name": "@lodestar/test-utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Testing utilities for Lodestar plugin development",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "lodestar": "lodestar check"
+  },
+  "dependencies": {
+    "@lodestar/types": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0"
+  },
+  "sideEffects": false
+}

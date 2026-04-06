@@ -1,0 +1,242 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import type { RunSummary, WrittenConfig } from 'lodestar';
+import type { WorkspaceSummary } from 'lodestar';
+
+vi.mock('lodestar', () => ({
+  loadConfigFile: vi.fn(),
+  discoverWorkspaces: vi.fn(),
+  resolveConfig: vi.fn(() => ({
+    rootDir: '/fake',
+    plugins: [],
+    rules: new Map(),
+    scopedRules: [],
+    baseline: null,
+    adapters: [],
+  })),
+  run: vi.fn(),
+  runWorkspace: vi.fn(),
+}));
+
+vi.mock('../reporters/console', () => ({
+  createConsoleReporter: vi.fn(() => ({
+    name: 'console',
+    onStart: vi.fn(),
+    onRuleStart: vi.fn(),
+    onRuleComplete: vi.fn(),
+    onViolation: vi.fn(),
+    onComplete: vi.fn(),
+    onPackageStart: vi.fn(),
+    onPackageComplete: vi.fn(),
+  })),
+}));
+
+import { checkCommand } from './check';
+import { loadConfigFile, discoverWorkspaces } from 'lodestar';
+import { run, runWorkspace } from 'lodestar';
+
+const mockLoadConfigFile = vi.mocked(loadConfigFile);
+const mockDiscoverWorkspaces = vi.mocked(discoverWorkspaces);
+const mockRun = vi.mocked(run);
+const mockRunWorkspace = vi.mocked(runWorkspace);
+
+/** Create a minimal RunSummary for testing */
+function makeSummary(overrides: Partial<RunSummary> = {}): RunSummary {
+  return {
+    totalFiles: 0,
+    totalRules: 0,
+    violations: [],
+    ruleResults: [],
+    errorCount: 0,
+    warnCount: 0,
+    durationMs: 0,
+    ...overrides,
+  };
+}
+
+/** Create a minimal WorkspaceSummary for testing */
+function makeWorkspaceSummary(overrides: Partial<WorkspaceSummary> = {}): WorkspaceSummary {
+  return {
+    rootSummary: makeSummary(),
+    packages: [],
+    totalErrorCount: 0,
+    totalWarnCount: 0,
+    totalDurationMs: 0,
+    ...overrides,
+  };
+}
+
+/** Minimal WrittenConfig fixture */
+const stubConfig: WrittenConfig = { plugins: [], rules: {} };
+
+describe('checkCommand', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    process.exitCode = undefined;
+
+    mockLoadConfigFile.mockResolvedValue(null);
+    mockDiscoverWorkspaces.mockResolvedValue([]);
+    mockRun.mockResolvedValue(makeSummary());
+    mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary());
+  });
+
+  afterEach(() => {
+    process.exitCode = undefined;
+  });
+
+  describe('설정 파일이 없는 경우', () => {
+    it('에러 메시지를 출력하고 exitCode를 1로 설정한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(null);
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('No lodestar.config.ts found'),
+        expect.any(String),
+      );
+      expect(process.exitCode).toBe(1);
+    });
+
+    it('run이나 runWorkspace를 호출하지 않는다', async () => {
+      mockLoadConfigFile.mockResolvedValue(null);
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      expect(mockRun).not.toHaveBeenCalled();
+      expect(mockRunWorkspace).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('단일 프로젝트 모드', () => {
+    it('워크스페이스가 없으면 run을 호출한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      expect(mockRun).toHaveBeenCalledTimes(1);
+      expect(mockRunWorkspace).not.toHaveBeenCalled();
+    });
+
+    it('에러가 없으면 exitCode를 설정하지 않는다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary({ errorCount: 0, warnCount: 3 }));
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      expect(process.exitCode).toBeUndefined();
+    });
+
+    it('에러가 있으면 exitCode를 1로 설정한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary({ errorCount: 2 }));
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      expect(process.exitCode).toBe(1);
+    });
+  });
+
+  describe('워크스페이스 모드', () => {
+    it('워크스페이스가 감지되면 runWorkspace를 호출한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([
+        { name: '@lodestar/core', dir: '/fake/packages/core' },
+      ]);
+      mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary());
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      expect(mockRunWorkspace).toHaveBeenCalledTimes(1);
+      expect(mockRun).not.toHaveBeenCalled();
+    });
+
+    it('--workspace 플래그가 true이면 워크스페이스 모드를 강제한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary());
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console', workspace: true });
+
+      expect(mockRunWorkspace).toHaveBeenCalledTimes(1);
+      expect(mockDiscoverWorkspaces).not.toHaveBeenCalled();
+    });
+
+    it('--workspace 플래그가 false이면 단일 프로젝트 모드를 강제한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console', workspace: false });
+
+      expect(mockRun).toHaveBeenCalledTimes(1);
+      expect(mockRunWorkspace).not.toHaveBeenCalled();
+      expect(mockDiscoverWorkspaces).not.toHaveBeenCalled();
+    });
+
+    it('워크스페이스 모드에서 에러가 있으면 exitCode를 1로 설정한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([
+        { name: '@lodestar/core', dir: '/fake/packages/core' },
+      ]);
+      mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary({ totalErrorCount: 5 }));
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      expect(process.exitCode).toBe(1);
+    });
+
+    it('워크스페이스 모드에서 경고만 있으면 exitCode를 설정하지 않는다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([
+        { name: '@lodestar/core', dir: '/fake/packages/core' },
+      ]);
+      mockRunWorkspace.mockResolvedValue(
+        makeWorkspaceSummary({
+          totalErrorCount: 0,
+          totalWarnCount: 7,
+        }),
+      );
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      expect(process.exitCode).toBeUndefined();
+    });
+
+    it('패키지 수를 포함한 합계 메시지를 출력한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([
+        { name: '@lodestar/core', dir: '/fake/packages/core' },
+      ]);
+      mockRunWorkspace.mockResolvedValue(
+        makeWorkspaceSummary({
+          packages: [
+            {
+              package: { name: '@lodestar/core', dir: '/fake/packages/core' },
+              summary: makeSummary(),
+            },
+            {
+              package: { name: '@lodestar/cli', dir: '/fake/packages/cli' },
+              summary: makeSummary(),
+            },
+          ],
+          totalErrorCount: 1,
+          totalWarnCount: 2,
+          totalDurationMs: 100,
+        }),
+      );
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const totalLine = calls.find((c) => c.includes('Total:'));
+      expect(totalLine).toContain('1 errors');
+      expect(totalLine).toContain('2 warnings');
+      expect(totalLine).toContain('3 packages');
+    });
+  });
+});

@@ -1,0 +1,224 @@
+# Lodestar — Full API Reference for LLMs
+
+## Rule Authoring API
+
+### defineRule<TOptions>(definition)
+
+```ts
+import { defineRule } from 'lodestar';
+
+const myRule = defineRule<{ max: number }>({
+  name: 'my-plugin/my-rule',       // {plugin-namespace}/{rule-name}
+  description: 'What this rule checks',
+  needs: ['fs'],                    // 'fs' | 'graph' | 'ast' | 'config'
+  schema: { type: 'object', ... }, // JSON Schema for options validation
+  async check(ctx) {
+    // ctx.rootDir     — absolute project root
+    // ctx.options     — typed TOptions from user config
+    // ctx.providers   — data source providers
+    // ctx.report({ message, location? }) — report a violation
+  },
+});
+```
+
+### definePlugin(factory)
+
+```ts
+import { definePlugin } from 'lodestar';
+
+const myPlugin = definePlugin(() => ({
+  name: 'my-plugin',
+  rules: [rule1, rule2],
+}));
+
+export { myPlugin };  // named export, NOT default
+```
+
+### defineConfig(config)
+
+```ts
+import { defineConfig } from 'lodestar';
+import { pluginFs } from '@lodestar/plugin-fs-layout';
+
+export default defineConfig({
+  plugins: [pluginFs],                    // direct imports (preferred)
+  rules: {
+    'fs-layout/directory-exists': {
+      severity: 'error',                  // 'error' | 'warn' | 'off'
+      options: { required: ['src'] },
+    },
+  },
+  include: ['src/**/*.ts'],               // optional, default: ['**/*']
+  exclude: ['node_modules/**'],           // optional
+  root: true,                             // don't inherit parent config
+  baseline: '.lodestar-baseline.json',    // suppress existing violations
+});
+```
+
+## Providers
+
+### FileSystemProvider (needs: ['fs'])
+
+```ts
+ctx.providers.fs.glob(pattern: string): Promise<readonly string[]>
+ctx.providers.fs.readFile(path: string): Promise<string>
+ctx.providers.fs.exists(path: string): Promise<boolean>
+ctx.providers.fs.readJson<T>(path: string): Promise<T>
+```
+
+### DependencyGraphProvider (needs: ['graph'])
+
+```ts
+ctx.providers.graph.getDependencies(file: string): Promise<readonly string[]>
+ctx.providers.graph.getDependents(file: string): Promise<readonly string[]>
+ctx.providers.graph.hasCircular(entry: string): Promise<boolean>
+ctx.providers.graph.getModuleGraph(): Promise<ModuleGraph>
+```
+
+### ASTProvider (needs: ['ast'])
+
+```ts
+ctx.providers.ast.getSourceFile(path: string): Promise<unknown>  // SWC Module
+ctx.providers.ast.getImports(path: string): Promise<readonly ImportInfo[]>
+ctx.providers.ast.getExports(path: string): Promise<readonly ExportInfo[]>
+```
+
+ImportInfo: `{ source, specifiers: string[], isTypeOnly, location: { file, line?, column? } }`
+ExportInfo: `{ name, isTypeOnly, isDefault, source?: string }` (source present for re-exports)
+
+### ConfigFileProvider (needs: ['config'])
+
+```ts
+ctx.providers.config.getPackageJson(dir?): Promise<Record<string, unknown>>
+ctx.providers.config.getTsConfig(dir?): Promise<Record<string, unknown>>
+ctx.providers.config.getCustomConfig<T>(filename, dir?): Promise<T>
+```
+
+## Plugin Reference
+
+### @lodestar/plugin-fs-layout
+
+**fs-layout/directory-exists**
+```ts
+options: { required: string[] }  // supports glob patterns: 'src/rules/*/index.ts'
+```
+
+**fs-layout/no-forbidden-path**
+```ts
+options: { patterns: string[] }  // glob patterns for forbidden files
+```
+
+**fs-layout/paired-files**
+```ts
+options: {
+  pairs: [{
+    source: string,                      // glob for source files
+    required: string | string[],         // template(s): '{dir}/{name}.spec.ts'
+    message?: string,
+  }]
+}
+```
+
+### @lodestar/plugin-naming-convention
+
+**naming-convention/file-naming**
+```ts
+options: {
+  scopes: [{
+    include: string,                     // glob pattern
+    convention?: 'kebab-case' | 'camelCase' | 'PascalCase' | 'snake_case',
+    regex?: string,                      // overrides convention
+    message?: string,
+    exclude?: string[],
+  }]
+}
+```
+
+### @lodestar/plugin-import-boundary
+
+**import-boundary/no-deep-import**
+```ts
+options: {
+  modules: string[],     // dirs requiring barrel imports
+  allow?: string[],      // permitted deep import paths
+  include?: string[],
+  exclude?: string[],
+}
+```
+
+**import-boundary/manifest-imports**
+```ts
+options: {
+  manifestFile?: string,  // default: 'module.json'
+  include?: string[],     // default: ['**/*.ts']
+  exclude?: string[],
+}
+```
+
+
+```ts
+options: {
+  allow: string[]  // e.g. ['@lodestar/types', '@lodestar/config']
+}
+```
+### @lodestar/plugin-dependency-graph
+
+**dependency-graph/no-circular**
+```ts
+options: {
+  entries?: string[],   // glob for entry points (default: all)
+  ignore?: string[],    // glob for files to skip
+  maxDepth?: number,    // max cycle chain length
+}
+```
+
+**dependency-graph/no-circular-packages**
+```ts
+options: {
+  scope?: string  // e.g. '@lodestar' — auto-detected if omitted
+}
+```
+Detects cycles between workspace packages via package.json dependencies.
+
+### @lodestar/plugin-source-content
+
+**source-content/no-restricted-text**
+```ts
+options: {
+  include: string[],
+  exclude?: string[],
+  presets?: ('no-korean' | 'no-japanese' | 'no-chinese' | 'ascii-only' | 'no-todo')[],
+  patterns?: [{ regex: string, flags?: string, message: string }],
+}
+```
+
+**source-content/barrel-only**
+```ts
+options: {
+  include: string[],   // glob for barrel files
+  exclude?: string[],
+}
+```
+Ensures files contain only re-exports (all exports have a `source` field in AST).
+
+## CLI
+
+```sh
+npx lodestar check [--workspace | --no-workspace]
+npx lodestar init
+```
+
+Exit code 0 = no errors. Exit code 1 = errors found. Warnings don't fail.
+
+## Workspace Mode
+
+Auto-detected when pnpm-workspace.yaml exists. Root config runs globally, per-package `lodestar.config.ts` files run scoped. Packages without their own config are skipped. `root: true` opts out of inheritance.
+
+## Native Acceleration
+
+```sh
+pnpm add -D @lodestar/accel-rust   # napi-rs, ~10-15x
+pnpm add -D @lodestar/accel-go     # WASM, ~3-5x
+```
+
+Auto-detected, no config needed. Falls back to TypeScript (SWC) implementation.

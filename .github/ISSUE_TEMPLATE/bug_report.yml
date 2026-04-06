@@ -1,0 +1,91 @@
+name: Bug Report
+description: Report a bug in lodestar
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please fill out the sections below so we can reproduce and fix the issue.
+
+  - type: checkboxes
+    id: validations
+    attributes:
+      label: Validations
+      options:
+        - label: I have searched the [existing issues](https://github.com/retemper/lodestar/issues) and this bug has not been reported yet.
+          required: true
+        - label: I have read the [Contributing guide](https://github.com/retemper/lodestar/blob/main/CONTRIBUTING.md).
+          required: true
+
+  - type: input
+    id: package
+    attributes:
+      label: Package
+      description: Which lodestar package is affected?
+      placeholder: '@lodestar/core'
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: '1.0.0'
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear description of what the bug is. What did you expect to happen? What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: |
+        Please provide a minimal reproduction. This can be:
+        - A link to a repository that reproduces the issue
+        - A code snippet that reproduces the issue
+
+        Without a reproduction, we may not be able to investigate the issue.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the steps to reproduce the bug.
+      placeholder: |
+        1. Install `@lodestar/core`
+        2. Create a `lodestar.config.ts` with ...
+        3. Run `lodestar check`
+        4. See error ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Paste the output of the following command, or fill in manually.
+      render: shell
+      placeholder: |
+        Node.js: v22.x.x
+        pnpm: 10.x.x
+        OS: macOS / Linux / Windows
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: If applicable, paste relevant error logs or stack traces.
+      render: shell
+    validations:
+      required: false
