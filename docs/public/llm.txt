@@ -1,0 +1,51 @@
+# Lodestar — Declare your architecture. Enforce it.
+
+Intra-package architecture rules that ESLint can't do — layer dependencies, module boundaries, circular imports. Define your architecture in `lodestar.config.ts`, enforce it in CI, visualize it as a diagram.
+
+## The Problem
+
+Every project has unwritten architecture rules — "domain shouldn't import infra", "use the barrel, not internals", "no circular dependencies". These rules live in people's heads and erode silently.
+
+## The Solution
+
+```ts
+// lodestar.config.ts
+import { pluginArchitecture } from '@lodestar/plugin-architecture';
+
+export default defineConfig({
+  plugins: [pluginArchitecture],
+  rules: {
+    'architecture/layers': {
+      severity: 'error',
+      options: {
+        layers: [
+          { name: 'domain', path: 'src/domain/**' },
+          { name: 'application', path: 'src/application/**', canImport: ['domain'] },
+          { name: 'infra', path: 'src/infra/**', canImport: ['domain', 'application'] },
+        ],
+      },
+    },
+  },
+});
+```
+
+## Commands
+
+- `lodestar check` — enforce architecture rules
+- `lodestar graph --layers` — visualize layer-level architecture
+- `lodestar graph` — visualize file-level dependency graph
+- `lodestar impact <file>` — show files affected by a change
+- `lodestar init` — create config file
+
+## Rules (plugin-architecture)
+
+- `architecture/layers` — dependency direction between layers
+- `architecture/modules` — module boundary encapsulation (barrel imports)
+- `architecture/no-circular` — circular dependency detection
+- `architecture/no-circular-packages` — circular package dependency detection
+
+## Links
+
+- Docs: https://retemper.github.io/lodestar/
+- GitHub: https://github.com/retemper/lodestar
+- Full API: /llm-full.txt

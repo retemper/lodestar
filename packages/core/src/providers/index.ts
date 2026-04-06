@@ -1,4 +1,4 @@
-export { createFileSystemProvider } from './fs.js';
-export { createGraphProvider } from './graph.js';
-export { createASTProvider } from './ast.js';
-export { createConfigFileProvider } from './config-file.js';
+export { createFileSystemProvider } from './fs';
+export { createGraphProvider } from './graph';
+export { createASTProvider } from './ast';
+export { createConfigFileProvider } from './config-file';

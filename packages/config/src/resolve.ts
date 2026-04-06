@@ -1,67 +1,129 @@
 import type {
   WrittenConfig,
+  WrittenConfigBlock,
   ResolvedConfig,
+  ResolvedPlugin,
   ResolvedRuleConfig,
+  ScopedRuleConfig,
   Severity,
   WrittenRuleConfig,
+  PluginEntry,
+  Plugin,
+  ToolAdapter,
 } from '@lodestar/types';
 
-/** Normalize a WrittenConfig into a fully resolved ResolvedConfig */
+/**
+ * Normalize a flat config (single block or array) into a fully resolved config.
+ * @param written - user-authored config to normalize
+ * @param rootDir - absolute path used as the resolution base
+ */
 function resolveConfig(written: WrittenConfig, rootDir: string): ResolvedConfig {
-  const rules = new Map<string, ResolvedRuleConfig>();
+  const blocks = Array.isArray(written) ? [...written] : [written];
 
-  if (written.rules) {
-    for (const [ruleId, config] of Object.entries(written.rules)) {
-      rules.set(ruleId, normalizeRuleConfig(ruleId, config));
+  const allPlugins: ResolvedPlugin[] = [];
+  const pluginIds = new Set<string>();
+  const globalRules = new Map<string, ResolvedRuleConfig>();
+  const scopedRules: ScopedRuleConfig[] = [];
+  const adapterMap = new Map<string, ToolAdapter>();
+
+  for (const block of blocks) {
+    // Collect plugins (deduplicate by ID)
+    for (const entry of block.plugins ?? []) {
+      const resolved = resolvePluginEntry(entry);
+      if (!pluginIds.has(resolved.name)) {
+        pluginIds.add(resolved.name);
+        allPlugins.push(resolved);
+      }
+    }
+
+    // Collect adapters (deduplicate by name, last wins)
+    for (const adapter of block.adapters ?? []) {
+      adapterMap.set(adapter.name, adapter);
+    }
+
+    // Collect rules — global or scoped
+    if (block.rules && Object.keys(block.rules).length > 0) {
+      const resolvedRules = new Map<string, ResolvedRuleConfig>();
+      for (const [ruleId, ruleConfig] of Object.entries(block.rules)) {
+        resolvedRules.set(
+          ruleId,
+          normalizeRuleConfig(ruleId, ruleConfig as Severity | WrittenRuleConfig),
+        );
+      }
+
+      if (block.files) {
+        scopedRules.push({
+          files: [...block.files],
+          ignores: [...(block.ignores ?? [])],
+          rules: resolvedRules,
+        });
+      } else {
+        for (const [ruleId, config] of resolvedRules) {
+          globalRules.set(ruleId, config);
+        }
+      }
     }
   }
 
-  const plugins = (written.plugins ?? []).map((entry) => {
-    if (typeof entry === 'string') {
-      return { name: entry, options: {} };
-    }
-    return { name: entry[0], options: entry[1] ?? {} };
-  });
-
   return {
     rootDir,
-    plugins,
-    rules,
-    include: written.include ? [...written.include] : ['**/*'],
-    exclude: written.exclude ? [...written.exclude] : ['node_modules/**', 'dist/**'],
-    baseline: normalizeBaseline(written.baseline),
+    plugins: allPlugins,
+    rules: globalRules,
+    scopedRules,
+    adapters: [...adapterMap.values()],
+    baseline: null,
   };
 }
 
-/** Normalize shorthand severity or full rule config */
+/**
+ * Resolve a single plugin entry into a ResolvedPlugin.
+ * @param entry - plugin entry in any supported format
+ */
+function resolvePluginEntry(entry: PluginEntry): ResolvedPlugin {
+  if (typeof entry === 'string') {
+    return { name: entry, plugin: { name: entry, rules: [] }, options: {} };
+  }
+
+  if (Array.isArray(entry)) {
+    const [pluginOrName, options] = entry;
+    if (typeof pluginOrName === 'string') {
+      return {
+        name: pluginOrName,
+        plugin: { name: pluginOrName, rules: [] },
+        options: { ...options },
+      };
+    }
+    const plugin = pluginOrName();
+    return { name: plugin.name, plugin: plugin as Plugin, options: { ...options } };
+  }
+
+  if (typeof entry === 'function') {
+    const result = entry();
+    const plugin = result as Plugin;
+    return { name: plugin.name, plugin, options: {} };
+  }
+
+  const plugin = entry as Plugin;
+  return { name: plugin.name, plugin, options: {} };
+}
+
+/**
+ * Normalize a rule config from shorthand or full form.
+ * @param ruleId - the rule identifier
+ * @param config - severity string or full WrittenRuleConfig
+ */
 function normalizeRuleConfig(
   ruleId: string,
   config: Severity | WrittenRuleConfig,
 ): ResolvedRuleConfig {
   if (typeof config === 'string') {
-    return {
-      ruleId,
-      severity: config,
-      options: {},
-      include: [],
-      exclude: [],
-    };
+    return { ruleId, severity: config, options: {} };
   }
-
   return {
     ruleId,
     severity: config.severity,
-    options: config.options ?? {},
-    include: config.include ? [...config.include] : [],
-    exclude: config.exclude ? [...config.exclude] : [],
+    options: config.options ? { ...config.options } : {},
   };
 }
 
-/** Normalize baseline setting */
-function normalizeBaseline(baseline: string | boolean | undefined): string | null {
-  if (baseline === true) return '.lodestar-baseline.json';
-  if (typeof baseline === 'string') return baseline;
-  return null;
-}
-
-export { resolveConfig, normalizeRuleConfig, normalizeBaseline };
+export { resolveConfig, resolvePluginEntry, normalizeRuleConfig };

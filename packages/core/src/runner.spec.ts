@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { RuleDefinition, RuleProviders, ResolvedRuleConfig } from '@lodestar/types';
-import { runRule, runRules } from './runner.js';
+import { runRule, runRules } from './runner';
 
 /** Creates mock providers for testing */
 function createMockProviders(): RuleProviders {

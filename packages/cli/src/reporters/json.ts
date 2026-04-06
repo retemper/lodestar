@@ -1,4 +1,4 @@
-import type { Reporter, Violation, RunSummary } from '@lodestar/types';
+import type { Reporter, Violation, RunSummary } from 'lodestar';
 
 /** Create a JSON reporter that outputs structured results to stdout */
 function createJsonReporter(): Reporter {
@@ -6,10 +6,13 @@ function createJsonReporter(): Reporter {
 
   return {
     name: 'json',
+    /** No-op -- JSON output is deferred to onComplete */
     onStart() {},
+    /** Collect each violation for later serialization */
     onViolation(violation: Violation) {
       violations.push(violation);
     },
+    /** Serialize all collected violations and the summary to stdout as JSON */
     onComplete(summary: RunSummary) {
       const output = {
         violations,

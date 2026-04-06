@@ -1,8 +1,8 @@
 {
   "private": true,
   "type": "module",
-  "name": "lodestar",
-  "description": "Pluggable, declarative architecture rule engine for any project",
+  "name": "lodestar-monorepo",
+  "description": "Declarative project governance framework",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,21 +16,20 @@
   },
   "keywords": [
     "architecture",
-    "linter",
-    "module-boundary",
-    "structure-guard",
-    "rule-engine",
+    "governance",
+    "rules",
+    "linting",
     "monorepo",
-    "eslint-plugin"
+    "project-structure",
+    "module-boundary",
+    "dependency-graph"
   ],
   "scripts": {
-    "build": "turbo build",
-    "test": "turbo test",
-    "type-check": "turbo type-check",
-    "lint": "turbo lint",
-    "dev": "turbo dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "docs:dev": "pnpm --filter @lodestar/docs dev",
+    "docs:build": "pnpm --filter @lodestar/docs build",
+    "docs:preview": "pnpm --filter @lodestar/docs preview",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish"
@@ -39,13 +38,27 @@
     "@changesets/changelog-github": "^0.6.0",
     "@changesets/cli": "^2.30.0",
     "@eslint/js": "^10.0.1",
+    "@lodestar/adapter-commitlint": "workspace:*",
+    "@lodestar/adapter-eslint": "workspace:*",
+    "@lodestar/adapter-husky": "workspace:*",
+    "@lodestar/adapter-knip": "workspace:*",
+    "@lodestar/adapter-lint-staged": "workspace:*",
+    "@lodestar/adapter-prettier": "workspace:*",
+    "@lodestar/adapter-stylelint": "workspace:*",
+    "@lodestar/cli": "workspace:*",
+    "@lodestar/plugin-architecture": "workspace:*",
+    "@lodestar/plugin-structure": "workspace:*",
     "@types/node": "^25.5.0",
     "@vitest/coverage-v8": "^4.1.0",
     "eslint": "^10.1.0",
+    "eslint-plugin-import-x": "^4.16.2",
+    "eslint-plugin-unicorn": "^64.0.0",
+    "lodestar": "workspace:*",
     "prettier": "^3.4.0",
     "turbo": "^2.3.0",
     "typescript": "^5.6.0",
-    "typescript-eslint": "^8.57.1"
+    "typescript-eslint": "^8.57.1",
+    "@repo/lodestar-config": "workspace:*"
   },
   "packageManager": "pnpm@10.22.0"
 }

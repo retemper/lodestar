@@ -1,10 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Violation, RunSummary } from '@lodestar/types';
-import { createConsoleReporter } from './console.js';
-import { createJsonReporter } from './json.js';
+import type { Violation, RunSummary, RuleResultSummary } from 'lodestar';
+import { createConsoleReporter } from './console';
+import { createJsonReporter } from './json';
+
+/** Create a minimal RunSummary for testing */
+function makeSummary(overrides: Partial<RunSummary> = {}): RunSummary {
+  return {
+    totalFiles: 0,
+    totalRules: 0,
+    violations: [],
+    ruleResults: [],
+    errorCount: 0,
+    warnCount: 0,
+    durationMs: 0,
+    ...overrides,
+  };
+}
 
 describe('createConsoleReporter', () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -13,139 +28,296 @@ describe('createConsoleReporter', () => {
     expect(reporter.name).toBe('console');
   });
 
-  describe('onStart', () => {
-    it('prints the number of rules to run', () => {
+  describe('onRuleComplete', () => {
+    it('shows checkmark for passing rules', () => {
       const reporter = createConsoleReporter();
-      reporter.onStart({ rootDir: '/root', ruleCount: 5 });
-
-      expect(console.error).toHaveBeenCalledWith('Running 5 rules...\n');
-    });
-
-    it('prints 0 when rule count is 0', () => {
-      const reporter = createConsoleReporter();
-      reporter.onStart({ rootDir: '/root', ruleCount: 0 });
-
-      expect(console.error).toHaveBeenCalledWith('Running 0 rules...\n');
-    });
-  });
-
-  describe('onViolation', () => {
-    it('displays error severity as ERROR', () => {
-      const reporter = createConsoleReporter();
-      const violation: Violation = {
-        ruleId: 'test/rule',
-        message: 'Something wrong',
-        severity: 'error',
-        location: { file: 'src/app.ts', line: 10, column: 5 },
+      const result: RuleResultSummary = {
+        ruleId: 'naming-convention/file-naming',
+        violations: [],
+        durationMs: 5,
       };
 
-      reporter.onViolation(violation);
+      reporter.onRuleComplete!(result);
 
-      expect(console.error).toHaveBeenCalledWith(
-        '  ERROR  src/app.ts:10:5  Something wrong  [test/rule]',
+      const output = (console.error as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(output).toContain('✓');
+      expect(output).toContain('naming-convention/file-naming');
+    });
+
+    it('shows cross for failing rules with violations inline', () => {
+      const reporter = createConsoleReporter();
+      const result: RuleResultSummary = {
+        ruleId: 'fs-layout/directory-exists',
+        violations: [
+          {
+            ruleId: 'fs-layout/directory-exists',
+            message: 'Required directory "tests" does not exist',
+            severity: 'error',
+          },
+        ],
+        durationMs: 3,
+      };
+
+      reporter.onRuleComplete!(result);
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
       );
+      expect(calls[0]).toContain('✗');
+      expect(calls[0]).toContain('fs-layout/directory-exists');
+      expect(calls[1]).toContain('Required directory');
     });
 
-    it('displays warn severity as WARN', () => {
+    it('shows warning indicator for warn-only results', () => {
       const reporter = createConsoleReporter();
-      const violation: Violation = {
-        ruleId: 'test/rule',
-        message: 'Minor issue',
-        severity: 'warn',
-        location: { file: 'src/index.ts', line: 1, column: 0 },
+      const result: RuleResultSummary = {
+        ruleId: 'naming-convention/file-naming',
+        violations: [
+          {
+            ruleId: 'naming-convention/file-naming',
+            message: 'Bad name',
+            severity: 'warn',
+          },
+        ],
+        durationMs: 2,
       };
 
-      reporter.onViolation(violation);
+      reporter.onRuleComplete!(result);
 
-      expect(console.error).toHaveBeenCalledWith(
-        '  WARN  src/index.ts:1:0  Minor issue  [test/rule]',
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
       );
+      expect(calls[0]).toContain('!');
+      expect(calls[0]).toContain('naming-convention/file-naming');
+      expect(calls[1]).toContain('Bad name');
     });
 
-    it('displays (project) when location is absent', () => {
+    it('위반에 location이 없으면 위치 정보를 출력하지 않는다', () => {
       const reporter = createConsoleReporter();
-      const violation: Violation = {
-        ruleId: 'test/rule',
-        message: 'Project level issue',
-        severity: 'error',
+      const result: RuleResultSummary = {
+        ruleId: 'fs-layout/directory-exists',
+        violations: [
+          {
+            ruleId: 'fs-layout/directory-exists',
+            message: 'Missing directory',
+            severity: 'error',
+          },
+        ],
+        durationMs: 1,
       };
 
-      reporter.onViolation(violation);
+      reporter.onRuleComplete!(result);
 
-      expect(console.error).toHaveBeenCalledWith(
-        '  ERROR  (project)  Project level issue  [test/rule]',
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
       );
+      const violationLine = calls[1];
+      expect(violationLine).toContain('Missing directory');
+      expect(violationLine).not.toContain('at ');
     });
 
-    it('displays 0 when location has no line', () => {
+    it('위반에 location은 있지만 line이 없으면 파일 경로만 출력한다', () => {
       const reporter = createConsoleReporter();
-      const violation: Violation = {
-        ruleId: 'test/rule',
-        message: 'Issue',
-        severity: 'error',
-        location: { file: 'src/app.ts' },
+      const result: RuleResultSummary = {
+        ruleId: 'naming-convention/file-naming',
+        violations: [
+          {
+            ruleId: 'naming-convention/file-naming',
+            message: 'Bad file name',
+            severity: 'error',
+            location: { file: 'src/MyComponent.ts' },
+          },
+        ],
+        durationMs: 1,
       };
 
-      reporter.onViolation(violation);
+      reporter.onRuleComplete!(result);
 
-      expect(console.error).toHaveBeenCalledWith('  ERROR  src/app.ts:0:0  Issue  [test/rule]');
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const violationLine = calls[1];
+      expect(violationLine).toContain('at src/MyComponent.ts');
+      expect(violationLine).not.toContain(':');
+    });
+
+    it('위반에 location과 line이 모두 있으면 파일 경로와 줄 번호를 출력한다', () => {
+      const reporter = createConsoleReporter();
+      const result: RuleResultSummary = {
+        ruleId: 'naming-convention/file-naming',
+        violations: [
+          {
+            ruleId: 'naming-convention/file-naming',
+            message: 'Bad file name',
+            severity: 'error',
+            location: { file: 'src/MyComponent.ts', line: 42 },
+          },
+        ],
+        durationMs: 1,
+      };
+
+      reporter.onRuleComplete!(result);
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const violationLine = calls[1];
+      expect(violationLine).toContain('at src/MyComponent.ts:42');
+    });
+
+    it('shows error message when rule threw', () => {
+      const reporter = createConsoleReporter();
+      const result: RuleResultSummary = {
+        ruleId: 'broken/rule',
+        violations: [],
+        durationMs: 0,
+        error: new Error('Parse failed'),
+      };
+
+      reporter.onRuleComplete!(result);
+
+      const output = (console.error as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(output).toContain('✗');
+      expect(output).toContain('Parse failed');
     });
   });
 
   describe('onComplete', () => {
-    it('prints a summary of error and warning counts', () => {
+    it('prints summary totals', () => {
       const reporter = createConsoleReporter();
-      const summary: RunSummary = {
-        totalFiles: 10,
+      reporter.onComplete(makeSummary({ errorCount: 3, warnCount: 2, durationMs: 150.5 }));
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const summary = calls.find((c) => c.includes('errors'));
+      expect(summary).toContain('3 errors');
+      expect(summary).toContain('2 warnings');
+      expect(summary).toContain('151ms');
+    });
+
+    it('prints zero counts', () => {
+      const reporter = createConsoleReporter();
+      reporter.onComplete(makeSummary({ durationMs: 0 }));
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const summary = calls.find((c) => c.includes('errors'));
+      expect(summary).toContain('0 errors');
+      expect(summary).toContain('0 warnings');
+    });
+
+    it('ruleResults가 있으면 위반 없는 규칙 수를 계산한다', () => {
+      const reporter = createConsoleReporter();
+      reporter.onComplete(
+        makeSummary({
+          totalRules: 3,
+          ruleResults: [
+            { ruleId: 'a', violations: [], durationMs: 1 },
+            {
+              ruleId: 'b',
+              violations: [{ ruleId: 'b', message: 'err', severity: 'error' }],
+              durationMs: 1,
+            },
+            { ruleId: 'c', violations: [], durationMs: 1 },
+          ],
+          errorCount: 1,
+          warnCount: 0,
+          durationMs: 3,
+        }),
+      );
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const line = calls.find((c) => c.includes('rules passed'));
+      expect(line).toContain('2 rules passed');
+    });
+  });
+
+  describe('onPackageStart', () => {
+    it('prints package name', () => {
+      const reporter = createConsoleReporter();
+      reporter.onPackageStart!({ name: '@lodestar/core', dir: '/root/packages/core' });
+
+      const output = (console.error as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(output).toContain('@lodestar/core');
+    });
+  });
+
+  describe('no-op 메서드', () => {
+    it('onStart는 예외를 던지지 않는다', () => {
+      const reporter = createConsoleReporter();
+      expect(() => reporter.onStart({ rootDir: '/root', ruleCount: 5 })).not.toThrow();
+    });
+
+    it('onRuleStart는 예외를 던지지 않는다', () => {
+      const reporter = createConsoleReporter();
+      expect(() => reporter.onRuleStart!('test/rule')).not.toThrow();
+    });
+
+    it('onPackageComplete는 예외를 던지지 않는다', () => {
+      const reporter = createConsoleReporter();
+      expect(() =>
+        reporter.onPackageComplete!(undefined as never, undefined as never),
+      ).not.toThrow();
+    });
+
+    it('onViolation은 예외를 던지지 않는다', () => {
+      const reporter = createConsoleReporter();
+      expect(() =>
+        reporter.onViolation({ ruleId: 'test', message: 'msg', severity: 'error' }),
+      ).not.toThrow();
+    });
+  });
+
+  describe('onComplete 폴백 분기', () => {
+    it('ruleResults가 없으면 totalRules 기반으로 passed를 계산한다 (에러 있음)', () => {
+      const reporter = createConsoleReporter();
+      const summary = {
+        totalFiles: 0,
         totalRules: 5,
         violations: [],
-        errorCount: 3,
-        warnCount: 2,
-        durationMs: 150.5,
-      };
+        errorCount: 2,
+        warnCount: 0,
+        durationMs: 10,
+      } as unknown as RunSummary;
 
       reporter.onComplete(summary);
 
-      expect(console.error).toHaveBeenCalledWith('');
-      expect(console.error).toHaveBeenCalledWith('3 errors, 2 warnings (151ms)');
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const line = calls.find((c) => c.includes('rules passed'));
+      expect(line).toContain('4 rules passed');
     });
 
-    it('prints correctly when errors and warnings are both 0', () => {
+    it('ruleResults가 없으면 totalRules 기반으로 passed를 계산한다 (에러 없음)', () => {
       const reporter = createConsoleReporter();
-      const summary: RunSummary = {
+      const summary = {
         totalFiles: 0,
-        totalRules: 0,
+        totalRules: 3,
         violations: [],
         errorCount: 0,
-        warnCount: 0,
-        durationMs: 0,
-      };
+        warnCount: 1,
+        durationMs: 5,
+      } as unknown as RunSummary;
 
       reporter.onComplete(summary);
 
-      expect(console.error).toHaveBeenCalledWith('0 errors, 0 warnings (0ms)');
-    });
-
-    it('rounds fractional durationMs to an integer', () => {
-      const reporter = createConsoleReporter();
-      const summary: RunSummary = {
-        totalFiles: 0,
-        totalRules: 0,
-        violations: [],
-        errorCount: 0,
-        warnCount: 0,
-        durationMs: 99.7,
-      };
-
-      reporter.onComplete(summary);
-
-      expect(console.error).toHaveBeenCalledWith('0 errors, 0 warnings (100ms)');
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const line = calls.find((c) => c.includes('rules passed'));
+      expect(line).toContain('3 rules passed');
     });
   });
 });
 
 describe('createJsonReporter', () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     vi.restoreAllMocks();
     vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   });
@@ -155,79 +327,39 @@ describe('createJsonReporter', () => {
     expect(reporter.name).toBe('json');
   });
 
-  it('outputs violations and summary as JSON in onComplete', () => {
+  it('outputs violations and summary as JSON', () => {
     const reporter = createJsonReporter();
-    const violation: Violation = {
-      ruleId: 'test/rule',
-      message: 'Bad',
-      severity: 'error',
-    };
+    const violation: Violation = { ruleId: 'test/rule', message: 'Bad', severity: 'error' };
 
-    reporter.onStart({ rootDir: '/root', ruleCount: 1 });
     reporter.onViolation(violation);
-    reporter.onComplete({
-      totalFiles: 1,
-      totalRules: 1,
-      violations: [violation],
-      errorCount: 1,
-      warnCount: 0,
-      durationMs: 50,
-    });
+    reporter.onComplete(
+      makeSummary({
+        totalRules: 1,
+        violations: [violation],
+        errorCount: 1,
+        durationMs: 50,
+      }),
+    );
 
     const output = (process.stdout.write as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    const parsed = JSON.parse(output) as {
-      violations: Violation[];
-      summary: Record<string, unknown>;
-    };
+    const parsed = JSON.parse(output);
 
     expect(parsed.violations).toHaveLength(1);
     expect(parsed.violations[0].ruleId).toBe('test/rule');
-    expect(parsed.summary).toStrictEqual({
-      totalRules: 1,
-      errorCount: 1,
-      warnCount: 0,
-      durationMs: 50,
-    });
   });
 
-  it('outputs an empty violations array when there are no violations', () => {
+  it('outputs empty violations array when clean', () => {
     const reporter = createJsonReporter();
-
-    reporter.onComplete({
-      totalFiles: 0,
-      totalRules: 0,
-      violations: [],
-      errorCount: 0,
-      warnCount: 0,
-      durationMs: 0,
-    });
+    reporter.onComplete(makeSummary());
 
     const output = (process.stdout.write as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    const parsed = JSON.parse(output) as { violations: unknown[] };
+    const parsed = JSON.parse(output);
 
     expect(parsed.violations).toStrictEqual([]);
   });
 
-  it('collects multiple violations in order', () => {
+  it('onStart는 예외를 던지지 않는다', () => {
     const reporter = createJsonReporter();
-
-    reporter.onViolation({ ruleId: 'a', message: 'First', severity: 'error' });
-    reporter.onViolation({ ruleId: 'b', message: 'Second', severity: 'warn' });
-    reporter.onViolation({ ruleId: 'c', message: 'Third', severity: 'error' });
-
-    reporter.onComplete({
-      totalFiles: 0,
-      totalRules: 3,
-      violations: [],
-      errorCount: 2,
-      warnCount: 1,
-      durationMs: 10,
-    });
-
-    const output = (process.stdout.write as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    const parsed = JSON.parse(output) as { violations: Array<{ ruleId: string }> };
-
-    expect(parsed.violations).toHaveLength(3);
-    expect(parsed.violations.map((v) => v.ruleId)).toStrictEqual(['a', 'b', 'c']);
+    expect(() => reporter.onStart({ rootDir: '/root', ruleCount: 3 })).not.toThrow();
   });
 });

@@ -1,8 +1,11 @@
-import { readFile, access, readdir } from 'node:fs/promises';
+import { readFile, access } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import type { FileSystemProvider } from '@lodestar/types';
 
-/** Create a file system provider rooted at the given directory */
+/**
+ * Create a file system provider rooted at the given directory.
+ * @param rootDir - absolute path; all relative paths passed to provider methods resolve against this
+ */
 function createFileSystemProvider(rootDir: string): FileSystemProvider {
   return {
     async glob(pattern: string): Promise<readonly string[]> {

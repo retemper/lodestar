@@ -14,7 +14,7 @@ export default defineConfig([
     dts: false,
     sourcemap: true,
     banner: {
-      js: '#!/usr/bin/env node',
+      js: '#!/usr/bin/env -S node --experimental-strip-types --no-warnings',
     },
   },
 ]);

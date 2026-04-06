@@ -5,11 +5,17 @@ import type { Plugin, RuleDefinition, ResolvedPlugin } from '@lodestar/types';
 
 /** Resolved rule with its plugin namespace */
 interface ResolvedRule {
+  /** Name of the plugin that registered this rule */
   readonly pluginName: string;
+  /** The rule definition including name and check function */
   readonly rule: RuleDefinition;
 }
 
-/** Resolve plugin modules and collect all rules */
+/**
+ * Resolve plugin modules and collect all rules.
+ * @param plugins - pre-resolved plugin references from config
+ * @param rootDir - base directory for node_modules resolution fallback
+ */
 async function resolvePlugins(
   plugins: readonly ResolvedPlugin[],
   rootDir?: string,
@@ -17,28 +23,33 @@ async function resolvePlugins(
   const rules: ResolvedRule[] = [];
 
   for (const pluginRef of plugins) {
-    const pluginModule = await importPlugin(pluginRef.name, rootDir);
+    // If plugin was resolved at config time (direct import), use it directly
+    const plugin =
+      pluginRef.plugin.rules.length > 0
+        ? pluginRef.plugin
+        : await importPluginByName(pluginRef.name, rootDir);
 
-    if (!pluginModule) {
+    if (!plugin) {
       throw new Error(`Failed to resolve plugin: ${pluginRef.name}`);
     }
 
-    const plugin =
-      typeof pluginModule === 'function' ? pluginModule(pluginRef.options) : pluginModule;
+    const maybeAsync = typeof plugin === 'function' ? plugin(pluginRef.options) : plugin;
+    const resolved = maybeAsync instanceof Promise ? await maybeAsync : maybeAsync;
 
-    for (const rule of plugin.rules) {
-      rules.push({
-        pluginName: plugin.name,
-        rule,
-      });
+    for (const rule of resolved.rules) {
+      rules.push({ pluginName: resolved.name, rule });
     }
   }
 
   return rules;
 }
 
-/** Import a plugin module by name or path */
-async function importPlugin(
+/**
+ * Import a plugin module by name (legacy string-based resolution).
+ * @param name - npm package name or scoped package identifier
+ * @param rootDir - base directory to start node_modules resolution from
+ */
+async function importPluginByName(
   name: string,
   rootDir?: string,
 ): Promise<Plugin | ((opts: unknown) => Plugin) | null> {
@@ -47,8 +58,9 @@ async function importPlugin(
   for (const dir of dirs) {
     try {
       const resolved = await resolveFromDir(name, dir);
-      const mod = (await import(resolved)) as { default?: Plugin | ((opts: unknown) => Plugin) };
-      if (mod.default) return mod.default;
+      const mod = await import(resolved);
+      const plugin = extractPlugin(mod);
+      if (plugin) return plugin;
     } catch {
       // Failed to resolve from this directory — try next
     }
@@ -56,8 +68,8 @@ async function importPlugin(
 
   // All directories exhausted — fall back to bare import
   try {
-    const mod = (await import(name)) as { default?: Plugin | ((opts: unknown) => Plugin) };
-    return mod.default ?? null;
+    const mod = await import(name);
+    return extractPlugin(mod) ?? null;
   } catch {
     return null;
   }
@@ -72,7 +84,6 @@ function buildSearchDirs(rootDir?: string): readonly string[] {
   if (nodePath) {
     for (const p of nodePath.split(':')) {
       const trimmed = p.trim();
-      // NODE_PATH points to node_modules, so use the parent directory
       if (trimmed) dirs.push(join(trimmed, '..'));
     }
   }
@@ -80,7 +91,11 @@ function buildSearchDirs(rootDir?: string): readonly string[] {
   return dirs;
 }
 
-/** Resolve the ESM entry point of a package from the given directory's node_modules */
+/**
+ * Resolve the ESM entry point of a package from the given directory's node_modules.
+ * @param name - package name to look up
+ * @param dir - parent directory containing node_modules
+ */
 async function resolveFromDir(name: string, dir: string): Promise<string> {
   const packageDir = join(dir, 'node_modules', name);
   const packageJsonPath = join(packageDir, 'package.json');
@@ -105,5 +120,29 @@ function resolveExportsEntry(pkg: {
   return null;
 }
 
-export { resolvePlugins, importPlugin };
+/** A value that is either a Plugin instance or a factory that produces one */
+type PluginLike = Plugin | ((opts: unknown) => Plugin);
+
+/** Extract a plugin from a module's exports — supports named and default exports */
+function extractPlugin(mod: Record<string, unknown>): PluginLike | null {
+  // Try default export first (backwards compat)
+  if (mod.default && isPluginLike(mod.default)) return mod.default as PluginLike;
+
+  // Try named exports — find the first one that looks like a plugin/factory
+  for (const value of Object.values(mod)) {
+    if (isPluginLike(value)) return value as PluginLike;
+  }
+
+  return null;
+}
+
+/** Check if a value looks like a Plugin or PluginFactory */
+function isPluginLike(value: unknown): boolean {
+  if (typeof value === 'function') return true;
+  if (typeof value === 'object' && value !== null && 'name' in value && 'rules' in value)
+    return true;
+  return false;
+}
+
+export { resolvePlugins, importPluginByName as importPlugin };
 export type { ResolvedRule };

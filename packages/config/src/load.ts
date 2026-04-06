@@ -1,4 +1,3 @@
-import { pathToFileURL } from 'node:url';
 import { access } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import type { WrittenConfig } from '@lodestar/types';
@@ -21,21 +20,37 @@ function isConfigModule(mod: unknown): mod is { default: WrittenConfig } {
   return typeof mod === 'object' && mod !== null && 'default' in mod;
 }
 
-/** Load lodestar config from the given directory */
+/**
+ * Load lodestar config from the given directory.
+ * Uses jiti for TypeScript config files. No cascading — loads exactly one file.
+ * @param rootDir - absolute path to search for config files
+ */
 async function loadConfigFile(rootDir: string): Promise<WrittenConfig | null> {
   const resolvedRoot = resolve(rootDir);
 
   for (const filename of CONFIG_FILES) {
     const configPath = join(resolvedRoot, filename);
     if (await fileExists(configPath)) {
-      const configUrl = pathToFileURL(configPath).href;
-      const mod: unknown = await import(configUrl);
-      if (isConfigModule(mod)) return mod.default;
-      return null;
+      const mod = await importConfig(configPath);
+      if (!isConfigModule(mod)) return null;
+      return mod.default;
     }
   }
 
   return null;
+}
+
+/**
+ * Import a config file using jiti for TypeScript support.
+ * @param configPath - absolute path to the config file
+ */
+async function importConfig(configPath: string): Promise<unknown> {
+  if (configPath.endsWith('.ts')) {
+    const { createJiti } = await import('jiti');
+    const jiti = createJiti(configPath, { interopDefault: true });
+    return jiti.import(configPath);
+  }
+  return import(configPath);
 }
 
 export { loadConfigFile, CONFIG_FILES };

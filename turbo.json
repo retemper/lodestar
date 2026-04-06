@@ -1,4 +1,5 @@
 {
+  "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -13,6 +14,11 @@
     },
     "lint": {
       "dependsOn": []
+    },
+    "lodestar": {
+      "dependsOn": ["build"],
+      "outputs": [],
+      "cache": false
     },
     "dev": {
       "cache": false,

@@ -1,3 +1,4 @@
-export { loadConfigFile, CONFIG_FILES } from './load.js';
-export { resolveConfig, normalizeRuleConfig, normalizeBaseline } from './resolve.js';
-export { mergeConfigs } from './merge.js';
+export { loadConfigFile, CONFIG_FILES } from './load';
+export { resolveConfig, resolvePluginEntry, normalizeRuleConfig } from './resolve';
+export { discoverWorkspaces, readWorkspacePatterns, parsePnpmWorkspaceYaml } from './workspace';
+export type { WorkspacePackage } from './workspace';

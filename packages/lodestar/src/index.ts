@@ -1,21 +1,25 @@
 /**
- * Lodestar — Pluggable, declarative architecture rule engine
+ * Lodestar — Declare your architecture. Enforce it.
  *
- * This is the umbrella package that re-exports the core public API.
- * Users only need to install "lodestar" for basic usage.
+ * Project-level rule engine. ESLint checks inside files.
+ * Lodestar checks across the project.
  */
 
 // Config helpers
-export { defineConfig } from '@lodestar/types';
-export { definePlugin, defineRule, definePreset } from '@lodestar/types';
+export { defineConfig, definePlugin, defineRule } from '@lodestar/types';
 
 // Config loading
-export { loadConfigFile } from '@lodestar/config';
-export { resolveConfig } from '@lodestar/config';
-export { mergeConfigs } from '@lodestar/config';
+export { loadConfigFile, resolveConfig, discoverWorkspaces } from '@lodestar/config';
 
 // Core engine
-export { run, createProviders } from '@lodestar/core';
+export {
+  run,
+  createProviders,
+  runWorkspace,
+  validateConfig,
+  runRule,
+  resolvePlugins,
+} from '@lodestar/core';
 
 // Re-export all types
 export type {
@@ -34,7 +38,10 @@ export type {
   PluginFactory,
 
   // Config
+  ToolAdapter,
+  WrittenConfigBlock,
   WrittenConfig,
+  ScopedRuleConfig,
   ResolvedConfig,
   ResolvedRuleConfig,
   PluginEntry,
@@ -49,11 +56,17 @@ export type {
   ImportInfo,
   ExportInfo,
 
-  // Adapter & Preset
-  Adapter,
-  Preset,
+  // Reporter
   Reporter,
+  RuleResultSummary,
   RunSummary,
 } from '@lodestar/types';
 
-export type { RunOptions } from '@lodestar/core';
+export type {
+  RunOptions,
+  WorkspaceRunOptions,
+  WorkspaceReporter,
+  WorkspaceSummary,
+  PackageSummary,
+} from '@lodestar/core';
+export type { WorkspacePackage } from '@lodestar/config';

@@ -1,8 +1,7 @@
-export { defineConfig } from './config.js';
-export { definePlugin, defineRule } from './plugin.js';
-export { definePreset } from './preset.js';
+export { defineConfig } from './config';
+export { definePlugin, defineRule } from './plugin';
 
-export type { JSONSchema7 } from './json-schema.js';
+export type { JSONSchema7 } from './json-schema';
 
 export type {
   ProviderKey,
@@ -21,19 +20,20 @@ export type {
   RuleContext,
   RuleProviders,
   RuleDefinition,
-} from './rule.js';
+} from './rule';
 
-export type { Plugin, PluginFactory } from './plugin.js';
+export type { Plugin, PluginFactory } from './plugin';
 
 export type {
+  ToolAdapter,
+  WrittenConfigBlock,
   WrittenConfig,
   PluginEntry,
   WrittenRuleConfig,
+  ScopedRuleConfig,
   ResolvedConfig,
   ResolvedPlugin,
   ResolvedRuleConfig,
-} from './config.js';
+} from './config';
 
-export type { Adapter } from './adapter.js';
-export type { Preset } from './preset.js';
-export type { Reporter, RunSummary } from './reporter.js';
+export type { Reporter, RuleResultSummary, RunSummary } from './reporter';

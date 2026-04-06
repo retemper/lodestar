@@ -1,38 +1,48 @@
 {
-  "name": "@lodestar/eslint",
+  "name": "@lodestar/adapter-eslint",
   "version": "0.0.0",
   "type": "module",
-  "description": "ESLint adapter for Lodestar — bridge rules and config presets",
+  "description": "ESLint adapter for Lodestar — run ESLint rules via lodestar check",
   "license": "MIT",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run",
-    "test:watch": "vitest",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@lodestar/types": "workspace:*",
+    "@lodestar/config": "workspace:*"
   },
   "peerDependencies": {
     "eslint": ">=9.0.0",
     "typescript-eslint": ">=8.0.0"
   },
   "peerDependenciesMeta": {
-    "typescript-eslint": { "optional": true }
+    "eslint": {
+      "optional": true
+    },
+    "typescript-eslint": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "eslint": "^10.1.0",
-    "typescript-eslint": "^8.57.1",
     "tsup": "^8.3.0",
-    "typescript": "^5.6.0",
-    "vitest": "^4.1.0"
+    "typescript": "^5.6.0"
   },
   "sideEffects": false,
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }

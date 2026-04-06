@@ -1,47 +1,30 @@
 import { describe, it, expect } from 'vitest';
-import { generateConfigTemplate } from './init.js';
+import { generateConfigTemplate } from './init';
 
 describe('generateConfigTemplate', () => {
-  it('generates a config template with the app preset', () => {
-    const result = generateConfigTemplate('app');
-
-    expect(result).toBe(`import { defineConfig } from 'lodestar';
-
-export default defineConfig({
-  extends: ['@lodestar/preset-app'],
-});
-`);
-  });
-
-  it('generates a config template with the lib preset', () => {
-    const result = generateConfigTemplate('lib');
-
-    expect(result).toContain('@lodestar/preset-lib');
-  });
-
-  it('generates a config template with the server preset', () => {
-    const result = generateConfigTemplate('server');
-
-    expect(result).toContain('@lodestar/preset-server');
-  });
-
-  it('uses a custom preset name as-is', () => {
-    const result = generateConfigTemplate('my-custom');
-
-    expect(result).toContain('@lodestar/preset-my-custom');
-  });
-
-  it('generated template is valid TypeScript syntax', () => {
-    const result = generateConfigTemplate('app');
+  it('defineConfig import를 포함한다', () => {
+    const result = generateConfigTemplate();
 
     expect(result).toContain("import { defineConfig } from 'lodestar'");
-    expect(result).toContain('export default defineConfig(');
-    expect(result).toContain('extends:');
   });
 
-  it('handles an empty string preset', () => {
-    const result = generateConfigTemplate('');
+  it('export default defineConfig을 포함한다', () => {
+    const result = generateConfigTemplate();
 
-    expect(result).toContain('@lodestar/preset-');
+    expect(result).toContain('export default defineConfig(');
+  });
+
+  it('architecture 플러그인을 포함한다', () => {
+    const result = generateConfigTemplate();
+
+    expect(result).toContain('@lodestar/plugin-architecture');
+    expect(result).toContain('pluginArchitecture');
+  });
+
+  it('layers 규칙 설정을 포함한다', () => {
+    const result = generateConfigTemplate();
+
+    expect(result).toContain('architecture/layers');
+    expect(result).toContain('canImport');
   });
 });

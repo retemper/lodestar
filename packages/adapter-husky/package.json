@@ -1,26 +1,29 @@
 {
-  "name": "@lodestar/husky",
+  "name": "@lodestar/adapter-husky",
   "version": "0.0.0",
   "type": "module",
-  "description": "Git hooks integration for Lodestar via Husky",
+  "description": "Husky adapter for Lodestar — configure git hooks from lodestar.config.ts",
   "license": "MIT",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "lodestar": "lodestar check"
   },
   "dependencies": {
     "@lodestar/types": "workspace:*"
-  },
-  "peerDependencies": {
-    "husky": ">=9.0.0"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
@@ -28,5 +31,8 @@
     "vitest": "^4.1.0"
   },
   "sideEffects": false,
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }

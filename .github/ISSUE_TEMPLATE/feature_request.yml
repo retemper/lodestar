@@ -1,0 +1,53 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature! Please describe the problem you're trying to solve and the solution you'd like.
+
+  - type: checkboxes
+    id: validations
+    attributes:
+      label: Validations
+      options:
+        - label: I have searched the [existing issues](https://github.com/retemper/lodestar/issues) and this feature has not been requested yet.
+          required: true
+        - label: I have read the [Contributing guide](https://github.com/retemper/lodestar/blob/main/CONTRIBUTING.md).
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: |
+        Describe the problem you're trying to solve. What is frustrating or missing today?
+        Focus on the problem, not the solution — this helps us find the best approach.
+      placeholder: "When I try to ... I can't ... because ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the solution you'd like. Include API design, code examples, or references to other libraries if helpful.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches have you considered? Why wouldn't they work?
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any other context, screenshots, or references.
+    validations:
+      required: false

@@ -1,0 +1,19 @@
+{
+  "name": "clean-architecture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "lodestar check",
+    "check:fix": "lodestar check --fix"
+  },
+  "devDependencies": {
+    "lodestar": "workspace:*",
+    "@lodestar/cli": "workspace:*",
+    "@lodestar/plugin-architecture": "workspace:*",
+    "@lodestar/plugin-structure": "workspace:*",
+    "@lodestar/adapter-eslint": "workspace:*",
+    "@lodestar/adapter-prettier": "workspace:*",
+    "@lodestar/adapter-husky": "workspace:*",
+    "typescript": "^5.0.0"
+  }
+}
