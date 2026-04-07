@@ -1,6 +1,6 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import { createProviders } from 'lodestar';
+import { createProviders } from '@retemper/lodestar';
 
 /** Options for the impact analysis command */
 interface ImpactOptions {

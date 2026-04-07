@@ -15,7 +15,7 @@ npx lodestar init
 이 명령은 `lodestar.config.ts`를 생성합니다:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({

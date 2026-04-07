@@ -120,7 +120,7 @@ interface WorkspacePackage {
 리포터는 `Reporter` 인터페이스를 구현하는 일반 객체입니다. 최소 예시:
 
 ```ts
-import type { Reporter, Violation, RunSummary, RuleResultSummary } from 'lodestar';
+import type { Reporter, Violation, RunSummary, RuleResultSummary } from '@retemper/lodestar';
 
 function createMyReporter(): Reporter {
   return {

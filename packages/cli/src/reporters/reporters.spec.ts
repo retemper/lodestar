@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Violation, RunSummary, RuleResultSummary } from 'lodestar';
+import type { Violation, RunSummary, RuleResultSummary } from '@retemper/lodestar';
 import { createConsoleReporter } from './console';
 import { createJsonReporter } from './json';
 

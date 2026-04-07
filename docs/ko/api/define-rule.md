@@ -3,7 +3,7 @@
 타입이 지정된 규칙(Rule) 정의를 생성합니다.
 
 ```ts
-import { defineRule } from 'lodestar';
+import { defineRule } from '@retemper/lodestar';
 
 const myRule = defineRule<MyOptions>({
   name: 'namespace/rule-name',

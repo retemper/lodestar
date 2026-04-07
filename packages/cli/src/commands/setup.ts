@@ -1,7 +1,7 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import type { WrittenConfigBlock } from 'lodestar';
-import { loadConfigFile } from 'lodestar';
+import type { WrittenConfigBlock } from '@retemper/lodestar';
+import { loadConfigFile } from '@retemper/lodestar';
 
 /** Run verifySetup and apply fixes for all adapters */
 async function setupCommand(_args: ArgumentsCamelCase<Record<string, unknown>>): Promise<void> {

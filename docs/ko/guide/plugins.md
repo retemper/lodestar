@@ -13,7 +13,7 @@
 플러그인은 **named export**로 임포트하여 `plugins` 배열에 직접 전달합니다:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({

@@ -1,4 +1,4 @@
-import type { Reporter, Violation, RunSummary } from 'lodestar';
+import type { Reporter, Violation, RunSummary } from '@retemper/lodestar';
 
 /** Create a JSON reporter that outputs structured results to stdout */
 function createJsonReporter(): Reporter {

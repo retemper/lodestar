@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { RunSummary, WorkspaceSummary, WrittenConfig } from 'lodestar';
+import type { RunSummary, WorkspaceSummary, WrittenConfig } from '@retemper/lodestar';
 
-vi.mock('lodestar', () => ({
+vi.mock('@retemper/lodestar', () => ({
   loadConfigFile: vi.fn(),
   discoverWorkspaces: vi.fn(),
   resolveConfig: vi.fn(() => ({
@@ -30,7 +30,7 @@ vi.mock('../reporters/console', () => ({
 }));
 
 import { checkCommand } from './check';
-import { discoverWorkspaces, loadConfigFile, run, runWorkspace } from 'lodestar';
+import { discoverWorkspaces, loadConfigFile, run, runWorkspace } from '@retemper/lodestar';
 
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 const mockDiscoverWorkspaces = vi.mocked(discoverWorkspaces);
@@ -282,7 +282,7 @@ describe('checkCommand', () => {
         rule: ['test/specific'],
       });
 
-      const resolveConfig = (await import('lodestar')).resolveConfig as ReturnType<typeof vi.fn>;
+      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<typeof vi.fn>;
       const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
       const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
       expect(blocks[0].rules).toStrictEqual({ 'test/specific': 'error' });
@@ -308,7 +308,7 @@ describe('checkCommand', () => {
         rule: ['architecture/*'],
       });
 
-      const resolveConfig = (await import('lodestar')).resolveConfig as ReturnType<typeof vi.fn>;
+      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<typeof vi.fn>;
       const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
       const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
       expect(Object.keys(blocks[0].rules ?? {})).toStrictEqual([

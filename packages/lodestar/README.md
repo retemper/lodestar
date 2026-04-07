@@ -11,7 +11,7 @@ npm install -D lodestar
 ## Usage
 
 ```ts
-import { defineConfig, run, loadConfigFile, resolveConfig } from 'lodestar';
+import { defineConfig, run, loadConfigFile, resolveConfig } from '@retemper/lodestar';
 
 const written = await loadConfigFile(process.cwd());
 const config = resolveConfig(written, process.cwd());

@@ -6,7 +6,7 @@ Lodestar enforces intra-package architecture rules that ESLint can't — layer d
 
 ```ts
 // lodestar.config.ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
@@ -173,7 +173,7 @@ export default await fromLodestar();
 ## Writing Custom Rules
 
 ```ts
-import { definePlugin, defineRule } from 'lodestar';
+import { definePlugin, defineRule } from '@retemper/lodestar';
 
 const noUtilsBarrel = defineRule({
   name: 'my-team/no-utils-barrel',

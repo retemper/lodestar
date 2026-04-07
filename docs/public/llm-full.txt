@@ -5,7 +5,7 @@
 ### defineRule<TOptions>(definition)
 
 ```ts
-import { defineRule } from 'lodestar';
+import { defineRule } from '@retemper/lodestar';
 
 const myRule = defineRule<{ max: number }>({
   name: 'my-plugin/my-rule',       // {plugin-namespace}/{rule-name}
@@ -24,7 +24,7 @@ const myRule = defineRule<{ max: number }>({
 ### definePlugin(factory)
 
 ```ts
-import { definePlugin } from 'lodestar';
+import { definePlugin } from '@retemper/lodestar';
 
 const myPlugin = definePlugin(() => ({
   name: 'my-plugin',
@@ -37,7 +37,7 @@ export { myPlugin };  // named export, NOT default
 ### defineConfig(config)
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginFs } from '@retemper/lodestar-plugin-fs-layout';
 
 export default defineConfig({

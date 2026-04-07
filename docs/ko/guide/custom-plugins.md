@@ -6,7 +6,7 @@
 
 ```ts
 // lodestar-plugin-my-team/src/index.ts
-import { definePlugin, defineRule } from 'lodestar';
+import { definePlugin, defineRule } from '@retemper/lodestar';
 
 const maxFileLength = defineRule<{ max: number }>({
   name: 'my-team/max-file-length',
@@ -53,7 +53,7 @@ export default definePlugin(() => ({
 
 ```ts
 // lodestar.config.ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 
 export default defineConfig({
   plugins: ['lodestar-plugin-my-team'],

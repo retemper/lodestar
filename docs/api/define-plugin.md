@@ -3,7 +3,7 @@
 Create a plugin that bundles multiple rules.
 
 ```ts
-import { definePlugin } from 'lodestar';
+import { definePlugin } from '@retemper/lodestar';
 
 export default definePlugin((options) => ({
   name: 'my-plugin',

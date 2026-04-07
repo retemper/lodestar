@@ -51,7 +51,7 @@ npx lodestar init
 Generates a starter config that imports `defineConfig` and `@retemper/lodestar-plugin-architecture`, with a sample `architecture/layers` rule pre-configured:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({

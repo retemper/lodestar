@@ -5,7 +5,7 @@
 Type-safe helper for creating `lodestar.config.ts`. Accepts a single config block or an array of blocks (flat config).
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 
 export default defineConfig({
   plugins: [...],
@@ -113,7 +113,7 @@ interface ToolAdapter<TConfig = unknown> {
 Example with all three official adapters:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
 import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
@@ -152,7 +152,7 @@ Adapters are deduplicated by `name` during config resolution -- if multiple bloc
 The array form allows different rules or adapters for different file sets. Blocks without `files` apply globally; blocks with `files` apply only to matching paths:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig([

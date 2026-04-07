@@ -3,7 +3,7 @@
 Create a typed rule definition.
 
 ```ts
-import { defineRule } from 'lodestar';
+import { defineRule } from '@retemper/lodestar';
 
 const myRule = defineRule<MyOptions>({
   name: 'namespace/rule-name',

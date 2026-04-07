@@ -1,7 +1,7 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import { createProviders, loadConfigFile } from 'lodestar';
-import type { ModuleNode } from 'lodestar';
+import { createProviders, loadConfigFile } from '@retemper/lodestar';
+import type { ModuleNode } from '@retemper/lodestar';
 
 /** Supported graph output formats */
 type GraphFormat = 'mermaid' | 'dot';

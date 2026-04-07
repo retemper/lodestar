@@ -13,7 +13,7 @@ A plugin is a named collection of rules. Lodestar ships one official plugin and 
 Plugins are imported as **named exports** and passed directly to the `plugins` array:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
