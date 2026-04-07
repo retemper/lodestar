@@ -1,8 +1,23 @@
 # Lodestar
 
+[![CI](https://github.com/retemper/lodestar/actions/workflows/ci.yml/badge.svg)](https://github.com/retemper/lodestar/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **Declare your architecture. Enforce it.**
 
 Lodestar enforces intra-package architecture rules that ESLint can't — layer dependencies, module boundaries, circular imports. Define your architecture in `lodestar.config.ts`, enforce it in CI, visualize it as a diagram.
+
+> **[Documentation](https://retemper.github.io/lodestar/)** · [Getting Started](https://retemper.github.io/lodestar/guide/getting-started) · [API Reference](https://retemper.github.io/lodestar/api/config)
+
+## Getting Started
+
+```sh
+npm install -D lodestar @retemper/lodestar-plugin-architecture
+npx lodestar init
+npx lodestar check
+```
+
+## Overview
 
 ```ts
 // lodestar.config.ts
@@ -92,14 +107,6 @@ Transitive dependents (2):
 Total: 5 files affected
 ```
 
-## Getting Started
-
-```sh
-npm install -D lodestar @retemper/lodestar-plugin-architecture
-npx lodestar init
-npx lodestar check
-```
-
 ## Rules
 
 ### `architecture/layers` — Dependency Direction
@@ -145,7 +152,9 @@ Detects circular dependency chains with configurable scope and depth limits.
 
 Detects circular dependencies between workspace packages by analyzing package.json.
 
-## ESLint Integration
+## Integrations
+
+### ESLint
 
 Centralize ESLint rules in `lodestar.config.ts` alongside architecture rules:
 
@@ -169,6 +178,8 @@ export default defineConfig({
 import { fromLodestar } from '@retemper/lodestar-adapter-eslint';
 export default await fromLodestar();
 ```
+
+See the full list of adapters in the [documentation](https://retemper.github.io/lodestar/guide/adapters).
 
 ## Writing Custom Rules
 
