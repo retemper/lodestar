@@ -8,12 +8,12 @@
   },
   "devDependencies": {
     "lodestar": "workspace:*",
-    "@lodestar/cli": "workspace:*",
-    "@lodestar/plugin-architecture": "workspace:*",
-    "@lodestar/plugin-structure": "workspace:*",
-    "@lodestar/adapter-eslint": "workspace:*",
-    "@lodestar/adapter-prettier": "workspace:*",
-    "@lodestar/adapter-husky": "workspace:*",
+    "@retemper/lodestar-cli": "workspace:*",
+    "@retemper/lodestar-plugin-architecture": "workspace:*",
+    "@retemper/lodestar-plugin-structure": "workspace:*",
+    "@retemper/lodestar-adapter-eslint": "workspace:*",
+    "@retemper/lodestar-adapter-prettier": "workspace:*",
+    "@retemper/lodestar-adapter-husky": "workspace:*",
     "typescript": "^5.0.0"
   }
 }

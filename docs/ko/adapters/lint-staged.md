@@ -2,7 +2,7 @@
 
 글로브(Glob) 패턴을 명령어에 매핑하는 `.lintstagedrc.json` 설정 파일을 생성합니다. 이 어댑터는 설정 전용(Setup-only) 어댑터로, lint-staged는 husky에 의해 호출되며 lodestar가 직접 실행하지 않습니다.
 
-**패키지:** `@lodestar/adapter-lint-staged`
+**패키지:** `@retemper/lodestar-adapter-lint-staged`
 
 **관리 파일:** `.lintstagedrc.json`
 
@@ -15,7 +15,7 @@
 ## 예시
 
 ```ts
-import { lintStagedAdapter } from '@lodestar/adapter-lint-staged';
+import { lintStagedAdapter } from '@retemper/lodestar-adapter-lint-staged';
 
 lintStagedAdapter({
   commands: {

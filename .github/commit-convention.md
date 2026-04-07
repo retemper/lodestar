@@ -28,7 +28,7 @@ Since we squash-merge PRs, **the PR title** is what matters — it becomes the f
 
 ### Scope
 
-The scope is the package name **without** the `@lodestar/` prefix:
+The scope is the package name **without** the `@retemper/lodestar-` prefix:
 
 - `types`, `config`, `core`, `cli`, `plugin-structure`, `plugin-boundary`, `plugin-deps`, `eslint`, `prettier`, `husky`, `tsconfig`, `accel`, `accel-typescript`, `accel-rust`, `accel-go`
 

@@ -50,20 +50,20 @@ lodestar is a monorepo managed with [pnpm workspaces](https://pnpm.io/workspaces
 ```
 lodestar/
 ├── packages/
-│   ├── types/              # @lodestar/types — Shared types and interfaces
-│   ├── config/             # @lodestar/config — Configuration loading and normalization
-│   ├── core/               # @lodestar/core — Core rule execution engine
-│   ├── cli/                # @lodestar/cli — CLI interface
-│   ├── accel/              # @lodestar/accel — Native acceleration facade
-│   ├── accel-typescript/   # @lodestar/accel-typescript — Acceleration shared types
-│   ├── accel-rust/         # @lodestar/accel-rust — Rust backend (napi-rs)
-│   ├── accel-go/           # @lodestar/accel-go — Go backend (WASM)
+│   ├── types/              # @retemper/lodestar-types — Shared types and interfaces
+│   ├── config/             # @retemper/lodestar-config — Configuration loading and normalization
+│   ├── core/               # @retemper/lodestar-core — Core rule execution engine
+│   ├── cli/                # @retemper/lodestar-cli — CLI interface
+│   ├── accel/              # @retemper/lodestar-accel — Native acceleration facade
+│   ├── accel-typescript/   # @retemper/lodestar-accel-typescript — Acceleration shared types
+│   ├── accel-rust/         # @retemper/lodestar-accel-rust — Rust backend (napi-rs)
+│   ├── accel-go/           # @retemper/lodestar-accel-go — Go backend (WASM)
 │   └── lodestar/           # lodestar — Unified facade package
 ├── plugins/
-│   ├── structure/          # @lodestar/plugin-structure — Directory structure validation
-│   ├── boundary/           # @lodestar/plugin-boundary — Module boundary enforcement
-│   ├── deps/               # @lodestar/plugin-deps — Dependency graph rules
-│   └── content/            # @lodestar/plugin-content — Source content conventions
+│   ├── structure/          # @retemper/lodestar-plugin-structure — Directory structure validation
+│   ├── boundary/           # @retemper/lodestar-plugin-boundary — Module boundary enforcement
+│   ├── deps/               # @retemper/lodestar-plugin-deps — Dependency graph rules
+│   └── content/            # @retemper/lodestar-plugin-content — Source content conventions
 ├── examples/
 ├── turbo.json              # Turborepo task pipeline
 ├── eslint.config.js        # ESLint flat config
@@ -78,10 +78,10 @@ lodestar/
 
 ```bash
 # Build only the package you're working on (and its dependencies)
-pnpm turbo build --filter=@lodestar/core
+pnpm turbo build --filter=@retemper/lodestar-core
 
 # Run tests for a single package
-pnpm turbo test --filter=@lodestar/core
+pnpm turbo test --filter=@retemper/lodestar-core
 
 # Watch mode for tests
 cd packages/core
@@ -112,7 +112,7 @@ Each commit message must follow this format:
 
 **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 
-**Scope** is the package name without the `@lodestar/` prefix (e.g., `core`, `cli`, `plugin-structure`).
+**Scope** is the package name without the `@retemper/lodestar-` prefix (e.g., `core`, `cli`, `plugin-structure`).
 
 **Examples:**
 
@@ -201,14 +201,14 @@ We use [Vitest](https://vitest.dev/) for all unit testing.
 pnpm test
 
 # Single package
-pnpm turbo test --filter=@lodestar/plugin-structure
+pnpm turbo test --filter=@retemper/lodestar-plugin-structure
 
 # Watch mode (from package directory)
 cd plugins/structure
 pnpm test:watch
 
 # With coverage
-pnpm turbo test --filter=@lodestar/plugin-structure -- --coverage
+pnpm turbo test --filter=@retemper/lodestar-plugin-structure -- --coverage
 ```
 
 ### Writing tests

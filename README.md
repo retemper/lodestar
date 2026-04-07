@@ -7,7 +7,7 @@ Lodestar enforces intra-package architecture rules that ESLint can't — layer d
 ```ts
 // lodestar.config.ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],
@@ -55,7 +55,7 @@ Lodestar makes these rules explicit — written in your repo, versioned in git, 
 ### Enforce — `lodestar check`
 
 ```
-@lodestar/core
+@retemper/lodestar-core
   ✓ architecture/layers                    12 files, 3 layers   5ms
   ✓ architecture/modules                   12 files             3ms
   ✓ architecture/no-circular               24 modules           2ms
@@ -95,7 +95,7 @@ Total: 5 files affected
 ## Getting Started
 
 ```sh
-npm install -D lodestar @lodestar/plugin-architecture
+npm install -D lodestar @retemper/lodestar-plugin-architecture
 npx lodestar init
 npx lodestar check
 ```
@@ -150,7 +150,7 @@ Detects circular dependencies between workspace packages by analyzing package.js
 Centralize ESLint rules in `lodestar.config.ts` alongside architecture rules:
 
 ```ts
-import { eslintAdapter } from '@lodestar/adapter-eslint';
+import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
 
 export default defineConfig({
   plugins: [pluginArchitecture],
@@ -166,7 +166,7 @@ export default defineConfig({
 
 ```js
 // eslint.config.js — one line
-import { fromLodestar } from '@lodestar/adapter-eslint';
+import { fromLodestar } from '@retemper/lodestar-adapter-eslint';
 export default await fromLodestar();
 ```
 

@@ -1,6 +1,6 @@
 import { dirname, basename, extname, join } from 'node:path';
 import { writeFile, mkdir } from 'node:fs/promises';
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/lodestar-types';
 
 /** A pair definition linking source files to required companion files */
 interface FilePair {

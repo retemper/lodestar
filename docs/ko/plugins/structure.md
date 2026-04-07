@@ -3,11 +3,11 @@
 파일 시스템 구조 규칙을 강제합니다 -- 디렉토리 존재 여부, 금지 경로, 페어 파일(Paired File) 검증.
 
 ```sh
-pnpm add -D @lodestar/plugin-structure
+pnpm add -D @retemper/lodestar-plugin-structure
 ```
 
 ```ts
-import { pluginStructure } from '@lodestar/plugin-structure';
+import { pluginStructure } from '@retemper/lodestar-plugin-structure';
 
 export default defineConfig({
   plugins: [pluginStructure],

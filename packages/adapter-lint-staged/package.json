@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/adapter-lint-staged",
+  "name": "@retemper/lodestar-adapter-lint-staged",
   "version": "0.0.0",
   "type": "module",
   "description": "lint-staged adapter for Lodestar — staged file linting from lodestar config",
@@ -23,7 +23,7 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

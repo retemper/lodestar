@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { Plugin, RuleDefinition, ResolvedPlugin } from '@lodestar/types';
+import type { Plugin, RuleDefinition, ResolvedPlugin } from '@retemper/lodestar-types';
 
 /** Resolved rule with its plugin namespace */
 interface ResolvedRule {

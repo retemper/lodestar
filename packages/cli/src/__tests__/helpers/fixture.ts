@@ -54,29 +54,29 @@ async function createFixtureConfig(rootDir: string, config: WrittenConfig): Prom
   const configContent = `export default ${JSON.stringify(config, null, 2)};\n`;
   await writeFile(join(rootDir, 'lodestar.config.mjs'), configContent, 'utf-8');
 
-  // Symlink @lodestar/* plugins specified in the config into the fixture's node_modules
+  // Symlink @retemper/lodestar-* plugins specified in the config into the fixture's node_modules
   const blocks = Array.isArray(config) ? config : [config];
   const plugins = blocks.flatMap((block) => block.plugins ?? []);
   for (const entry of plugins) {
     const name = typeof entry === 'string' ? entry : (entry as readonly [string, ...unknown[]])[0];
-    if (name.startsWith('@lodestar/')) {
+    if (name.startsWith('@retemper/lodestar-')) {
       await symlinkWorkspacePackage(rootDir, name);
     }
   }
 }
 
 /**
- * Creates a symlink from @lodestar/* to the correct monorepo directory.
+ * Creates a symlink from @retemper/lodestar-* to the correct monorepo directory.
  * @param rootDir - Absolute path to the fixture directory
- * @param packageName - Scoped package name (e.g. '@lodestar/plugin-structure')
+ * @param packageName - Scoped package name (e.g. '@retemper/lodestar-plugin-structure')
  */
 async function symlinkWorkspacePackage(rootDir: string, packageName: string): Promise<void> {
-  const shortName = packageName.replace('@lodestar/', '');
+  const shortName = packageName.replace('@retemper/lodestar-', '');
   const sourcePath = shortName.startsWith('plugin-')
     ? join(PLUGINS_DIR, shortName.replace('plugin-', ''))
     : join(PACKAGES_DIR, shortName);
-  const targetDir = join(rootDir, 'node_modules', '@lodestar');
-  const targetPath = join(targetDir, shortName);
+  const targetDir = join(rootDir, 'node_modules', '@retemper');
+  const targetPath = join(targetDir, `lodestar-${shortName}`);
 
   await mkdir(targetDir, { recursive: true });
   await symlink(sourcePath, targetPath, 'dir');

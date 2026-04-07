@@ -5,7 +5,7 @@ const RESOLVE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx'];
 
 /**
  * Resolve a relative import source to an actual file path.
- * Self-contained — no dependency on @lodestar/core.
+ * Self-contained — no dependency on @retemper/lodestar-core.
  * @param importer - relative path of the importing file
  * @param source - import specifier (e.g., './utils')
  * @param knownFiles - set of all known file paths for existence checks

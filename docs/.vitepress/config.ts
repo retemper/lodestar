@@ -139,10 +139,10 @@ export default defineConfig({
             {
               text: '패키지',
               items: [
-                { text: '@lodestar/types', link: '/ko/api/types' },
-                { text: '@lodestar/config', link: '/ko/api/config-api' },
-                { text: '@lodestar/core', link: '/ko/api/core' },
-                { text: '@lodestar/test-utils', link: '/ko/api/test-utils' },
+                { text: '@retemper/lodestar-types', link: '/ko/api/types' },
+                { text: '@retemper/lodestar-config', link: '/ko/api/config-api' },
+                { text: '@retemper/lodestar-core', link: '/ko/api/core' },
+                { text: '@retemper/lodestar-test-utils', link: '/ko/api/test-utils' },
               ],
             },
           ],
@@ -242,10 +242,10 @@ export default defineConfig({
         {
           text: 'Packages',
           items: [
-            { text: '@lodestar/types', link: '/api/types' },
-            { text: '@lodestar/config', link: '/api/config-api' },
-            { text: '@lodestar/core', link: '/api/core' },
-            { text: '@lodestar/test-utils', link: '/api/test-utils' },
+            { text: '@retemper/lodestar-types', link: '/api/types' },
+            { text: '@retemper/lodestar-config', link: '/api/config-api' },
+            { text: '@retemper/lodestar-core', link: '/api/core' },
+            { text: '@retemper/lodestar-test-utils', link: '/api/test-utils' },
           ],
         },
       ],

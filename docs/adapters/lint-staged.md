@@ -2,7 +2,7 @@
 
 Generates a `.lintstagedrc.json` config file that maps glob patterns to commands. This is a setup-only adapter: lint-staged is invoked by husky, not by lodestar directly.
 
-**Package:** `@lodestar/adapter-lint-staged`
+**Package:** `@retemper/lodestar-adapter-lint-staged`
 
 **Managed file:** `.lintstagedrc.json`
 
@@ -15,7 +15,7 @@ Generates a `.lintstagedrc.json` config file that maps glob patterns to commands
 ## Example
 
 ```ts
-import { lintStagedAdapter } from '@lodestar/adapter-lint-staged';
+import { lintStagedAdapter } from '@retemper/lodestar-adapter-lint-staged';
 
 lintStagedAdapter({
   commands: {

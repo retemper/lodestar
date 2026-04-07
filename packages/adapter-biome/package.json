@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/adapter-biome",
+  "name": "@retemper/lodestar-adapter-biome",
   "version": "0.0.0",
   "type": "module",
   "description": "Biome adapter for Lodestar — run Biome lint rules via lodestar check",
@@ -23,7 +23,7 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

@@ -1,6 +1,6 @@
 import { readFile, access } from 'node:fs/promises';
 import { join, relative } from 'node:path';
-import type { FileSystemProvider } from '@lodestar/types';
+import type { FileSystemProvider } from '@retemper/lodestar-types';
 
 /**
  * Create a file system provider rooted at the given directory.

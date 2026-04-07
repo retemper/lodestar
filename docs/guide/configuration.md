@@ -6,7 +6,7 @@ Lodestar is configured via a `lodestar.config.ts` file in your project root.
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],
@@ -41,7 +41,7 @@ Lodestar looks for config files in this order:
 Array of plugin instances. Plugins are imported as named exports:
 
 ```ts
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],
@@ -67,8 +67,8 @@ rules: {
 Array of tool adapters. See the [Adapters guide](/guide/adapters) for details.
 
 ```ts
-import { eslintAdapter } from '@lodestar/adapter-eslint';
-import { prettierAdapter } from '@lodestar/adapter-prettier';
+import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
+import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
 
 export default defineConfig({
   adapters: [eslintAdapter({ presets: ['strict'] }), prettierAdapter({ singleQuote: true })],

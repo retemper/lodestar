@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { ModuleNode } from '@lodestar/types';
-import { createMockProviders, createTestContext } from '@lodestar/test-utils';
+import type { ModuleNode } from '@retemper/lodestar-types';
+import { createMockProviders, createTestContext } from '@retemper/lodestar-test-utils';
 import { noCircular, estimateChainLength } from './no-circular.rule';
 import { matchGlob } from '../../shared/match-glob';
 

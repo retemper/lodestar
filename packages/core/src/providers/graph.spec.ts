@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { ASTProvider, FileSystemProvider, ImportInfo } from '@lodestar/types';
+import type { ASTProvider, FileSystemProvider, ImportInfo } from '@retemper/lodestar-types';
 import { createGraphProvider } from './graph';
 
 /** Creates a mock ASTProvider for testing */

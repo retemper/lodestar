@@ -3,8 +3,8 @@ import { mkdtemp, mkdir, writeFile, rm, symlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { runWorkspace } from './workspace-runner';
-import type { WrittenConfig, RunSummary } from '@lodestar/types';
-import type { WorkspacePackage } from '@lodestar/config';
+import type { WrittenConfig, RunSummary } from '@retemper/lodestar-types';
+import type { WorkspacePackage } from '@retemper/lodestar-config';
 import type { WorkspaceReporter } from './workspace-runner';
 
 /** Result of creating a test fixture directory */
@@ -60,7 +60,7 @@ async function linkPluginToPackage(
 /** Helper to create an architecture/layers rule configuration */
 function makeLayersConfig(): WrittenConfig {
   return {
-    plugins: ['@lodestar/plugin-architecture'],
+    plugins: ['@retemper/lodestar-plugin-architecture'],
     rules: {
       'architecture/layers': {
         severity: 'error',
@@ -98,7 +98,7 @@ describe('runWorkspace() integration test', () => {
       'src/domain/entity.ts': 'export const entity = {};',
       'src/infra/repo.ts': "import { entity } from '../domain/entity.ts';",
     });
-    await linkPlugin(rootDir, '@lodestar/plugin-architecture');
+    await linkPlugin(rootDir, '@retemper/lodestar-plugin-architecture');
 
     const rootConfig = makeLayersConfig();
     const result = await runWorkspace({ rootDir, rootConfig });
@@ -109,7 +109,7 @@ describe('runWorkspace() integration test', () => {
   it('패키지를 발견하고 per-package config를 실행한다', async () => {
     const pkgConfig = `
       export default {
-        plugins: ['@lodestar/plugin-architecture'],
+        plugins: ['@retemper/lodestar-plugin-architecture'],
         rules: {
           'architecture/layers': {
             severity: 'error',
@@ -136,9 +136,9 @@ describe('runWorkspace() integration test', () => {
       'packages/beta/lodestar.config.mjs': pkgConfig,
     });
 
-    await linkPlugin(rootDir, '@lodestar/plugin-architecture');
-    await linkPluginToPackage(rootDir, 'packages/alpha', '@lodestar/plugin-architecture');
-    await linkPluginToPackage(rootDir, 'packages/beta', '@lodestar/plugin-architecture');
+    await linkPlugin(rootDir, '@retemper/lodestar-plugin-architecture');
+    await linkPluginToPackage(rootDir, 'packages/alpha', '@retemper/lodestar-plugin-architecture');
+    await linkPluginToPackage(rootDir, 'packages/beta', '@retemper/lodestar-plugin-architecture');
 
     const rootConfig = makeLayersConfig();
     const result = await runWorkspace({ rootDir, rootConfig });
@@ -156,7 +156,7 @@ describe('runWorkspace() integration test', () => {
   it('자체 config가 없는 패키지는 건너뛴다', async () => {
     const pkgConfig = `
       export default {
-        plugins: ['@lodestar/plugin-architecture'],
+        plugins: ['@retemper/lodestar-plugin-architecture'],
         rules: {
           'architecture/layers': {
             severity: 'error',
@@ -178,8 +178,8 @@ describe('runWorkspace() integration test', () => {
       'packages/no-config/package.json': JSON.stringify({ name: '@test/no-config' }),
     });
 
-    await linkPlugin(rootDir, '@lodestar/plugin-architecture');
-    await linkPluginToPackage(rootDir, 'packages/with-config', '@lodestar/plugin-architecture');
+    await linkPlugin(rootDir, '@retemper/lodestar-plugin-architecture');
+    await linkPluginToPackage(rootDir, 'packages/with-config', '@retemper/lodestar-plugin-architecture');
 
     const rootConfig = makeLayersConfig();
     const result = await runWorkspace({ rootDir, rootConfig });
@@ -191,7 +191,7 @@ describe('runWorkspace() integration test', () => {
   it('workspace reporter 라이프사이클 메서드를 호출한다', async () => {
     const pkgConfig = `
       export default {
-        plugins: ['@lodestar/plugin-architecture'],
+        plugins: ['@retemper/lodestar-plugin-architecture'],
         rules: {
           'architecture/layers': {
             severity: 'error',
@@ -212,8 +212,8 @@ describe('runWorkspace() integration test', () => {
       'packages/app/lodestar.config.mjs': pkgConfig,
     });
 
-    await linkPlugin(rootDir, '@lodestar/plugin-architecture');
-    await linkPluginToPackage(rootDir, 'packages/app', '@lodestar/plugin-architecture');
+    await linkPlugin(rootDir, '@retemper/lodestar-plugin-architecture');
+    await linkPluginToPackage(rootDir, 'packages/app', '@retemper/lodestar-plugin-architecture');
 
     const events: string[] = [];
     const reporter: WorkspaceReporter = {

@@ -54,7 +54,7 @@ describe('Config pipeline integration test', () => {
     it('로드된 config을 ResolvedConfig으로 정규화한다', async () => {
       const { rootDir } = await setup({
         'lodestar.config.mjs': `export default {
-          plugins: ['@lodestar/plugin-architecture'],
+          plugins: ['@retemper/lodestar-plugin-architecture'],
           rules: { 'architecture/no-circular': 'error' },
         };\n`,
       });

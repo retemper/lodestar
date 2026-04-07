@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/config",
+  "name": "@retemper/lodestar-config",
   "version": "0.0.0",
   "type": "module",
   "description": "Configuration loading and resolution for Lodestar",
@@ -23,7 +23,7 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*",
+    "@retemper/lodestar-types": "workspace:*",
     "tinyglobby": "^0.2.15",
     "jiti": "^2.6.1"
   },

@@ -2,7 +2,7 @@
 
 커밋 메시지 린팅(Linting)을 위한 `.commitlintrc.json` 설정 파일을 생성합니다. 이 어댑터는 설정 전용(Setup-only) 어댑터로, commitlint는 husky에 의해 호출되며 lodestar가 직접 실행하지 않습니다.
 
-**패키지:** `@lodestar/adapter-commitlint`
+**패키지:** `@retemper/lodestar-adapter-commitlint`
 
 **관리 파일:** `.commitlintrc.json`
 
@@ -18,7 +18,7 @@
 ## 예시
 
 ```ts
-import { commitlintAdapter } from '@lodestar/adapter-commitlint';
+import { commitlintAdapter } from '@retemper/lodestar-adapter-commitlint';
 
 commitlintAdapter({
   extends: ['@commitlint/config-conventional'],

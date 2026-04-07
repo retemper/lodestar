@@ -5,7 +5,7 @@ import type {
   Reporter,
   RuleProviders,
   ResolvedRuleConfig,
-} from '@lodestar/types';
+} from '@retemper/lodestar-types';
 import { createFileSystemProvider } from './providers/fs';
 import { createGraphProvider } from './providers/graph';
 import { createASTProvider } from './providers/ast';

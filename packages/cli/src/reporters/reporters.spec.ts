@@ -300,10 +300,10 @@ describe('createConsoleReporter', () => {
   describe('onPackageStart', () => {
     it('prints package name', () => {
       const reporter = createConsoleReporter();
-      reporter.onPackageStart!({ name: '@lodestar/core', dir: '/root/packages/core' });
+      reporter.onPackageStart!({ name: '@retemper/lodestar-core', dir: '/root/packages/core' });
 
       const output = (console.error as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-      expect(output).toContain('@lodestar/core');
+      expect(output).toContain('@retemper/lodestar-core');
     });
   });
 

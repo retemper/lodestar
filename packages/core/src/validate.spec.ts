@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { validateConfig, findSimilar, levenshtein } from './validate';
-import type { ResolvedConfig } from '@lodestar/types';
+import type { ResolvedConfig } from '@retemper/lodestar-types';
 
 /** Create a minimal resolved config for testing */
 function makeConfig(ruleIds: string[]): ResolvedConfig {

@@ -5,7 +5,7 @@ import type {
   ModuleNode,
   ASTProvider,
   FileSystemProvider,
-} from '@lodestar/types';
+} from '@retemper/lodestar-types';
 
 /** Convert OS-specific path separators to forward slashes for consistent comparison */
 function toForwardSlash(p: string): string {

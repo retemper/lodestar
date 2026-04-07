@@ -1,8 +1,8 @@
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/lodestar-types';
 
 /** Represents a single workspace package and its internal dependency edges */
 interface PackageNode {
-  /** Package name from package.json (e.g., "@lodestar/types") */
+  /** Package name from package.json (e.g., "@retemper/lodestar-types") */
   readonly name: string;
   /** Relative path to the package directory */
   readonly dir: string;
@@ -12,7 +12,7 @@ interface PackageNode {
 
 /** Detect circular dependencies between workspace packages */
 const noCircularPackages = defineRule<{
-  /** Package scope prefix to treat as internal (e.g., "@lodestar") — auto-detected if omitted */
+  /** Package scope prefix to treat as internal (e.g., "@retemper") — auto-detected if omitted */
   readonly scope?: string;
 }>({
   name: 'architecture/no-circular-packages',
@@ -25,7 +25,7 @@ const noCircularPackages = defineRule<{
       scope: {
         type: 'string',
         description:
-          'Package scope prefix to consider as internal (e.g., "@lodestar"). Defaults to auto-detecting from the first workspace package found.',
+          'Package scope prefix to consider as internal (e.g., "@retemper"). Defaults to auto-detecting from the first workspace package found.',
       },
     },
   },

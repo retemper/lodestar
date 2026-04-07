@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import type { ProviderKey } from '@lodestar/types';
+import type { ProviderKey } from '@retemper/lodestar-types';
 import { resolvePlugins, importPlugin } from './resolver';
 
 /** Result of creating a test fixture directory */

@@ -38,7 +38,7 @@ describe('lodestar init E2E', () => {
     await runCli(['init'], { cwd: rootDir });
 
     const configContent = await readFile(join(rootDir, 'lodestar.config.ts'), 'utf-8');
-    expect(configContent).toContain('@lodestar/plugin-architecture');
+    expect(configContent).toContain('@retemper/lodestar-plugin-architecture');
     expect(configContent).toContain('pluginArchitecture');
     expect(configContent).toContain('architecture/layers');
   });

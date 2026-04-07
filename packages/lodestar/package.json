@@ -21,9 +21,9 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*",
-    "@lodestar/config": "workspace:*",
-    "@lodestar/core": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*",
+    "@retemper/lodestar-config": "workspace:*",
+    "@retemper/lodestar-core": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

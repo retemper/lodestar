@@ -1,11 +1,11 @@
-# @lodestar/cli
+# @retemper/lodestar-cli
 
 Command-line interface for the Lodestar architecture rule engine.
 
 ## Installation
 
 ```sh
-pnpm add -D @lodestar/cli
+pnpm add -D @retemper/lodestar-cli
 ```
 
 Or run directly:
@@ -54,7 +54,7 @@ import {
   initCommand,
   createConsoleReporter,
   createJsonReporter,
-} from '@lodestar/cli';
+} from '@retemper/lodestar-cli';
 ```
 
 | Export                  | Description                            |

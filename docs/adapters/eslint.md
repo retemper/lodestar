@@ -2,7 +2,7 @@
 
 Runs ESLint via the Node API and generates an `eslint.config.js` bridge file for IDE integration.
 
-**Package:** `@lodestar/adapter-eslint`
+**Package:** `@retemper/lodestar-adapter-eslint`
 
 **Managed file:** `eslint.config.js`
 
@@ -19,7 +19,7 @@ Runs ESLint via the Node API and generates an `eslint.config.js` bridge file for
 ## Example
 
 ```ts
-import { eslintAdapter } from '@lodestar/adapter-eslint';
+import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
 import importX from 'eslint-plugin-import-x';
 import unicorn from 'eslint-plugin-unicorn';
 
@@ -46,7 +46,7 @@ eslintAdapter({
 `verifySetup` checks that `eslint.config.js` exists at the project root with the following content:
 
 ```js
-import { fromLodestar } from '@lodestar/adapter-eslint';
+import { fromLodestar } from '@retemper/lodestar-adapter-eslint';
 
 export default await fromLodestar();
 ```

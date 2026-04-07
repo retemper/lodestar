@@ -6,7 +6,7 @@ A plugin is a named collection of rules. Lodestar ships one official plugin and 
 
 | Plugin                                                   | Focus                                                                 |
 | -------------------------------------------------------- | --------------------------------------------------------------------- |
-| [`@lodestar/plugin-architecture`](/plugins/architecture) | Layer boundaries, module encapsulation, circular dependency detection |
+| [`@retemper/lodestar-plugin-architecture`](/plugins/architecture) | Layer boundaries, module encapsulation, circular dependency detection |
 
 ## Using Plugins
 
@@ -14,7 +14,7 @@ Plugins are imported as **named exports** and passed directly to the `plugins` a
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],

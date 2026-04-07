@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/adapter-stylelint",
+  "name": "@retemper/lodestar-adapter-stylelint",
   "version": "0.0.0",
   "type": "module",
   "description": "Stylelint adapter for Lodestar — run CSS lint checks via lodestar check",
@@ -23,7 +23,7 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
