@@ -2,7 +2,7 @@
 
 Runs Stylelint via the CLI and parses JSON output for CSS lint violations. Also generates a `.stylelintrc.json` config file.
 
-**Package:** `@lodestar/adapter-stylelint`
+**Package:** `@retemper/adapter-stylelint`
 
 **Managed file:** `.stylelintrc.json`
 
@@ -21,7 +21,7 @@ All options are optional. Calling `stylelintAdapter()` with no arguments uses St
 ## Example
 
 ```ts
-import { stylelintAdapter } from '@lodestar/adapter-stylelint';
+import { stylelintAdapter } from '@retemper/adapter-stylelint';
 
 stylelintAdapter({
   extends: ['stylelint-config-standard'],

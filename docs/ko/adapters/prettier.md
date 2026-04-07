@@ -2,7 +2,7 @@
 
 Prettier를 CLI(`prettier --check` / `prettier --write`)로 실행하고, `.prettierrc` 파일을 생성합니다.
 
-**패키지:** `@lodestar/adapter-prettier`
+**패키지:** `@retemper/adapter-prettier`
 
 **관리 파일:** `.prettierrc`
 
@@ -26,7 +26,7 @@ Prettier를 CLI(`prettier --check` / `prettier --write`)로 실행하고, `.pret
 ## 예시
 
 ```ts
-import { prettierAdapter } from '@lodestar/adapter-prettier';
+import { prettierAdapter } from '@retemper/adapter-prettier';
 
 prettierAdapter({
   singleQuote: true,

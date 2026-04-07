@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { RuleDefinition, RuleProviders, ResolvedRuleConfig } from '@lodestar/types';
+import type { RuleDefinition, RuleProviders, ResolvedRuleConfig } from '@retemper/types';
 import { runRule, runRules } from './runner';
 
 /** Creates mock providers for testing */

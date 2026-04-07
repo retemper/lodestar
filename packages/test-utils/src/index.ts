@@ -8,7 +8,7 @@ import type {
   ConfigFileProvider,
   ImportInfo,
   ExportInfo,
-} from '@lodestar/types';
+} from '@retemper/types';
 
 /** Options for creating mock providers */
 interface MockProviderOverrides {

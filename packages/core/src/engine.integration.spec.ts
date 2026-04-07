@@ -3,8 +3,8 @@ import { mkdtemp, mkdir, writeFile, rm, symlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { run } from './engine';
-import { resolveConfig } from '@lodestar/config';
-import type { WrittenConfig, Violation } from '@lodestar/types';
+import { resolveConfig } from '@retemper/config';
+import type { WrittenConfig, Violation } from '@retemper/types';
 
 /** Result of creating a test fixture directory */
 interface FixtureResult {
@@ -68,10 +68,10 @@ describe('engine.run() integration test', () => {
       'src/domain/entity.ts': "import { repo } from '../infra/repo.ts';",
       'src/infra/repo.ts': 'export const repo = {};',
     });
-    await linkPlugin(rootDir, '@lodestar/plugin-architecture');
+    await linkPlugin(rootDir, '@retemper/plugin-architecture');
 
     const config: WrittenConfig = {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'error',
@@ -99,10 +99,10 @@ describe('engine.run() integration test', () => {
       'src/domain/entity.ts': 'export const entity = {};',
       'src/infra/repo.ts': "import { entity } from '../domain/entity.ts';",
     });
-    await linkPlugin(rootDir, '@lodestar/plugin-architecture');
+    await linkPlugin(rootDir, '@retemper/plugin-architecture');
 
     const config: WrittenConfig = {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'error',
@@ -128,10 +128,10 @@ describe('engine.run() integration test', () => {
       'src/domain/entity.ts': "import { repo } from '../infra/repo.ts';",
       'src/infra/repo.ts': 'export const repo = {};',
     });
-    await linkPlugin(rootDir, '@lodestar/plugin-architecture');
+    await linkPlugin(rootDir, '@retemper/plugin-architecture');
 
     const config: WrittenConfig = {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/plugin-architecture'],
       rules: {
         'architecture/layers': 'off',
       },
@@ -149,7 +149,7 @@ describe('engine.run() integration test', () => {
       'src/domain/entity.ts': "import { repo } from '../infra/repo.ts';",
       'src/infra/repo.ts': 'export const repo = {};',
     });
-    await linkPlugin(rootDir, '@lodestar/plugin-architecture');
+    await linkPlugin(rootDir, '@retemper/plugin-architecture');
 
     const calls: string[] = [];
     const reporter = {
@@ -160,7 +160,7 @@ describe('engine.run() integration test', () => {
     };
 
     const config: WrittenConfig = {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'error',

@@ -3,11 +3,11 @@
 The core plugin. Enforces intra-package architecture rules — layer dependencies, module boundaries, and circular import detection.
 
 ```sh
-pnpm add -D @lodestar/plugin-architecture
+pnpm add -D @retemper/plugin-architecture
 ```
 
 ```ts
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],

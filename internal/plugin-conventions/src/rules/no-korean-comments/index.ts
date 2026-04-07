@@ -1,4 +1,4 @@
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/types';
 
 /** Korean character ranges (U+AC00-U+D7AF, U+3130-U+318F, U+3200-U+321E) */
 const KOREAN_PATTERN = /[\uAC00-\uD7AF\u3130-\u318F\u3200-\u321E]/;

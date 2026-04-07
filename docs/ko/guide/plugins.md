@@ -6,7 +6,7 @@
 
 | 플러그인                                                    | 주요 기능                                  |
 | ----------------------------------------------------------- | ------------------------------------------ |
-| [`@lodestar/plugin-architecture`](/ko/plugins/architecture) | 레이어 경계, 모듈 캡슐화, 순환 의존성 탐지 |
+| [`@retemper/plugin-architecture`](/ko/plugins/architecture) | 레이어 경계, 모듈 캡슐화, 순환 의존성 탐지 |
 
 ## 플러그인 사용
 
@@ -14,7 +14,7 @@
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],

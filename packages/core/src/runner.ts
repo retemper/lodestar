@@ -4,7 +4,7 @@ import type {
   RuleProviders,
   Violation,
   ResolvedRuleConfig,
-} from '@lodestar/types';
+} from '@retemper/types';
 
 /** Result of running a single rule */
 interface RuleResult {

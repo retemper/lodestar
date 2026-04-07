@@ -1,9 +1,9 @@
-import type { WrittenConfigBlock } from '@lodestar/types';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import type { WrittenConfigBlock } from '@retemper/types';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
 import { pluginConventions } from '@repo/plugin-conventions';
-import { eslintAdapter } from '@lodestar/adapter-eslint';
-import { prettierAdapter } from '@lodestar/adapter-prettier';
-import { huskyAdapter } from '@lodestar/adapter-husky';
+import { eslintAdapter } from '@retemper/adapter-eslint';
+import { prettierAdapter } from '@retemper/adapter-prettier';
+import { huskyAdapter } from '@retemper/adapter-husky';
 import importX from 'eslint-plugin-import-x';
 import unicorn from 'eslint-plugin-unicorn';
 

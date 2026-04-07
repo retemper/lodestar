@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/plugin-architecture",
+  "name": "@retemper/plugin-architecture",
   "version": "0.0.0",
   "type": "module",
   "description": "Architecture as Code — layers, module boundaries, and circular dependency detection",
@@ -23,13 +23,13 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@retemper/types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
     "vitest": "^4.1.0",
-    "@lodestar/test-utils": "workspace:*"
+    "@retemper/test-utils": "workspace:*"
   },
   "sideEffects": false,
   "publishConfig": {

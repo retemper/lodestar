@@ -2,7 +2,7 @@
 
 Runs Knip via the CLI and parses JSON output to find unused files, dependencies, and exports. Also generates a `knip.json` config file.
 
-**Package:** `@lodestar/adapter-knip`
+**Package:** `@retemper/adapter-knip`
 
 **Managed file:** `knip.json`
 
@@ -21,7 +21,7 @@ All options are optional. Calling `knipAdapter()` with no arguments uses Knip de
 ## Example
 
 ```ts
-import { knipAdapter } from '@lodestar/adapter-knip';
+import { knipAdapter } from '@retemper/adapter-knip';
 
 knipAdapter({
   entry: ['src/index.ts'],

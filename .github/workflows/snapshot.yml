@@ -70,7 +70,7 @@ jobs:
               ``,
               `Install with:`,
               `\`\`\`bash`,
-              `pnpm add @lodestar/core@${tag}`,
+              `pnpm add @retemper/core@${tag}`,
               `\`\`\``,
               ``,
               `> All changed packages are available under the \`${tag}\` dist-tag.`,

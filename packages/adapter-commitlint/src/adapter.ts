@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ToolAdapter, Violation } from '@lodestar/types';
+import type { ToolAdapter, Violation } from '@retemper/types';
 
 /** commitlint adapter configuration — extends and custom rules */
 interface CommitlintAdapterConfig {

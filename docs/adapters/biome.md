@@ -2,7 +2,7 @@
 
 Runs Biome via the CLI and generates a `biome.json` config file.
 
-**Package:** `@lodestar/adapter-biome`
+**Package:** `@retemper/adapter-biome`
 
 **Managed file:** `biome.json`
 
@@ -20,7 +20,7 @@ Runs Biome via the CLI and generates a `biome.json` config file.
 ## Example
 
 ```ts
-import { biomeAdapter } from '@lodestar/adapter-biome';
+import { biomeAdapter } from '@retemper/adapter-biome';
 
 biomeAdapter({
   rules: {

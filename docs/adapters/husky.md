@@ -2,7 +2,7 @@
 
 Manages git hooks via Husky. Unlike other adapters, husky has no `check` or `fix` methods -- it only provides `verifySetup` and `setup`.
 
-**Package:** `@lodestar/adapter-husky`
+**Package:** `@retemper/adapter-husky`
 
 **Managed files:** `.husky/<hook-name>` (e.g., `.husky/pre-commit`)
 
@@ -17,7 +17,7 @@ A `HookDefinition` has a `commands` array. You can also pass an array of strings
 ## Example
 
 ```ts
-import { huskyAdapter } from '@lodestar/adapter-husky';
+import { huskyAdapter } from '@retemper/adapter-husky';
 
 huskyAdapter({
   hooks: {

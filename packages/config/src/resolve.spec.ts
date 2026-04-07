@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Plugin, PluginFactory } from '@lodestar/types';
+import type { Plugin, PluginFactory } from '@retemper/types';
 import { resolveConfig, resolvePluginEntry, normalizeRuleConfig } from './resolve';
 
 describe('normalizeRuleConfig', () => {

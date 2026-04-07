@@ -17,7 +17,7 @@ describe('generateConfigTemplate', () => {
   it('architecture 플러그인을 포함한다', () => {
     const result = generateConfigTemplate();
 
-    expect(result).toContain('@lodestar/plugin-architecture');
+    expect(result).toContain('@retemper/plugin-architecture');
     expect(result).toContain('pluginArchitecture');
   });
 

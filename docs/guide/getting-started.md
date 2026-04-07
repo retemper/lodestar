@@ -3,7 +3,7 @@
 ## Installation
 
 ```sh
-npm install -D lodestar @lodestar/plugin-architecture
+npm install -D lodestar @retemper/plugin-architecture
 ```
 
 ## Initialize Config
@@ -16,7 +16,7 @@ This creates a `lodestar.config.ts`:
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],

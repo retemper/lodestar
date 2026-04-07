@@ -1,4 +1,4 @@
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/types';
 import { matchGlob } from '../../shared/match-glob';
 
 /** Detect circular dependencies with configurable scope and depth */

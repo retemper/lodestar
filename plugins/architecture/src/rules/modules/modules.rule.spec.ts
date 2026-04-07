@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { Violation, ImportInfo } from '@lodestar/types';
-import { createMockProviders, createTestContext } from '@lodestar/test-utils';
+import type { Violation, ImportInfo } from '@retemper/types';
+import { createMockProviders, createTestContext } from '@retemper/test-utils';
 import { modules } from './modules.rule';
 
 /** Runs the module boundary rule and returns the list of violations */

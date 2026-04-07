@@ -3,11 +3,11 @@
 Enforces file system structure rules -- directory existence, forbidden paths, and paired file validation.
 
 ```sh
-pnpm add -D @lodestar/plugin-structure
+pnpm add -D @retemper/plugin-structure
 ```
 
 ```ts
-import { pluginStructure } from '@lodestar/plugin-structure';
+import { pluginStructure } from '@retemper/plugin-structure';
 
 export default defineConfig({
   plugins: [pluginStructure],

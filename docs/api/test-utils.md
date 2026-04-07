@@ -3,7 +3,7 @@
 Testing utilities for Lodestar rules. Provides mock providers and a test context that collects violations, so you can unit test rules without touching the file system or real dependency graphs.
 
 ```sh
-pnpm add -D @lodestar/test-utils
+pnpm add -D @retemper/test-utils
 ```
 
 ## createMockProviders
@@ -39,7 +39,7 @@ All fields are optional. Each overrides one provider method:
 
 ```ts
 import { vi } from 'vitest';
-import { createMockProviders } from '@lodestar/test-utils';
+import { createMockProviders } from '@retemper/test-utils';
 
 const providers = createMockProviders({
   glob: vi.fn().mockImplementation((pattern: string) => {
@@ -89,8 +89,8 @@ The returned `ctx` has:
 
 ```ts
 import { describe, it, expect, vi } from 'vitest';
-import { createMockProviders, createTestContext } from '@lodestar/test-utils';
-import { directoryExists } from '@lodestar/plugin-structure';
+import { createMockProviders, createTestContext } from '@retemper/test-utils';
+import { directoryExists } from '@retemper/plugin-structure';
 
 describe('structure/directory-exists', () => {
   it('reports a violation when a required path is missing', async () => {
@@ -133,7 +133,7 @@ A complete test for a custom rule:
 
 ```ts
 import { describe, it, expect, vi } from 'vitest';
-import { createMockProviders, createTestContext } from '@lodestar/test-utils';
+import { createMockProviders, createTestContext } from '@retemper/test-utils';
 import { myCustomRule } from './my-custom-rule';
 
 describe('my-plugin/my-custom-rule', () => {

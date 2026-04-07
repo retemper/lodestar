@@ -22,7 +22,7 @@ body:
     attributes:
       label: Package
       description: Which lodestar package is affected?
-      placeholder: '@lodestar/core'
+      placeholder: '@retemper/core'
     validations:
       required: true
 
@@ -61,7 +61,7 @@ body:
       label: Steps to reproduce
       description: List the steps to reproduce the bug.
       placeholder: |
-        1. Install `@lodestar/core`
+        1. Install `@retemper/core`
         2. Create a `lodestar.config.ts` with ...
         3. Run `lodestar check`
         4. See error ...

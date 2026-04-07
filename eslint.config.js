@@ -1,3 +1,3 @@
-import { fromLodestar } from '@lodestar/adapter-eslint';
+import { fromLodestar } from '@retemper/adapter-eslint';
 
 export default await fromLodestar();

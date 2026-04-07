@@ -2,7 +2,7 @@
 
 Husky를 통해 Git 훅(Hook)을 관리합니다. 다른 어댑터와 달리 `check`이나 `fix` 메서드는 없고, `verifySetup`과 `setup`만 제공합니다.
 
-**패키지:** `@lodestar/adapter-husky`
+**패키지:** `@retemper/adapter-husky`
 
 **관리 파일:** `.husky/<hook-name>` (예: `.husky/pre-commit`)
 
@@ -17,7 +17,7 @@ Husky를 통해 Git 훅(Hook)을 관리합니다. 다른 어댑터와 달리 `ch
 ## 예시
 
 ```ts
-import { huskyAdapter } from '@lodestar/adapter-husky';
+import { huskyAdapter } from '@retemper/adapter-husky';
 
 huskyAdapter({
   hooks: {

@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/core",
+  "name": "@retemper/core",
   "version": "0.0.0",
   "type": "module",
   "description": "Core engine for Lodestar rule execution with ESLint integration",
@@ -23,8 +23,8 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*",
-    "@lodestar/config": "workspace:*",
+    "@retemper/types": "workspace:*",
+    "@retemper/config": "workspace:*",
     "@swc/core": "^1.11.0"
   },
   "peerDependencies": {

@@ -1,6 +1,6 @@
-import type { WrittenConfig, Reporter, RunSummary } from '@lodestar/types';
-import type { WorkspacePackage } from '@lodestar/config';
-import { discoverWorkspaces, loadConfigFile, resolveConfig } from '@lodestar/config';
+import type { WrittenConfig, Reporter, RunSummary } from '@retemper/types';
+import type { WorkspacePackage } from '@retemper/config';
+import { discoverWorkspaces, loadConfigFile, resolveConfig } from '@retemper/config';
 import { run } from './engine';
 
 /** Options for workspace-aware execution */

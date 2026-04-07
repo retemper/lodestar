@@ -27,4 +27,4 @@ We provide security patches for the latest minor release of each package.
 
 ## Scope
 
-This policy applies to all packages in the `@lodestar/*` scope and the `lodestar` package published to npm.
+This policy applies to all packages in the `@retemper/*` scope and the `lodestar` package published to npm.

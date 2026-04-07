@@ -1,8 +1,8 @@
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/types';
 
 /** Represents a single workspace package and its internal dependency edges */
 interface PackageNode {
-  /** Package name from package.json (e.g., "@lodestar/types") */
+  /** Package name from package.json (e.g., "@retemper/types") */
   readonly name: string;
   /** Relative path to the package directory */
   readonly dir: string;

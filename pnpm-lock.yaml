@@ -17,34 +17,34 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.1.0(jiti@2.6.1))
-      '@lodestar/adapter-commitlint':
+      '@retemper/adapter-commitlint':
         specifier: workspace:*
         version: link:packages/adapter-commitlint
-      '@lodestar/adapter-eslint':
+      '@retemper/adapter-eslint':
         specifier: workspace:*
         version: link:packages/adapter-eslint
-      '@lodestar/adapter-husky':
+      '@retemper/adapter-husky':
         specifier: workspace:*
         version: link:packages/adapter-husky
-      '@lodestar/adapter-knip':
+      '@retemper/adapter-knip':
         specifier: workspace:*
         version: link:packages/adapter-knip
-      '@lodestar/adapter-lint-staged':
+      '@retemper/adapter-lint-staged':
         specifier: workspace:*
         version: link:packages/adapter-lint-staged
-      '@lodestar/adapter-prettier':
+      '@retemper/adapter-prettier':
         specifier: workspace:*
         version: link:packages/adapter-prettier
-      '@lodestar/adapter-stylelint':
+      '@retemper/adapter-stylelint':
         specifier: workspace:*
         version: link:packages/adapter-stylelint
-      '@lodestar/cli':
+      '@retemper/cli':
         specifier: workspace:*
         version: link:packages/cli
-      '@lodestar/plugin-architecture':
+      '@retemper/plugin-architecture':
         specifier: workspace:*
         version: link:plugins/architecture
-      '@lodestar/plugin-structure':
+      '@retemper/plugin-structure':
         specifier: workspace:*
         version: link:plugins/structure
       '@repo/lodestar-config':
@@ -89,22 +89,22 @@ importers:
 
   examples/clean-architecture:
     devDependencies:
-      '@lodestar/adapter-eslint':
+      '@retemper/adapter-eslint':
         specifier: workspace:*
         version: link:../../packages/adapter-eslint
-      '@lodestar/adapter-husky':
+      '@retemper/adapter-husky':
         specifier: workspace:*
         version: link:../../packages/adapter-husky
-      '@lodestar/adapter-prettier':
+      '@retemper/adapter-prettier':
         specifier: workspace:*
         version: link:../../packages/adapter-prettier
-      '@lodestar/cli':
+      '@retemper/cli':
         specifier: workspace:*
         version: link:../../packages/cli
-      '@lodestar/plugin-architecture':
+      '@retemper/plugin-architecture':
         specifier: workspace:*
         version: link:../../plugins/architecture
-      '@lodestar/plugin-structure':
+      '@retemper/plugin-structure':
         specifier: workspace:*
         version: link:../../plugins/structure
       lodestar:
@@ -116,19 +116,19 @@ importers:
 
   examples/hexagonal:
     devDependencies:
-      '@lodestar/adapter-eslint':
+      '@retemper/adapter-eslint':
         specifier: workspace:*
         version: link:../../packages/adapter-eslint
-      '@lodestar/adapter-prettier':
+      '@retemper/adapter-prettier':
         specifier: workspace:*
         version: link:../../packages/adapter-prettier
-      '@lodestar/cli':
+      '@retemper/cli':
         specifier: workspace:*
         version: link:../../packages/cli
-      '@lodestar/plugin-architecture':
+      '@retemper/plugin-architecture':
         specifier: workspace:*
         version: link:../../plugins/architecture
-      '@lodestar/plugin-structure':
+      '@retemper/plugin-structure':
         specifier: workspace:*
         version: link:../../plugins/structure
       lodestar:
@@ -140,22 +140,22 @@ importers:
 
   internal/lodestar-config:
     dependencies:
-      '@lodestar/adapter-eslint':
+      '@retemper/adapter-eslint':
         specifier: workspace:*
         version: link:../../packages/adapter-eslint
-      '@lodestar/adapter-husky':
+      '@retemper/adapter-husky':
         specifier: workspace:*
         version: link:../../packages/adapter-husky
-      '@lodestar/adapter-prettier':
+      '@retemper/adapter-prettier':
         specifier: workspace:*
         version: link:../../packages/adapter-prettier
-      '@lodestar/plugin-architecture':
+      '@retemper/plugin-architecture':
         specifier: workspace:*
         version: link:../../plugins/architecture
-      '@lodestar/plugin-structure':
+      '@retemper/plugin-structure':
         specifier: workspace:*
         version: link:../../plugins/structure
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../../packages/types
       '@repo/plugin-conventions':
@@ -177,11 +177,11 @@ importers:
 
   internal/plugin-conventions:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../../packages/types
     devDependencies:
-      '@lodestar/test-utils':
+      '@retemper/test-utils':
         specifier: workspace:*
         version: link:../../packages/test-utils
       tsup:
@@ -196,7 +196,7 @@ importers:
 
   packages/adapter-biome:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -212,7 +212,7 @@ importers:
 
   packages/adapter-commitlint:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -228,10 +228,10 @@ importers:
 
   packages/adapter-eslint:
     dependencies:
-      '@lodestar/config':
+      '@retemper/config':
         specifier: workspace:*
         version: link:../config
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
       eslint:
@@ -250,7 +250,7 @@ importers:
 
   packages/adapter-husky:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -266,7 +266,7 @@ importers:
 
   packages/adapter-knip:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -282,7 +282,7 @@ importers:
 
   packages/adapter-lint-staged:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -298,7 +298,7 @@ importers:
 
   packages/adapter-prettier:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -314,7 +314,7 @@ importers:
 
   packages/adapter-stylelint:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -352,7 +352,7 @@ importers:
 
   packages/config:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
       jiti:
@@ -374,10 +374,10 @@ importers:
 
   packages/core:
     dependencies:
-      '@lodestar/config':
+      '@retemper/config':
         specifier: workspace:*
         version: link:../config
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
       '@swc/core':
@@ -402,13 +402,13 @@ importers:
 
   packages/lodestar:
     dependencies:
-      '@lodestar/config':
+      '@retemper/config':
         specifier: workspace:*
         version: link:../config
-      '@lodestar/core':
+      '@retemper/core':
         specifier: workspace:*
         version: link:../core
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -421,7 +421,7 @@ importers:
 
   packages/test-utils:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -443,11 +443,11 @@ importers:
 
   plugins/architecture:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../../packages/types
     devDependencies:
-      '@lodestar/test-utils':
+      '@retemper/test-utils':
         specifier: workspace:*
         version: link:../../packages/test-utils
       tsup:
@@ -462,11 +462,11 @@ importers:
 
   plugins/structure:
     dependencies:
-      '@lodestar/types':
+      '@retemper/types':
         specifier: workspace:*
         version: link:../../packages/types
     devDependencies:
-      '@lodestar/test-utils':
+      '@retemper/test-utils':
         specifier: workspace:*
         version: link:../../packages/test-utils
       tsup:

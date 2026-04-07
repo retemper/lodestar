@@ -1,4 +1,4 @@
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/types';
 import { resolveImport } from '../../shared/resolve-import';
 
 /** A named layer with a file pattern and allowed import targets */

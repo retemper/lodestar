@@ -1,9 +1,9 @@
-# @lodestar/core
+# @retemper/core
 
 Rule engine, runner, plugin resolver, and providers.
 
 ```ts
-import { run, runWorkspace, createProviders } from '@lodestar/core';
+import { run, runWorkspace, createProviders } from '@retemper/core';
 ```
 
 ## `run(options)`
@@ -157,6 +157,6 @@ function createMyReporter(): Reporter {
 | `createJsonReporter()`    | stdout | Collects all violations and writes a single JSON object on completion. Useful for CI pipelines and programmatic consumption.                     |
 
 ```ts
-import { createConsoleReporter } from '@lodestar/cli';
-import { createJsonReporter } from '@lodestar/cli';
+import { createConsoleReporter } from '@retemper/cli';
+import { createJsonReporter } from '@retemper/cli';
 ```

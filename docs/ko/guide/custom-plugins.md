@@ -80,7 +80,7 @@ export default defineConfig({
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "peerDependencies": {
-    "@lodestar/types": ">=0.1.0"
+    "@retemper/types": ">=0.1.0"
   }
 }
 ```

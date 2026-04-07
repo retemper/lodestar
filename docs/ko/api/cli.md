@@ -48,11 +48,11 @@ npx lodestar check --rule architecture/layers --rule naming-convention/file-nami
 npx lodestar init
 ```
 
-`defineConfig`와 `@lodestar/plugin-architecture`를 임포트하고, 샘플 `architecture/layers` 규칙이 사전 구성된 시작 설정을 생성합니다:
+`defineConfig`와 `@retemper/plugin-architecture`를 임포트하고, 샘플 `architecture/layers` 규칙이 사전 구성된 시작 설정을 생성합니다:
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],

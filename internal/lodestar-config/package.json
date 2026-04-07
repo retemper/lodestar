@@ -21,13 +21,13 @@
     "build": "tsup"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*",
-    "@lodestar/plugin-architecture": "workspace:*",
-    "@lodestar/plugin-structure": "workspace:*",
+    "@retemper/types": "workspace:*",
+    "@retemper/plugin-architecture": "workspace:*",
+    "@retemper/plugin-structure": "workspace:*",
     "@repo/plugin-conventions": "workspace:*",
-    "@lodestar/adapter-eslint": "workspace:*",
-    "@lodestar/adapter-prettier": "workspace:*",
-    "@lodestar/adapter-husky": "workspace:*",
+    "@retemper/adapter-eslint": "workspace:*",
+    "@retemper/adapter-prettier": "workspace:*",
+    "@retemper/adapter-husky": "workspace:*",
     "eslint-plugin-import-x": "^4.16.2",
     "eslint-plugin-unicorn": "^64.0.0"
   },

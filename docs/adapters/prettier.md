@@ -2,7 +2,7 @@
 
 Runs Prettier via the CLI (`prettier --check` / `prettier --write`) and generates a `.prettierrc` file.
 
-**Package:** `@lodestar/adapter-prettier`
+**Package:** `@retemper/adapter-prettier`
 
 **Managed file:** `.prettierrc`
 
@@ -26,7 +26,7 @@ Runs Prettier via the CLI (`prettier --check` / `prettier --write`) and generate
 ## Example
 
 ```ts
-import { prettierAdapter } from '@lodestar/adapter-prettier';
+import { prettierAdapter } from '@retemper/adapter-prettier';
 
 prettierAdapter({
   singleQuote: true,

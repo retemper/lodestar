@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/docs",
+  "name": "@retemper/docs",
   "private": true,
   "type": "module",
   "scripts": {

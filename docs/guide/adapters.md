@@ -3,12 +3,12 @@
 Adapters are integrations with external tools -- linters, formatters, and git hooks -- declared in `lodestar.config.ts`. They let you centralize tool configuration in a single source of truth while generating the native config files that each tool and IDE expects.
 
 ```sh
-pnpm add -D @lodestar/adapter-eslint @lodestar/adapter-prettier @lodestar/adapter-biome @lodestar/adapter-husky @lodestar/adapter-lint-staged @lodestar/adapter-commitlint @lodestar/adapter-knip @lodestar/adapter-stylelint
+pnpm add -D @retemper/adapter-eslint @retemper/adapter-prettier @retemper/adapter-biome @retemper/adapter-husky @retemper/adapter-lint-staged @retemper/adapter-commitlint @retemper/adapter-knip @retemper/adapter-stylelint
 ```
 
 ## The ToolAdapter Interface
 
-Every adapter implements the `ToolAdapter` interface from `@lodestar/types`:
+Every adapter implements the `ToolAdapter` interface from `@retemper/types`:
 
 ```ts
 interface ToolAdapter<TConfig = unknown> {
@@ -35,9 +35,9 @@ interface ToolAdapter<TConfig = unknown> {
 Adapters are placed in the `adapters` array inside a config block:
 
 ```ts
-import { defineConfig } from '@lodestar/types';
-import { eslintAdapter } from '@lodestar/adapter-eslint';
-import { prettierAdapter } from '@lodestar/adapter-prettier';
+import { defineConfig } from '@retemper/types';
+import { eslintAdapter } from '@retemper/adapter-eslint';
+import { prettierAdapter } from '@retemper/adapter-prettier';
 
 export default defineConfig({
   adapters: [eslintAdapter({ presets: ['strict'] }), prettierAdapter({ singleQuote: true })],
@@ -58,11 +58,11 @@ Running `lodestar check --fix` applies the auto-fix for setup violations -- crea
 
 | Adapter                                      | Package                         | Managed File         | Description                          |
 | -------------------------------------------- | ------------------------------- | -------------------- | ------------------------------------ |
-| [adapter-eslint](/adapters/eslint)           | `@lodestar/adapter-eslint`      | `eslint.config.js`   | ESLint via Node API with bridge file |
-| [adapter-prettier](/adapters/prettier)       | `@lodestar/adapter-prettier`    | `.prettierrc`        | Prettier via CLI                     |
-| [adapter-biome](/adapters/biome)             | `@lodestar/adapter-biome`       | `biome.json`         | Biome via CLI with temp config       |
-| [adapter-husky](/adapters/husky)             | `@lodestar/adapter-husky`       | `.husky/<hook>`      | Git hooks via Husky                  |
-| [adapter-lint-staged](/adapters/lint-staged) | `@lodestar/adapter-lint-staged` | `.lintstagedrc.json` | Staged file linting                  |
-| [adapter-commitlint](/adapters/commitlint)   | `@lodestar/adapter-commitlint`  | `.commitlintrc.json` | Commit message conventions           |
-| [adapter-knip](/adapters/knip)               | `@lodestar/adapter-knip`        | `knip.json`          | Unused exports/dependencies          |
-| [adapter-stylelint](/adapters/stylelint)     | `@lodestar/adapter-stylelint`   | `.stylelintrc.json`  | CSS/SCSS linting                     |
+| [adapter-eslint](/adapters/eslint)           | `@retemper/adapter-eslint`      | `eslint.config.js`   | ESLint via Node API with bridge file |
+| [adapter-prettier](/adapters/prettier)       | `@retemper/adapter-prettier`    | `.prettierrc`        | Prettier via CLI                     |
+| [adapter-biome](/adapters/biome)             | `@retemper/adapter-biome`       | `biome.json`         | Biome via CLI with temp config       |
+| [adapter-husky](/adapters/husky)             | `@retemper/adapter-husky`       | `.husky/<hook>`      | Git hooks via Husky                  |
+| [adapter-lint-staged](/adapters/lint-staged) | `@retemper/adapter-lint-staged` | `.lintstagedrc.json` | Staged file linting                  |
+| [adapter-commitlint](/adapters/commitlint)   | `@retemper/adapter-commitlint`  | `.commitlintrc.json` | Commit message conventions           |
+| [adapter-knip](/adapters/knip)               | `@retemper/adapter-knip`        | `knip.json`          | Unused exports/dependencies          |
+| [adapter-stylelint](/adapters/stylelint)     | `@retemper/adapter-stylelint`   | `.stylelintrc.json`  | CSS/SCSS linting                     |

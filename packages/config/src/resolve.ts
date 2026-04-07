@@ -9,7 +9,7 @@ import type {
   PluginEntry,
   Plugin,
   ToolAdapter,
-} from '@lodestar/types';
+} from '@retemper/types';
 
 /**
  * Normalize a flat config (single block or array) into a fully resolved config.

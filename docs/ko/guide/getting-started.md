@@ -3,7 +3,7 @@
 ## 설치
 
 ```sh
-npm install -D lodestar @lodestar/plugin-architecture
+npm install -D lodestar @retemper/plugin-architecture
 ```
 
 ## 설정 초기화
@@ -16,7 +16,7 @@ npx lodestar init
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],

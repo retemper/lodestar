@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ToolAdapter, Violation } from '@lodestar/types';
+import type { ToolAdapter, Violation } from '@retemper/types';
 
 /** ESLint-specific adapter configuration */
 interface EslintAdapterConfig {
@@ -20,7 +20,7 @@ interface EslintAdapterConfig {
 }
 
 /** Template for eslint.config.js that bridges to lodestar config */
-const ESLINT_CONFIG_TEMPLATE = `import { fromLodestar } from '@lodestar/adapter-eslint';
+const ESLINT_CONFIG_TEMPLATE = `import { fromLodestar } from '@retemper/adapter-eslint';
 
 export default await fromLodestar();
 `;

@@ -1,5 +1,5 @@
-import type { WrittenConfigBlock } from '@lodestar/types';
-import { pluginStructure } from '@lodestar/plugin-structure';
+import type { WrittenConfigBlock } from '@retemper/types';
+import { pluginStructure } from '@retemper/plugin-structure';
 import { base } from './base';
 
 /** Config for plugin packages — base + paired-files rules */

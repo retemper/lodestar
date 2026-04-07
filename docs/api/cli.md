@@ -48,11 +48,11 @@ Create a `lodestar.config.ts` file in the current directory.
 npx lodestar init
 ```
 
-Generates a starter config that imports `defineConfig` and `@lodestar/plugin-architecture`, with a sample `architecture/layers` rule pre-configured:
+Generates a starter config that imports `defineConfig` and `@retemper/plugin-architecture`, with a sample `architecture/layers` rule pre-configured:
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],

@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/adapter-husky",
+  "name": "@retemper/adapter-husky",
   "version": "0.0.0",
   "type": "module",
   "description": "Husky adapter for Lodestar — configure git hooks from lodestar.config.ts",
@@ -23,7 +23,7 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@retemper/types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

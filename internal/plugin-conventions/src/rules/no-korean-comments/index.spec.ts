@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createMockProviders, createTestContext } from '@lodestar/test-utils';
+import { createMockProviders, createTestContext } from '@retemper/test-utils';
 import { noKoreanComments, findKoreanComments, containsKorean } from './index';
 
 describe('containsKorean', () => {

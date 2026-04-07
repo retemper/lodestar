@@ -80,7 +80,7 @@ A plugin is just an npm package. Export a `definePlugin()` call as the default e
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "peerDependencies": {
-    "@lodestar/types": ">=0.1.0"
+    "@retemper/types": ">=0.1.0"
   }
 }
 ```

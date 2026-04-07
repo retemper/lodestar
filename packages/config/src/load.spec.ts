@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { loadConfigFile } from './load';
-import type { WrittenConfigBlock } from '@lodestar/types';
+import type { WrittenConfigBlock } from '@retemper/types';
 
 /** Result of creating a test fixture directory */
 interface FixtureResult {

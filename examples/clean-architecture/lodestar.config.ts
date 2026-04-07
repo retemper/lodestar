@@ -1,9 +1,9 @@
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
-import { pluginStructure } from '@lodestar/plugin-structure';
-import { eslintAdapter } from '@lodestar/adapter-eslint';
-import { prettierAdapter } from '@lodestar/adapter-prettier';
-import { huskyAdapter } from '@lodestar/adapter-husky';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
+import { pluginStructure } from '@retemper/plugin-structure';
+import { eslintAdapter } from '@retemper/adapter-eslint';
+import { prettierAdapter } from '@retemper/adapter-prettier';
+import { huskyAdapter } from '@retemper/adapter-husky';
 
 export default defineConfig([
   {

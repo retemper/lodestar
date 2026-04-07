@@ -1,6 +1,6 @@
 import { mkdir, writeFile, chmod, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ToolAdapter, Violation } from '@lodestar/types';
+import type { ToolAdapter, Violation } from '@retemper/types';
 
 /** Indent each line for readable diff output */
 function indent(text: string): string {

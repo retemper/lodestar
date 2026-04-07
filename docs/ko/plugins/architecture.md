@@ -3,11 +3,11 @@
 핵심 플러그인(Plugin)입니다. 패키지 내부의 아키텍처 규칙 -- 레이어 의존성, 모듈 경계, 순환 임포트 감지를 강제합니다.
 
 ```sh
-pnpm add -D @lodestar/plugin-architecture
+pnpm add -D @retemper/plugin-architecture
 ```
 
 ```ts
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],

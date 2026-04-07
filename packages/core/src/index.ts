@@ -18,4 +18,4 @@ export type {
   WorkspaceSummary,
   PackageSummary,
 } from './workspace-runner';
-export type { WorkspacePackage } from '@lodestar/config';
+export type { WorkspacePackage } from '@retemper/config';

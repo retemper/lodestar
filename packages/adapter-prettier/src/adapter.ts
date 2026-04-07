@@ -2,7 +2,7 @@ import { execFile } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import type { ToolAdapter, Violation } from '@lodestar/types';
+import type { ToolAdapter, Violation } from '@retemper/types';
 
 const execFileAsync = promisify(execFile);
 

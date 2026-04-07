@@ -8,11 +8,11 @@
   },
   "devDependencies": {
     "lodestar": "workspace:*",
-    "@lodestar/cli": "workspace:*",
-    "@lodestar/plugin-architecture": "workspace:*",
-    "@lodestar/plugin-structure": "workspace:*",
-    "@lodestar/adapter-eslint": "workspace:*",
-    "@lodestar/adapter-prettier": "workspace:*",
+    "@retemper/cli": "workspace:*",
+    "@retemper/plugin-architecture": "workspace:*",
+    "@retemper/plugin-structure": "workspace:*",
+    "@retemper/adapter-eslint": "workspace:*",
+    "@retemper/adapter-prettier": "workspace:*",
     "typescript": "^5.0.0"
   }
 }

@@ -1,9 +1,9 @@
-# @lodestar/config
+# @retemper/config
 
 설정 로딩, 정규화 및 병합을 담당합니다.
 
 ```ts
-import { loadConfigFile, resolveConfig, mergeConfigs } from '@lodestar/config';
+import { loadConfigFile, resolveConfig, mergeConfigs } from '@retemper/config';
 ```
 
 ## `loadConfigFile(dir)`

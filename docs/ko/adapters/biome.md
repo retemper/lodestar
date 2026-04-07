@@ -2,7 +2,7 @@
 
 Biome을 CLI로 실행하고, `biome.json` 설정 파일을 생성합니다.
 
-**패키지:** `@lodestar/adapter-biome`
+**패키지:** `@retemper/adapter-biome`
 
 **관리 파일:** `biome.json`
 
@@ -20,7 +20,7 @@ Biome을 CLI로 실행하고, `biome.json` 설정 파일을 생성합니다.
 ## 예시
 
 ```ts
-import { biomeAdapter } from '@lodestar/adapter-biome';
+import { biomeAdapter } from '@retemper/adapter-biome';
 
 biomeAdapter({
   rules: {

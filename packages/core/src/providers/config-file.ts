@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ConfigFileProvider } from '@lodestar/types';
+import type { ConfigFileProvider } from '@retemper/types';
 
 /**
  * Create a config file provider for reading project configs.

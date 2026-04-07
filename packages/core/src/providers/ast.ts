@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { parseSync } from '@swc/core';
 import type { Module, ModuleItem } from '@swc/core';
-import type { ASTProvider, ImportInfo, ExportInfo } from '@lodestar/types';
+import type { ASTProvider, ImportInfo, ExportInfo } from '@retemper/types';
 
 /**
  * Create an AST provider backed by SWC for TypeScript source analysis.

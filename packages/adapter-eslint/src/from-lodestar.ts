@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'node:path';
-import { loadConfigFile } from '@lodestar/config';
-import type { ToolAdapter, WrittenConfig, WrittenConfigBlock } from '@lodestar/types';
+import { loadConfigFile } from '@retemper/config';
+import type { ToolAdapter, WrittenConfig, WrittenConfigBlock } from '@retemper/types';
 
 /** Extract the eslint adapter from a loaded config, if present */
 function findEslintAdapter(config: WrittenConfig): ToolAdapter | undefined {
@@ -36,7 +36,7 @@ async function loadConfigWithEslintAdapter(
  * Used in eslint.config.js for IDE integration:
  *
  * ```js
- * import { fromLodestar } from '@lodestar/adapter-eslint';
+ * import { fromLodestar } from '@retemper/adapter-eslint';
  * export default await fromLodestar();
  * ```
  *
