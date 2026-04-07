@@ -1,4 +1,4 @@
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/lodestar-types';
 
 /** Ensure that certain paths do not exist in the project */
 const noForbiddenPath = defineRule<{

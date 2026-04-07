@@ -1,6 +1,6 @@
 import { defineConfig } from 'lodestar';
 import { base } from '@repo/lodestar-config';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig([
   ...base,

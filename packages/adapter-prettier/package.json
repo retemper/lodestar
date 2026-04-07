@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/adapter-prettier",
+  "name": "@retemper/lodestar-adapter-prettier",
   "version": "0.0.0",
   "type": "module",
   "description": "Prettier adapter for Lodestar — run format checks via lodestar check",
@@ -23,7 +23,7 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

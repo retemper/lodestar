@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { RunSummary } from '@lodestar/types';
-import type { WorkspacePackage } from '@lodestar/config';
+import type { RunSummary } from '@retemper/lodestar-types';
+import type { WorkspacePackage } from '@retemper/lodestar-config';
 
-vi.mock('@lodestar/config', () => ({
+vi.mock('@retemper/lodestar-config', () => ({
   discoverWorkspaces: vi.fn(),
   loadConfigFile: vi.fn(),
   resolveConfig: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock('./engine', () => ({
   run: vi.fn(),
 }));
 
-import { discoverWorkspaces, loadConfigFile, resolveConfig } from '@lodestar/config';
+import { discoverWorkspaces, loadConfigFile, resolveConfig } from '@retemper/lodestar-config';
 import { run } from './engine';
 import { runWorkspace } from './workspace-runner';
 

@@ -25,7 +25,7 @@ describe('lodestar check E2E', () => {
       'src/infra/repo.ts': 'export const repo = {};',
     });
     await createFixtureConfig(rootDir, {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/lodestar-plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'error',
@@ -49,7 +49,7 @@ describe('lodestar check E2E', () => {
       'src/infra/repo.ts': "import { entity } from '../domain/entity.ts';",
     });
     await createFixtureConfig(rootDir, {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/lodestar-plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'error',
@@ -73,7 +73,7 @@ describe('lodestar check E2E', () => {
       'src/infra/repo.ts': 'export const repo = {};',
     });
     await createFixtureConfig(rootDir, {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/lodestar-plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'error',
@@ -97,7 +97,7 @@ describe('lodestar check E2E', () => {
       'src/infra/repo.ts': 'export const repo = {};',
     });
     await createFixtureConfig(rootDir, {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/lodestar-plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'error',
@@ -129,7 +129,7 @@ describe('lodestar check E2E', () => {
       'src/infra/repo.ts': 'export const repo = {};',
     });
     await createFixtureConfig(rootDir, {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/lodestar-plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'warn',
@@ -157,7 +157,7 @@ describe('lodestar check E2E', () => {
       'src/domain/internal.ts': 'export const internal = {};',
     });
     await createFixtureConfig(rootDir, {
-      plugins: ['@lodestar/plugin-architecture'],
+      plugins: ['@retemper/lodestar-plugin-architecture'],
       rules: {
         'architecture/layers': {
           severity: 'error',

@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/adapter-eslint",
+  "name": "@retemper/lodestar-adapter-eslint",
   "version": "0.0.0",
   "type": "module",
   "description": "ESLint adapter for Lodestar — run ESLint rules via lodestar check",
@@ -21,8 +21,8 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*",
-    "@lodestar/config": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*",
+    "@retemper/lodestar-config": "workspace:*"
   },
   "peerDependencies": {
     "eslint": ">=9.0.0",

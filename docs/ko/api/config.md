@@ -86,7 +86,7 @@ type PluginEntry =
 예시:
 
 ```ts
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],
@@ -114,10 +114,10 @@ interface ToolAdapter<TConfig = unknown> {
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
-import { eslintAdapter } from '@lodestar/adapter-eslint';
-import { prettierAdapter } from '@lodestar/adapter-prettier';
-import { huskyAdapter } from '@lodestar/adapter-husky';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
+import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
+import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
+import { huskyAdapter } from '@retemper/lodestar-adapter-husky';
 
 export default defineConfig({
   plugins: [pluginArchitecture],
@@ -153,7 +153,7 @@ export default defineConfig({
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig([
   // 전역 블록 -- 모든 파일에 적용

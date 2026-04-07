@@ -142,7 +142,7 @@ describe('checkCommand', () => {
     it('워크스페이스가 감지되면 runWorkspace를 호출한다', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
-        { name: '@lodestar/core', dir: '/fake/packages/core' },
+        { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
       ]);
       mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary());
 
@@ -177,7 +177,7 @@ describe('checkCommand', () => {
     it('워크스페이스 모드에서 에러가 있으면 exitCode를 1로 설정한다', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
-        { name: '@lodestar/core', dir: '/fake/packages/core' },
+        { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
       ]);
       mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary({ totalErrorCount: 5 }));
 
@@ -189,7 +189,7 @@ describe('checkCommand', () => {
     it('워크스페이스 모드에서 경고만 있으면 exitCode를 설정하지 않는다', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
-        { name: '@lodestar/core', dir: '/fake/packages/core' },
+        { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
       ]);
       mockRunWorkspace.mockResolvedValue(
         makeWorkspaceSummary({
@@ -206,7 +206,7 @@ describe('checkCommand', () => {
     it('워크스페이스 모드에서 총 소요 시간을 포함하여 출력한다', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
-        { name: '@lodestar/core', dir: '/fake/packages/core' },
+        { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
       ]);
       mockRunWorkspace.mockResolvedValue(
         makeWorkspaceSummary({
@@ -229,17 +229,17 @@ describe('checkCommand', () => {
     it('패키지 수를 포함한 합계 메시지를 출력한다', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
-        { name: '@lodestar/core', dir: '/fake/packages/core' },
+        { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
       ]);
       mockRunWorkspace.mockResolvedValue(
         makeWorkspaceSummary({
           packages: [
             {
-              package: { name: '@lodestar/core', dir: '/fake/packages/core' },
+              package: { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
               summary: makeSummary(),
             },
             {
-              package: { name: '@lodestar/cli', dir: '/fake/packages/cli' },
+              package: { name: '@retemper/lodestar-cli', dir: '/fake/packages/cli' },
               summary: makeSummary(),
             },
           ],

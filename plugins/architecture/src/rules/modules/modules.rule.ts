@@ -1,4 +1,4 @@
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/lodestar-types';
 
 /** Enforce module boundary encapsulation — external code must use the barrel (index) import */
 const modules = defineRule<{

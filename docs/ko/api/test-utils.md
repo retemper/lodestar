@@ -3,7 +3,7 @@
 Lodestar 규칙(Rule)을 위한 테스트 유틸리티입니다. 목(Mock) 프로바이더와 위반(Violation)을 수집하는 테스트 컨텍스트(Context)를 제공하여, 파일 시스템이나 실제 의존성 그래프에 접근하지 않고도 규칙을 단위 테스트할 수 있습니다.
 
 ```sh
-pnpm add -D @lodestar/test-utils
+pnpm add -D @retemper/lodestar-test-utils
 ```
 
 ## createMockProviders
@@ -39,7 +39,7 @@ function createMockProviders(overrides?: MockProviderOverrides): RuleProviders;
 
 ```ts
 import { vi } from 'vitest';
-import { createMockProviders } from '@lodestar/test-utils';
+import { createMockProviders } from '@retemper/lodestar-test-utils';
 
 const providers = createMockProviders({
   glob: vi.fn().mockImplementation((pattern: string) => {
@@ -89,8 +89,8 @@ function createTestContext<TOptions = Record<string, unknown>>(
 
 ```ts
 import { describe, it, expect, vi } from 'vitest';
-import { createMockProviders, createTestContext } from '@lodestar/test-utils';
-import { directoryExists } from '@lodestar/plugin-structure';
+import { createMockProviders, createTestContext } from '@retemper/lodestar-test-utils';
+import { directoryExists } from '@retemper/lodestar-plugin-structure';
 
 describe('structure/directory-exists', () => {
   it('필수 경로가 누락되면 위반을 보고한다', async () => {
@@ -133,7 +133,7 @@ describe('structure/directory-exists', () => {
 
 ```ts
 import { describe, it, expect, vi } from 'vitest';
-import { createMockProviders, createTestContext } from '@lodestar/test-utils';
+import { createMockProviders, createTestContext } from '@retemper/lodestar-test-utils';
 import { myCustomRule } from './my-custom-rule';
 
 describe('my-plugin/my-custom-rule', () => {

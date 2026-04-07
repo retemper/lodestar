@@ -1,9 +1,9 @@
-# @lodestar/types
+# @retemper/lodestar-types
 
 Zero-runtime type definitions shared across all Lodestar packages.
 
 ```sh
-pnpm add -D @lodestar/types
+pnpm add -D @retemper/lodestar-types
 ```
 
 This package is a peer dependency for plugin authors. It provides the core interfaces that plugins implement.

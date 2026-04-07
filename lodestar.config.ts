@@ -1,7 +1,7 @@
 import { defineConfig } from 'lodestar';
 import { adapters, base } from '@repo/lodestar-config';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
-import { pluginStructure } from '@lodestar/plugin-structure';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
+import { pluginStructure } from '@retemper/lodestar-plugin-structure';
 
 export default defineConfig([
   ...base,

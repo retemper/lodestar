@@ -15,7 +15,7 @@ Lodestar supports monorepo workspace mode. Each package can have its own `lodest
 ```ts
 // lodestar.config.ts (monorepo root)
 export default defineConfig({
-  plugins: ['@lodestar/plugin-structure', '@lodestar/plugin-deps'],
+  plugins: ['@retemper/lodestar-plugin-structure', '@retemper/lodestar-plugin-deps'],
   rules: {
     'structure/directory-exists': {
       severity: 'error',
@@ -31,7 +31,7 @@ export default defineConfig({
 ```ts
 // packages/core/lodestar.config.mjs
 export default {
-  plugins: ['@lodestar/plugin-structure'],
+  plugins: ['@retemper/lodestar-plugin-structure'],
   rules: {
     'structure/directory-exists': {
       severity: 'error',
@@ -51,7 +51,7 @@ To prevent inheriting root rules, set `root: true`:
 // packages/legacy/lodestar.config.mjs
 export default {
   root: true, // standalone — ignores root config
-  plugins: ['@lodestar/plugin-structure'],
+  plugins: ['@retemper/lodestar-plugin-structure'],
   rules: {
     /* only these rules apply */
   },

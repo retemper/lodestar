@@ -38,7 +38,7 @@ export { myPlugin };  // named export, NOT default
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginFs } from '@lodestar/plugin-fs-layout';
+import { pluginFs } from '@retemper/lodestar-plugin-fs-layout';
 
 export default defineConfig({
   plugins: [pluginFs],                    // direct imports (preferred)
@@ -96,7 +96,7 @@ ctx.providers.config.getCustomConfig<T>(filename, dir?): Promise<T>
 
 ## Plugin Reference
 
-### @lodestar/plugin-fs-layout
+### @retemper/lodestar-plugin-fs-layout
 
 **fs-layout/directory-exists**
 ```ts
@@ -119,7 +119,7 @@ options: {
 }
 ```
 
-### @lodestar/plugin-naming-convention
+### @retemper/lodestar-plugin-naming-convention
 
 **naming-convention/file-naming**
 ```ts
@@ -134,7 +134,7 @@ options: {
 }
 ```
 
-### @lodestar/plugin-import-boundary
+### @retemper/lodestar-plugin-import-boundary
 
 **import-boundary/no-deep-import**
 ```ts
@@ -158,10 +158,10 @@ options: {
 
 ```ts
 options: {
-  allow: string[]  // e.g. ['@lodestar/types', '@lodestar/config']
+  allow: string[]  // e.g. ['@retemper/lodestar-types', '@retemper/lodestar-config']
 }
 ```
-### @lodestar/plugin-dependency-graph
+### @retemper/lodestar-plugin-dependency-graph
 
 **dependency-graph/no-circular**
 ```ts
@@ -175,12 +175,12 @@ options: {
 **dependency-graph/no-circular-packages**
 ```ts
 options: {
-  scope?: string  // e.g. '@lodestar' — auto-detected if omitted
+  scope?: string  // e.g. '@retemper' — auto-detected if omitted
 }
 ```
 Detects cycles between workspace packages via package.json dependencies.
 
-### @lodestar/plugin-source-content
+### @retemper/lodestar-plugin-source-content
 
 **source-content/no-restricted-text**
 ```ts
@@ -217,8 +217,8 @@ Auto-detected when pnpm-workspace.yaml exists. Root config runs globally, per-pa
 ## Native Acceleration
 
 ```sh
-pnpm add -D @lodestar/accel-rust   # napi-rs, ~10-15x
-pnpm add -D @lodestar/accel-go     # WASM, ~3-5x
+pnpm add -D @retemper/lodestar-accel-rust   # napi-rs, ~10-15x
+pnpm add -D @retemper/lodestar-accel-go     # WASM, ~3-5x
 ```
 
 Auto-detected, no config needed. Falls back to TypeScript (SWC) implementation.

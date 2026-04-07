@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/plugin-structure",
+  "name": "@retemper/lodestar-plugin-structure",
   "version": "0.0.0",
   "type": "module",
   "description": "File system structure enforcement — directory existence, forbidden paths, and paired file validation",
@@ -23,13 +23,13 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
     "vitest": "^4.1.0",
-    "@lodestar/test-utils": "workspace:*"
+    "@retemper/lodestar-test-utils": "workspace:*"
   },
   "sideEffects": false,
   "publishConfig": {

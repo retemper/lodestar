@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/cli",
+  "name": "@retemper/lodestar-cli",
   "version": "0.0.0",
   "type": "module",
   "description": "CLI for Lodestar architecture rule engine",

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { ImportInfo } from '@lodestar/types';
-import { createMockProviders, createTestContext } from '@lodestar/test-utils';
+import type { ImportInfo } from '@retemper/lodestar-types';
+import { createMockProviders, createTestContext } from '@retemper/lodestar-test-utils';
 import { layers } from './layers.rule';
 import type { LayerDefinition } from './layers.rule';
 

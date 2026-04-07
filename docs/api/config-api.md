@@ -1,9 +1,9 @@
-# @lodestar/config
+# @retemper/lodestar-config
 
 Config loading, normalization, and merging.
 
 ```ts
-import { loadConfigFile, resolveConfig, mergeConfigs } from '@lodestar/config';
+import { loadConfigFile, resolveConfig, mergeConfigs } from '@retemper/lodestar-config';
 ```
 
 ## `loadConfigFile(dir)`

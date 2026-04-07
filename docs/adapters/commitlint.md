@@ -2,7 +2,7 @@
 
 Generates a `.commitlintrc.json` config file for commit message linting. This is a setup-only adapter: commitlint is invoked by husky, not by lodestar directly.
 
-**Package:** `@lodestar/adapter-commitlint`
+**Package:** `@retemper/lodestar-adapter-commitlint`
 
 **Managed file:** `.commitlintrc.json`
 
@@ -18,7 +18,7 @@ All options are optional. Calling `commitlintAdapter()` with no arguments produc
 ## Example
 
 ```ts
-import { commitlintAdapter } from '@lodestar/adapter-commitlint';
+import { commitlintAdapter } from '@retemper/lodestar-adapter-commitlint';
 
 commitlintAdapter({
   extends: ['@commitlint/config-conventional'],

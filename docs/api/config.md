@@ -86,7 +86,7 @@ type PluginEntry =
 Example:
 
 ```ts
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
   plugins: [pluginArchitecture],
@@ -114,10 +114,10 @@ Example with all three official adapters:
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
-import { eslintAdapter } from '@lodestar/adapter-eslint';
-import { prettierAdapter } from '@lodestar/adapter-prettier';
-import { huskyAdapter } from '@lodestar/adapter-husky';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
+import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
+import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
+import { huskyAdapter } from '@retemper/lodestar-adapter-husky';
 
 export default defineConfig({
   plugins: [pluginArchitecture],
@@ -153,7 +153,7 @@ The array form allows different rules or adapters for different file sets. Block
 
 ```ts
 import { defineConfig } from 'lodestar';
-import { pluginArchitecture } from '@lodestar/plugin-architecture';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig([
   // Global block -- applies to all files

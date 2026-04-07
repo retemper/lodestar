@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ToolAdapter, Violation } from '@lodestar/types';
+import type { ToolAdapter, Violation } from '@retemper/lodestar-types';
 
 /** lint-staged adapter configuration — maps glob patterns to commands */
 interface LintStagedAdapterConfig {

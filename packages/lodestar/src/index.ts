@@ -6,10 +6,10 @@
  */
 
 // Config helpers
-export { defineConfig, definePlugin, defineRule } from '@lodestar/types';
+export { defineConfig, definePlugin, defineRule } from '@retemper/lodestar-types';
 
 // Config loading
-export { loadConfigFile, resolveConfig, discoverWorkspaces } from '@lodestar/config';
+export { loadConfigFile, resolveConfig, discoverWorkspaces } from '@retemper/lodestar-config';
 
 // Core engine
 export {
@@ -19,7 +19,7 @@ export {
   validateConfig,
   runRule,
   resolvePlugins,
-} from '@lodestar/core';
+} from '@retemper/lodestar-core';
 
 // Re-export all types
 export type {
@@ -60,7 +60,7 @@ export type {
   Reporter,
   RuleResultSummary,
   RunSummary,
-} from '@lodestar/types';
+} from '@retemper/lodestar-types';
 
 export type {
   RunOptions,
@@ -68,5 +68,5 @@ export type {
   WorkspaceReporter,
   WorkspaceSummary,
   PackageSummary,
-} from '@lodestar/core';
-export type { WorkspacePackage } from '@lodestar/config';
+} from '@retemper/lodestar-core';
+export type { WorkspacePackage } from '@retemper/lodestar-config';

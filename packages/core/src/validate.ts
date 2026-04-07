@@ -1,4 +1,4 @@
-import type { ResolvedConfig } from '@lodestar/types';
+import type { ResolvedConfig } from '@retemper/lodestar-types';
 
 /** A config validation diagnostic */
 interface ConfigDiagnostic {

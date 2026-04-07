@@ -1,6 +1,6 @@
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { defineRule } from '@lodestar/types';
+import { defineRule } from '@retemper/lodestar-types';
 
 /** Ensure that required directories or files exist in the project */
 const directoryExists = defineRule<{

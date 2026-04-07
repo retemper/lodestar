@@ -1,7 +1,7 @@
 import { access } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { WrittenConfig } from '@lodestar/types';
+import type { WrittenConfig } from '@retemper/lodestar-types';
 
 /** Supported config file names in priority order */
 const CONFIG_FILES = ['lodestar.config.ts', 'lodestar.config.js', 'lodestar.config.mjs'] as const;

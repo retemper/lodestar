@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { run, createProviders } from './engine';
-import type { ResolvedConfig, Plugin, RuleDefinition, ToolAdapter } from '@lodestar/types';
+import type { ResolvedConfig, Plugin, RuleDefinition, ToolAdapter } from '@retemper/lodestar-types';
 
 /** Creates a minimal ResolvedConfig for testing */
 function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {

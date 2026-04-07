@@ -6,7 +6,7 @@ This document describes how lodestar packages are versioned, released, and publi
 
 lodestar uses **independent versioning** — each package in the monorepo has its own version number and follows [Semantic Versioning (SemVer)](https://semver.org/).
 
-Independent versioning is chosen because packages like `@lodestar/plugin-structure`, `@lodestar/plugin-boundary`, and `@lodestar/plugin-deps` have minimal internal dependencies and evolve at different rates from `@lodestar/core` or `@lodestar/cli`.
+Independent versioning is chosen because packages like `@retemper/lodestar-plugin-structure`, `@retemper/lodestar-plugin-boundary`, and `@retemper/lodestar-plugin-deps` have minimal internal dependencies and evolve at different rates from `@retemper/lodestar-core` or `@retemper/lodestar-cli`.
 
 ### Pre-1.0 Contract
 
@@ -99,4 +99,4 @@ Breaking changes require explicit documentation:
 
 ## Internal Dependencies
 
-When a dependency package (e.g., `@lodestar/types`) is bumped, all packages that depend on it automatically get their dependency range updated via `updateInternalDependencies: "patch"` in the changesets config. This ensures consistent dependency versions across the monorepo.
+When a dependency package (e.g., `@retemper/lodestar-types`) is bumped, all packages that depend on it automatically get their dependency range updated via `updateInternalDependencies: "patch"` in the changesets config. This ensures consistent dependency versions across the monorepo.

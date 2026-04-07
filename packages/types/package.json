@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/types",
+  "name": "@retemper/lodestar-types",
   "version": "0.0.0",
   "type": "module",
   "description": "Type definitions for Lodestar rule engine",

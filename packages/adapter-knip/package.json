@@ -1,5 +1,5 @@
 {
-  "name": "@lodestar/adapter-knip",
+  "name": "@retemper/lodestar-adapter-knip",
   "version": "0.0.0",
   "type": "module",
   "description": "Knip adapter for Lodestar — find unused exports, dependencies, and files via lodestar check",
@@ -23,7 +23,7 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@lodestar/types": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
