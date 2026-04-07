@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { RunSummary, WrittenConfig } from 'lodestar';
-import type { WorkspaceSummary } from 'lodestar';
+import type { RunSummary, WorkspaceSummary, WrittenConfig } from 'lodestar';
 
 vi.mock('lodestar', () => ({
   loadConfigFile: vi.fn(),
@@ -31,8 +30,7 @@ vi.mock('../reporters/console', () => ({
 }));
 
 import { checkCommand } from './check';
-import { loadConfigFile, discoverWorkspaces } from 'lodestar';
-import { run, runWorkspace } from 'lodestar';
+import { discoverWorkspaces, loadConfigFile, run, runWorkspace } from 'lodestar';
 
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 const mockDiscoverWorkspaces = vi.mocked(discoverWorkspaces);
@@ -205,6 +203,29 @@ describe('checkCommand', () => {
       expect(process.exitCode).toBeUndefined();
     });
 
+    it('워크스페이스 모드에서 총 소요 시간을 포함하여 출력한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([
+        { name: '@lodestar/core', dir: '/fake/packages/core' },
+      ]);
+      mockRunWorkspace.mockResolvedValue(
+        makeWorkspaceSummary({
+          packages: [],
+          totalErrorCount: 0,
+          totalWarnCount: 0,
+          totalDurationMs: 42.7,
+        }),
+      );
+
+      await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      const totalLine = calls.find((c) => c.includes('Total:'));
+      expect(totalLine).toContain('43ms');
+    });
+
     it('패키지 수를 포함한 합계 메시지를 출력한다', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
@@ -237,6 +258,109 @@ describe('checkCommand', () => {
       expect(totalLine).toContain('1 errors');
       expect(totalLine).toContain('2 warnings');
       expect(totalLine).toContain('3 packages');
+    });
+  });
+
+  describe('--rule 필터', () => {
+    it('--rule 필터가 주어지면 매칭되는 규칙만 전달한다', async () => {
+      const configWithRules: WrittenConfig = {
+        plugins: [],
+        rules: {
+          'test/specific': 'error',
+          'test/other': 'warn',
+          'architecture/layers': 'error',
+        },
+      };
+      mockLoadConfigFile.mockResolvedValue(configWithRules);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        rule: ['test/specific'],
+      });
+
+      const resolveConfig = (await import('lodestar')).resolveConfig as ReturnType<typeof vi.fn>;
+      const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
+      const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
+      expect(blocks[0].rules).toStrictEqual({ 'test/specific': 'error' });
+    });
+
+    it('--rule에 와일드카드 패턴을 사용할 수 있다', async () => {
+      const configWithRules: WrittenConfig = {
+        plugins: [],
+        rules: {
+          'architecture/layers': 'error',
+          'architecture/boundaries': 'warn',
+          'naming/file': 'error',
+        },
+      };
+      mockLoadConfigFile.mockResolvedValue(configWithRules);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        rule: ['architecture/*'],
+      });
+
+      const resolveConfig = (await import('lodestar')).resolveConfig as ReturnType<typeof vi.fn>;
+      const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
+      const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
+      expect(Object.keys(blocks[0].rules ?? {})).toStrictEqual([
+        'architecture/layers',
+        'architecture/boundaries',
+      ]);
+    });
+
+    it('block에 rules가 없으면 그대로 반환한다', async () => {
+      const configWithoutRules: WrittenConfig = { plugins: [] };
+      mockLoadConfigFile.mockResolvedValue(configWithoutRules);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        rule: ['test/specific'],
+      });
+
+      expect(mockRun).toHaveBeenCalledTimes(1);
+    });
+
+    it('json format을 지정하면 JSON reporter를 사용한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'json',
+        rule: ['test/*'],
+      });
+
+      expect(mockRun).toHaveBeenCalledTimes(1);
+    });
+
+    it('--fix 옵션을 run에 전달한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        fix: true,
+      });
+
+      expect(mockRun).toHaveBeenCalledWith(expect.objectContaining({ fix: true }));
     });
   });
 });

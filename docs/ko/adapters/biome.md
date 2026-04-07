@@ -8,12 +8,12 @@ Biome을 CLI로 실행하고, `biome.json` 설정 파일을 생성합니다.
 
 ## 설정 옵션
 
-| 옵션      | 타입                                | 설명                                                         |
-| --------- | ---------------------------------- | ----------------------------------------------------------- |
+| 옵션      | 타입                                | 설명                                                                    |
+| --------- | ----------------------------------- | ----------------------------------------------------------------------- |
 | `rules`   | `Record<string, BiomeRuleSeverity>` | 규칙 오버라이드 -- 키는 `group/rule` (예: `"style/noNonNullAssertion"`) |
-| `ignore`  | `string[]`                         | 무시할 글로브(Glob) 패턴                                       |
-| `extends` | `string`                           | 확장할 기존 biome.json 경로                                    |
-| `bin`     | `string`                           | 바이너리 이름 또는 경로 (기본값: `"biome"`)                      |
+| `ignore`  | `string[]`                          | 무시할 글로브(Glob) 패턴                                                |
+| `extends` | `string`                            | 확장할 기존 biome.json 경로                                             |
+| `bin`     | `string`                            | 바이너리 이름 또는 경로 (기본값: `"biome"`)                             |
 
 `BiomeRuleSeverity`는 `'error' | 'warn' | 'info' | 'off'`입니다.
 
@@ -29,7 +29,7 @@ biomeAdapter({
   },
   ignore: ['dist/**', 'node_modules/**'],
   extends: './biome-base.json',
-})
+});
 ```
 
 ## 임시 설정 파일

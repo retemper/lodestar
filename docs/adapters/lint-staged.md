@@ -8,8 +8,8 @@ Generates a `.lintstagedrc.json` config file that maps glob patterns to commands
 
 ## Config Options
 
-| Option     | Type                                          | Description                                                   |
-| ---------- | --------------------------------------------- | ------------------------------------------------------------- |
+| Option     | Type                                          | Description                                                         |
+| ---------- | --------------------------------------------- | ------------------------------------------------------------------- |
 | `commands` | `Record<string, string \| readonly string[]>` | Glob pattern to command mapping -- e.g., `{"*.ts": "eslint --fix"}` |
 
 ## Example
@@ -23,7 +23,7 @@ lintStagedAdapter({
     '*.{css,scss}': 'stylelint --fix',
     '*.{ts,tsx,css,scss,json,md}': 'prettier --write',
   },
-})
+});
 ```
 
 ## How verifySetup Works

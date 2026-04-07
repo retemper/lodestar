@@ -1,6 +1,5 @@
 import type {
   WrittenConfig,
-  WrittenConfigBlock,
   ResolvedConfig,
   ResolvedPlugin,
   ResolvedRuleConfig,

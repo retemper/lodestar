@@ -134,6 +134,24 @@ describe('architecture/no-circular-packages', () => {
     expect(violations.length).toBeGreaterThan(0);
   });
 
+  it('@ 접두사만 있고 / 가 없는 패키지명은 스코프로 인식하지 않는다', async () => {
+    const glob = vi
+      .fn()
+      .mockResolvedValueOnce(['packages/core/package.json'])
+      .mockResolvedValueOnce([]);
+    const readJson = vi.fn().mockResolvedValueOnce({ name: '@noslash', dependencies: {} });
+    const providers = createMockProviders({ glob, readJson });
+    const { ctx, violations } = createTestContext(
+      {},
+      providers,
+      'architecture/no-circular-packages',
+    );
+
+    await noCircularPackages.check(ctx as never);
+
+    expect(violations).toHaveLength(0);
+  });
+
   it('스코프가 없는 패키지만 있으면 검사를 건너뛴다', async () => {
     const glob = vi
       .fn()
@@ -170,6 +188,41 @@ describe('architecture/no-circular-packages', () => {
     expect(violations).toHaveLength(0);
   });
 
+  it('scope 옵션이 주어지면 자동 감지 대신 해당 scope를 사용한다', async () => {
+    const glob = vi
+      .fn()
+      .mockResolvedValueOnce(['packages/a/package.json', 'packages/b/package.json'])
+      .mockResolvedValueOnce([]);
+    const readJson = vi
+      .fn()
+      .mockResolvedValueOnce({ name: '@custom/a', dependencies: { '@custom/b': '*' } })
+      .mockResolvedValueOnce({ name: '@custom/b', dependencies: { '@custom/a': '*' } });
+    const providers = createMockProviders({ glob, readJson });
+    const { ctx, violations } = createTestContext(
+      { scope: '@custom' },
+      providers,
+      'architecture/no-circular-packages',
+    );
+
+    await noCircularPackages.check(ctx as never);
+
+    expect(violations.length).toBeGreaterThan(0);
+  });
+
+  it('패키지 디렉토리가 하나도 없으면 조기 반환한다', async () => {
+    const glob = vi.fn().mockResolvedValue([]);
+    const providers = createMockProviders({ glob });
+    const { ctx, violations } = createTestContext(
+      {},
+      providers,
+      'architecture/no-circular-packages',
+    );
+
+    await noCircularPackages.check(ctx as never);
+
+    expect(violations).toHaveLength(0);
+  });
+
   it('올바른 규칙 메타데이터를 가진다', () => {
     expect(noCircularPackages.name).toBe('architecture/no-circular-packages');
     expect(noCircularPackages.needs).toStrictEqual(['fs', 'config']);
@@ -192,6 +245,21 @@ describe('detectCycles', () => {
       ['B', ['C']],
       ['C', [] as string[]],
     ]);
+    const cycles = detectCycles(graph);
+    expect(cycles).toHaveLength(0);
+  });
+
+  it('그래프에 없는 의존성 노드를 건너뛴다', () => {
+    const graph = new Map([
+      ['A', ['B', 'missing']],
+      ['B', [] as string[]],
+    ]);
+    const cycles = detectCycles(graph);
+    expect(cycles).toHaveLength(0);
+  });
+
+  it('의존성이 없는 노드만 있으면 빈 배열을 반환한다', () => {
+    const graph = new Map([['A', [] as string[]]]);
     const cycles = detectCycles(graph);
     expect(cycles).toHaveLength(0);
   });

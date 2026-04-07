@@ -18,7 +18,9 @@ function indent(text: string): string {
 }
 
 /** Build a lint-staged config object from adapter config */
-function buildLintStagedConfig(config: LintStagedAdapterConfig): Record<string, string | readonly string[]> {
+function buildLintStagedConfig(
+  config: LintStagedAdapterConfig,
+): Record<string, string | readonly string[]> {
   return { ...config.commands };
 }
 

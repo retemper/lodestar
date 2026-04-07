@@ -14,7 +14,7 @@ import { run, runWorkspace, createProviders } from '@lodestar/core';
 const summary = await run({
   config: resolvedConfig,
   reporter: myReporter, // 선택 사항
-  fix: true,            // 선택 사항 -- 위반 사항 자동 수정
+  fix: true, // 선택 사항 -- 위반 사항 자동 수정
 });
 ```
 
@@ -89,9 +89,9 @@ interface RuleResultSummary {
   readonly ruleId: string;
   readonly violations: readonly Violation[];
   readonly durationMs: number;
-  readonly meta?: string;       // 예: "14 files", "0 cycles"
-  readonly docsUrl?: string;    // 규칙의 문서 URL
-  readonly error?: Error;       // 규칙이 예외를 던진 경우 설정
+  readonly meta?: string; // 예: "14 files", "0 cycles"
+  readonly docsUrl?: string; // 규칙의 문서 URL
+  readonly error?: Error; // 규칙이 예외를 던진 경우 설정
 }
 ```
 
@@ -110,8 +110,8 @@ interface WorkspaceReporter extends Reporter {
 
 ```ts
 interface WorkspacePackage {
-  readonly name: string;  // package.json의 패키지 이름
-  readonly dir: string;   // 패키지 디렉토리의 절대 경로
+  readonly name: string; // package.json의 패키지 이름
+  readonly dir: string; // 패키지 디렉토리의 절대 경로
 }
 ```
 
@@ -151,10 +151,10 @@ function createMyReporter(): Reporter {
 
 ### 내장 리포터 (Built-in Reporters)
 
-| 리포터 | 출력 | 설명 |
-| --- | --- | --- |
+| 리포터                    | 출력   | 설명                                                                                                                                                |
+| ------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `createConsoleReporter()` | stderr | ANSI 색상, 규칙별 통과/실패 상태, 메타데이터, 소요 시간이 포함된 사람이 읽을 수 있는 출력. `WorkspaceReporter`를 구현하여 패키지 헤더를 표시합니다. |
-| `createJsonReporter()` | stdout | 모든 위반 사항을 수집하고 완료 시 단일 JSON 객체를 출력합니다. CI 파이프라인 및 프로그래밍 방식 소비에 유용합니다. |
+| `createJsonReporter()`    | stdout | 모든 위반 사항을 수집하고 완료 시 단일 JSON 객체를 출력합니다. CI 파이프라인 및 프로그래밍 방식 소비에 유용합니다.                                  |
 
 ```ts
 import { createConsoleReporter } from '@lodestar/cli';

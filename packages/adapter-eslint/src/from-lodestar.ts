@@ -1,6 +1,35 @@
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { loadConfigFile } from '@lodestar/config';
-import type { WrittenConfigBlock } from '@lodestar/types';
+import type { ToolAdapter, WrittenConfig, WrittenConfigBlock } from '@lodestar/types';
+
+/** Extract the eslint adapter from a loaded config, if present */
+function findEslintAdapter(config: WrittenConfig): ToolAdapter | undefined {
+  const blocks: readonly WrittenConfigBlock[] = Array.isArray(config) ? config : [config];
+  return blocks.flatMap((b) => b.adapters ?? []).find((a) => a.name === 'eslint');
+}
+
+/**
+ * Walk up from dir loading lodestar configs until one with an eslint adapter is found.
+ * Sub-package configs may omit adapters — the root config provides them.
+ */
+async function loadConfigWithEslintAdapter(
+  dir: string,
+): Promise<{ readonly config: WrittenConfig; readonly adapter: ToolAdapter }> {
+  const config = await loadConfigFile(dir);
+  if (config) {
+    const adapter = findEslintAdapter(config);
+    if (adapter) return { config, adapter };
+  }
+
+  const parent = dirname(dir);
+  if (parent === dir) {
+    throw new Error(
+      'No lodestar.config.ts with eslintAdapter() found. Add eslintAdapter() to the adapters array.',
+    );
+  }
+
+  return loadConfigWithEslintAdapter(parent);
+}
 
 /**
  * Generate ESLint flat config from lodestar.config.ts.
@@ -15,25 +44,12 @@ import type { WrittenConfigBlock } from '@lodestar/types';
  */
 async function fromLodestar(configDir?: string): Promise<unknown[]> {
   const startDir = configDir ? resolve(configDir) : process.cwd();
-  const config = await loadConfigFile(startDir);
+  const { adapter } = await loadConfigWithEslintAdapter(startDir);
 
-  if (!config) {
-    throw new Error('No lodestar.config.ts found. Create one with `lodestar init`.');
-  }
-
-  const blocks: readonly WrittenConfigBlock[] = Array.isArray(config) ? config : [config];
-  const eslintAdapter = blocks.flatMap((b) => b.adapters ?? []).find((a) => a.name === 'eslint');
-
-  if (!eslintAdapter) {
-    throw new Error(
-      'No eslint adapter in lodestar.config.ts. Add eslintAdapter() to the adapters array.',
-    );
-  }
-
-  if (!eslintAdapter.generateConfig) {
+  if (!adapter.generateConfig) {
     throw new Error('ESLint adapter missing generateConfig().');
   }
-  return eslintAdapter.generateConfig();
+  return adapter.generateConfig();
 }
 
 export { fromLodestar };

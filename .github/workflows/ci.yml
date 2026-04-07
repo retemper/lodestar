@@ -50,14 +50,34 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Phase 1: build-free checks (parallel)
+      - name: Lint & format
+        run: pnpm turbo lint & pnpm format:check & wait
+
+      # Phase 2: build → type-check
       - run: pnpm turbo build
-
-      - run: pnpm turbo lint
-
-      - run: pnpm format:check
-
       - run: pnpm turbo type-check
 
+  lodestar:
+    needs: changed
+    if: needs.changed.outputs.should_skip != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo build
+      - name: Re-link workspace bins after build
+        run: pnpm install --frozen-lockfile
       - run: pnpm turbo lodestar
 
   test:
@@ -95,14 +115,15 @@ jobs:
   # Gate job for branch protection
   ci-passed:
     if: always()
-    needs: [lint, test]
+    needs: [lint, lodestar, test]
     runs-on: ubuntu-latest
     steps:
       - name: Check results
         run: |
           if [[ "${{ needs.lint.result }}" != "success" && "${{ needs.lint.result }}" != "skipped" ]] || \
+             [[ "${{ needs.lodestar.result }}" != "success" && "${{ needs.lodestar.result }}" != "skipped" ]] || \
              [[ "${{ needs.test.result }}" != "success" && "${{ needs.test.result }}" != "skipped" ]]; then
-            echo "CI failed (lint=${{ needs.lint.result }}, test=${{ needs.test.result }})"
+            echo "CI failed (lint=${{ needs.lint.result }}, lodestar=${{ needs.lodestar.result }}, test=${{ needs.test.result }})"
             exit 1
           fi
           echo "CI passed"

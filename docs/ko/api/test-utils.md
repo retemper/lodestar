@@ -18,22 +18,22 @@ function createMockProviders(overrides?: MockProviderOverrides): RuleProviders;
 
 모든 필드는 선택 사항입니다. 각 필드는 하나의 프로바이더 메서드를 오버라이드합니다:
 
-| 필드                | 기본 반환값              | 프로바이더  | 설명                               |
-| ------------------ | ---------------------- | --------- | --------------------------------- |
-| `glob`             | `[]`                   | `fs`      | 패턴에 매칭되는 파일 찾기             |
-| `readFile`         | `''`                   | `fs`      | 파일 내용 읽기                       |
-| `exists`           | `true`                 | `fs`      | 경로 존재 여부 확인                   |
-| `readJson`         | `{}`                   | `fs`      | JSON 파일 읽기 및 파싱               |
-| `getDependencies`  | `[]`                   | `graph`   | 파일이 임포트하는 파일 목록            |
-| `getDependents`    | `[]`                   | `graph`   | 파일을 임포트하는 파일 목록            |
-| `hasCircular`      | `false`                | `graph`   | 순환 의존성 여부 확인                  |
-| `getModuleGraph`   | `{ nodes: new Map() }` | `graph`   | 전체 모듈 그래프 조회                  |
-| `getSourceFile`    | `null`                 | `ast`     | AST 소스 파일 조회                    |
-| `getImports`       | `[]`                   | `ast`     | 파일의 import 선언 조회               |
-| `getExports`       | `[]`                   | `ast`     | 파일의 export 선언 조회               |
-| `getPackageJson`   | `{}`                   | `config`  | package.json 읽기                    |
-| `getTsConfig`      | `{}`                   | `config`  | tsconfig.json 읽기                   |
-| `getCustomConfig`  | `{}`                   | `config`  | 커스텀 설정 파일 읽기                  |
+| 필드              | 기본 반환값            | 프로바이더 | 설명                        |
+| ----------------- | ---------------------- | ---------- | --------------------------- |
+| `glob`            | `[]`                   | `fs`       | 패턴에 매칭되는 파일 찾기   |
+| `readFile`        | `''`                   | `fs`       | 파일 내용 읽기              |
+| `exists`          | `true`                 | `fs`       | 경로 존재 여부 확인         |
+| `readJson`        | `{}`                   | `fs`       | JSON 파일 읽기 및 파싱      |
+| `getDependencies` | `[]`                   | `graph`    | 파일이 임포트하는 파일 목록 |
+| `getDependents`   | `[]`                   | `graph`    | 파일을 임포트하는 파일 목록 |
+| `hasCircular`     | `false`                | `graph`    | 순환 의존성 여부 확인       |
+| `getModuleGraph`  | `{ nodes: new Map() }` | `graph`    | 전체 모듈 그래프 조회       |
+| `getSourceFile`   | `null`                 | `ast`      | AST 소스 파일 조회          |
+| `getImports`      | `[]`                   | `ast`      | 파일의 import 선언 조회     |
+| `getExports`      | `[]`                   | `ast`      | 파일의 export 선언 조회     |
+| `getPackageJson`  | `{}`                   | `config`   | package.json 읽기           |
+| `getTsConfig`     | `{}`                   | `config`   | tsconfig.json 읽기          |
+| `getCustomConfig` | `{}`                   | `config`   | 커스텀 설정 파일 읽기       |
 
 ### 예시
 
@@ -66,20 +66,21 @@ function createTestContext<TOptions = Record<string, unknown>>(
 
 ### 파라미터
 
-| 파라미터    | 타입            | 기본값   | 설명                              |
-| ----------- | --------------- | -------- | -------------------------------- |
-| `options`   | `TOptions`      | --       | 규칙에 전달할 규칙 옵션             |
+| 파라미터    | 타입            | 기본값   | 설명                                    |
+| ----------- | --------------- | -------- | --------------------------------------- |
+| `options`   | `TOptions`      | --       | 규칙에 전달할 규칙 옵션                 |
 | `providers` | `RuleProviders` | --       | 프로바이더 (`createMockProviders` 사용) |
-| `ruleId`    | `string`        | `'test'` | 보고된 위반에 할당되는 규칙 ID        |
+| `ruleId`    | `string`        | `'test'` | 보고된 위반에 할당되는 규칙 ID          |
 
 ### TestContextResult
 
-| 필드         | 타입                    | 설명                                  |
-| ------------ | ----------------------- | ------------------------------------ |
-| `ctx`        | `RuleContext<TOptions>` | `rule.check()`에 전달할 컨텍스트       |
+| 필드         | 타입                    | 설명                                      |
+| ------------ | ----------------------- | ----------------------------------------- |
+| `ctx`        | `RuleContext<TOptions>` | `rule.check()`에 전달할 컨텍스트          |
 | `violations` | `Violation[]`           | 보고된 위반을 수집하는 가변(Mutable) 배열 |
 
 반환된 `ctx`는 다음을 포함합니다:
+
 - `rootDir`은 `'/test'`로 설정됨
 - `report()`는 `violations`에 심각도(Severity) `'error'`로 푸시
 - `meta()`는 no-op
@@ -142,7 +143,9 @@ describe('my-plugin/my-custom-rule', () => {
       exists: vi.fn().mockResolvedValue(true),
     });
     const { ctx, violations } = createTestContext(
-      { /* 규칙 옵션 */ },
+      {
+        /* 규칙 옵션 */
+      },
       providers,
       'my-plugin/my-custom-rule',
     );
@@ -157,7 +160,9 @@ describe('my-plugin/my-custom-rule', () => {
       glob: vi.fn().mockResolvedValue(['src/bad-file.ts']),
     });
     const { ctx, violations } = createTestContext(
-      { /* 규칙 옵션 */ },
+      {
+        /* 규칙 옵션 */
+      },
       providers,
     );
 

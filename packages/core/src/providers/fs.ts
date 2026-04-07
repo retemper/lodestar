@@ -12,7 +12,7 @@ function createFileSystemProvider(rootDir: string): FileSystemProvider {
       const { glob } = await import('node:fs/promises');
       const matches: string[] = [];
       for await (const entry of glob(pattern, { cwd: rootDir })) {
-        matches.push(relative(rootDir, join(rootDir, entry)));
+        matches.push(relative(rootDir, join(rootDir, entry)).replaceAll('\\', '/'));
       }
       return matches;
     },

@@ -11,6 +11,8 @@ interface WorkspaceRunOptions {
   readonly rootConfig: WrittenConfig;
   /** Optional reporter for output */
   readonly reporter?: WorkspaceReporter;
+  /** When true, apply auto-fixes for fixable violations */
+  readonly fix?: boolean;
 }
 
 /** Extended reporter that understands workspace structure */
@@ -49,14 +51,14 @@ interface PackageSummary {
  * 2. For each package with its own config, run independently (no merge — flat config)
  */
 async function runWorkspace(options: WorkspaceRunOptions): Promise<WorkspaceSummary> {
-  const { rootDir, rootConfig, reporter } = options;
+  const { rootDir, rootConfig, reporter, fix } = options;
   const startTime = performance.now();
 
   const rootPkg: WorkspacePackage = { name: '(root)', dir: rootDir };
   reporter?.onPackageStart?.(rootPkg);
 
   const rootResolved = resolveConfig(rootConfig, rootDir);
-  const rootSummary = await run({ config: rootResolved, reporter });
+  const rootSummary = await run({ config: rootResolved, reporter, fix });
   reporter?.onPackageComplete?.(rootPkg, rootSummary);
 
   const packages = await discoverWorkspaces(rootDir);
@@ -68,7 +70,7 @@ async function runWorkspace(options: WorkspaceRunOptions): Promise<WorkspaceSumm
 
     reporter?.onPackageStart?.(pkg);
     const resolved = resolveConfig(packageConfig, pkg.dir);
-    const summary = await run({ config: resolved, reporter });
+    const summary = await run({ config: resolved, reporter, fix });
 
     packageSummaries.push({ package: pkg, summary });
     reporter?.onPackageComplete?.(pkg, summary);

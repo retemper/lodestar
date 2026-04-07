@@ -76,11 +76,11 @@ rules: {
 
 ```ts
 type PluginEntry =
-  | PluginFactory              // 팩토리 함수 (권장)
-  | Plugin                     // 직접 플러그인 객체
-  | [PluginFactory, options]   // 옵션이 있는 팩토리
-  | [string, options]          // 문자열 이름과 옵션 (레거시)
-  | string;                    // 문자열 이름 (레거시)
+  | PluginFactory // 팩토리 함수 (권장)
+  | Plugin // 직접 플러그인 객체
+  | [PluginFactory, options] // 옵션이 있는 팩토리
+  | [string, options] // 문자열 이름과 옵션 (레거시)
+  | string; // 문자열 이름 (레거시)
 ```
 
 예시:

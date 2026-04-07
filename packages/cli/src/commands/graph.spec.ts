@@ -11,7 +11,7 @@ import {
 } from './graph';
 import type { LayerDef } from './graph';
 
-/** 테스트용 모듈 그래프 생성 */
+/** Creates a module graph for testing */
 function makeNodes(defs: Record<string, string[]>): ReadonlyMap<string, ModuleNode> {
   const nodes = new Map<string, ModuleNode>();
   for (const [id, deps] of Object.entries(defs)) {
@@ -97,6 +97,33 @@ describe('collectLayerEdges', () => {
     expect(edges[0].allowed).toBe(false);
   });
 
+  it('레이어에 속하지 않는 파일의 의존성은 무시한다', () => {
+    const nodes = makeNodes({
+      'lib/external.ts': ['src/domain/entity.ts'],
+      'src/domain/entity.ts': [],
+    });
+
+    const edges = collectLayerEdges(layerDefs, nodes);
+
+    expect(edges).toHaveLength(0);
+  });
+
+  it('canImport가 없는 레이어에서 다른 레이어로의 의존성은 violation이다', () => {
+    const defsNoCan: LayerDef[] = [
+      { name: 'domain', path: 'src/domain/**/*.ts' },
+      { name: 'orphan', path: 'src/orphan/**/*.ts' },
+    ];
+    const nodes = makeNodes({
+      'src/orphan/a.ts': ['src/domain/b.ts'],
+      'src/domain/b.ts': [],
+    });
+
+    const edges = collectLayerEdges(defsNoCan, nodes);
+
+    expect(edges).toHaveLength(1);
+    expect(edges[0].allowed).toBe(false);
+  });
+
   it('같은 레이어 내 의존성은 무시한다', () => {
     const nodes = makeNodes({
       'src/domain/entity.ts': ['src/domain/value-object.ts'],
@@ -154,6 +181,20 @@ describe('formatLayerMermaid', () => {
 
     expect(result).toContain('graph TD');
     expect(result).toContain('infra -->|3| domain');
+  });
+
+  it('연결되지 않은 레이어를 독립 노드로 출력한다', () => {
+    const defs: LayerDef[] = [
+      { name: 'domain', path: 'src/domain/**' },
+      { name: 'infra', path: 'src/infra/**', canImport: ['domain'] },
+      { name: 'isolated', path: 'src/isolated/**' },
+    ];
+    const edges = [{ from: 'infra', to: 'domain', count: 1, allowed: true }];
+    const result = formatLayerMermaid(defs, edges);
+
+    expect(result).toContain('  isolated');
+    expect(result).not.toContain('isolated -->');
+    expect(result).not.toContain('--> isolated');
   });
 
   it('위반을 점선으로 표시한다', () => {

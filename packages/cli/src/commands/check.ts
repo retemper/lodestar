@@ -30,7 +30,12 @@ async function checkCommand(args: ArgumentsCamelCase<CheckOptions>): Promise<voi
   const useWorkspace = await shouldUseWorkspaceMode(rootDir, args.workspace);
 
   if (useWorkspace) {
-    const result = await runWorkspace({ rootDir, rootConfig: effectiveConfig, reporter });
+    const result = await runWorkspace({
+      rootDir,
+      rootConfig: effectiveConfig,
+      reporter,
+      fix: args.fix,
+    });
     const packageCount = result.packages.length + 1;
     console.error(
       `\nTotal: ${result.totalErrorCount} errors, ${result.totalWarnCount} warnings across ${packageCount} packages (${result.totalDurationMs.toFixed(0)}ms)`,

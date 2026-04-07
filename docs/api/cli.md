@@ -8,13 +8,13 @@ Run all configured rules against the project.
 npx lodestar check [options]
 ```
 
-| Flag | Type | Default | Description |
-| --- | --- | --- | --- |
-| `--format` | `string` | `console` | Output format. Choices: `console`, `json` |
-| `--workspace` | `boolean` | auto-detected | Force workspace mode on |
-| `--no-workspace` | `boolean` | | Disable workspace mode |
-| `--rule` | `string[]` | all rules | Only run specific rules. Supports exact match (`naming-convention/file-naming`) and prefix wildcard (`architecture/*`) |
-| `--fix` | `boolean` | `false` | Auto-fix violations where possible |
+| Flag             | Type       | Default       | Description                                                                                                            |
+| ---------------- | ---------- | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `--format`       | `string`   | `console`     | Output format. Choices: `console`, `json`                                                                              |
+| `--workspace`    | `boolean`  | auto-detected | Force workspace mode on                                                                                                |
+| `--no-workspace` | `boolean`  |               | Disable workspace mode                                                                                                 |
+| `--rule`         | `string[]` | all rules     | Only run specific rules. Supports exact match (`naming-convention/file-naming`) and prefix wildcard (`architecture/*`) |
+| `--fix`          | `boolean`  | `false`       | Auto-fix violations where possible                                                                                     |
 
 When `--workspace` is omitted, workspace mode is auto-detected by checking whether `pnpm-workspace.yaml` or `package.json` workspaces are present. When running in workspace mode, lodestar runs rules against each discovered package and the root, then prints an aggregated summary.
 
@@ -33,10 +33,10 @@ npx lodestar check --rule architecture/layers --rule naming-convention/file-nami
 
 **Exit codes:**
 
-| Code | Meaning |
-| --- | --- |
-| `0` | No errors (warnings are allowed) |
-| `1` | One or more errors found |
+| Code | Meaning                          |
+| ---- | -------------------------------- |
+| `0`  | No errors (warnings are allowed) |
+| `1`  | One or more errors found         |
 
 ---
 
@@ -93,11 +93,11 @@ Output the project dependency graph in a visual format.
 npx lodestar graph [options]
 ```
 
-| Flag | Type | Default | Description |
-| --- | --- | --- | --- |
-| `--scope` | `string` | all files | Only show files matching this path prefix (e.g., `src/domain`) |
-| `--format` | `string` | `mermaid` | Output format. Choices: `mermaid`, `dot` |
-| `--layers` | `boolean` | `false` | Show layer-level architecture graph instead of file-level. Requires an `architecture/layers` rule in the config |
+| Flag       | Type      | Default   | Description                                                                                                     |
+| ---------- | --------- | --------- | --------------------------------------------------------------------------------------------------------------- |
+| `--scope`  | `string`  | all files | Only show files matching this path prefix (e.g., `src/domain`)                                                  |
+| `--format` | `string`  | `mermaid` | Output format. Choices: `mermaid`, `dot`                                                                        |
+| `--layers` | `boolean` | `false`   | Show layer-level architecture graph instead of file-level. Requires an `architecture/layers` rule in the config |
 
 **File-level mode** (default) outputs every import edge between source files. Use `--scope` to limit the output to a specific directory:
 
@@ -123,11 +123,11 @@ Show all files affected by changing a given file, using BFS over the dependents 
 npx lodestar impact <file> [options]
 ```
 
-| Flag | Type | Default | Description |
-| --- | --- | --- | --- |
-| `<file>` | `string` | **required** | Target file to analyze (relative to project root) |
-| `--json` | `boolean` | `false` | Output as JSON instead of human-readable text |
-| `--depth` | `number` | unlimited | Maximum BFS traversal depth |
+| Flag      | Type      | Default      | Description                                       |
+| --------- | --------- | ------------ | ------------------------------------------------- |
+| `<file>`  | `string`  | **required** | Target file to analyze (relative to project root) |
+| `--json`  | `boolean` | `false`      | Output as JSON instead of human-readable text     |
+| `--depth` | `number`  | unlimited    | Maximum BFS traversal depth                       |
 
 The default human-readable output lists direct dependents (depth 1) and transitive dependents (depth > 1) with their provenance path:
 
@@ -143,9 +143,7 @@ JSON output structure:
 {
   "target": "src/core/engine.ts",
   "directDependents": ["src/cli/commands/check.ts"],
-  "transitiveDependents": [
-    { "file": "src/cli/index.ts", "via": "src/cli/commands/check.ts" }
-  ],
+  "transitiveDependents": [{ "file": "src/cli/index.ts", "via": "src/cli/commands/check.ts" }],
   "totalAffected": 2
 }
 ```

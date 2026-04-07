@@ -8,13 +8,13 @@ Runs ESLint via the Node API and generates an `eslint.config.js` bridge file for
 
 ## Config Options
 
-| Option      | Type                                      | Description                                                    |
-| ----------- | ----------------------------------------- | -------------------------------------------------------------- |
-| `presets`   | `string[]`                                | Base configs -- `'recommended'`, `'strict'`, `'stylistic'` (mapped to typescript-eslint) |
-| `plugins`   | `Record<string, unknown>`                 | ESLint plugin packages to include                              |
-| `rules`     | `Record<string, unknown>`                 | ESLint rules with standard severity/options format             |
-| `ignores`   | `string[]`                                | Global ignore patterns                                         |
-| `overrides` | `{ files: string[]; rules: Record<string, unknown> }[]` | File-specific rule overrides                    |
+| Option      | Type                                                    | Description                                                                              |
+| ----------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `presets`   | `string[]`                                              | Base configs -- `'recommended'`, `'strict'`, `'stylistic'` (mapped to typescript-eslint) |
+| `plugins`   | `Record<string, unknown>`                               | ESLint plugin packages to include                                                        |
+| `rules`     | `Record<string, unknown>`                               | ESLint rules with standard severity/options format                                       |
+| `ignores`   | `string[]`                                              | Global ignore patterns                                                                   |
+| `overrides` | `{ files: string[]; rules: Record<string, unknown> }[]` | File-specific rule overrides                                                             |
 
 ## Example
 
@@ -38,7 +38,7 @@ eslintAdapter({
       rules: { '@typescript-eslint/no-explicit-any': 'off' },
     },
   ],
-})
+});
 ```
 
 ## Generated Bridge File

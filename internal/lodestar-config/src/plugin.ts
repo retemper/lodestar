@@ -2,7 +2,7 @@ import type { WrittenConfigBlock } from '@lodestar/types';
 import { pluginStructure } from '@lodestar/plugin-structure';
 import { base } from './base';
 
-/** 플러그인 패키지용 config — base + paired-files 규칙 */
+/** Config for plugin packages — base + paired-files rules */
 const plugin: readonly WrittenConfigBlock[] = [
   ...base,
   {

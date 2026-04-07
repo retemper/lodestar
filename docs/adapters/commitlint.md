@@ -8,10 +8,10 @@ Generates a `.commitlintrc.json` config file for commit message linting. This is
 
 ## Config Options
 
-| Option    | Type                       | Description                                                                       |
-| --------- | -------------------------- | --------------------------------------------------------------------------------- |
-| `extends` | `string[]`                 | Shareable configs to extend -- e.g., `'@commitlint/config-conventional'`          |
-| `rules`   | `Record<string, unknown>`  | Custom rules -- e.g., `{"type-enum": [2, "always", ["feat", "fix", "chore"]]}` |
+| Option    | Type                      | Description                                                                    |
+| --------- | ------------------------- | ------------------------------------------------------------------------------ |
+| `extends` | `string[]`                | Shareable configs to extend -- e.g., `'@commitlint/config-conventional'`       |
+| `rules`   | `Record<string, unknown>` | Custom rules -- e.g., `{"type-enum": [2, "always", ["feat", "fix", "chore"]]}` |
 
 All options are optional. Calling `commitlintAdapter()` with no arguments produces an empty config.
 
@@ -26,7 +26,7 @@ commitlintAdapter({
     'type-enum': [2, 'always', ['feat', 'fix', 'chore', 'docs', 'refactor', 'test']],
     'subject-case': [2, 'always', 'lower-case'],
   },
-})
+});
 ```
 
 ## How verifySetup Works

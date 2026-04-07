@@ -8,8 +8,8 @@ Manages git hooks via Husky. Unlike other adapters, husky has no `check` or `fix
 
 ## Config Options
 
-| Option  | Type                                        | Description                              |
-| ------- | ------------------------------------------- | ---------------------------------------- |
+| Option  | Type                                         | Description                                |
+| ------- | -------------------------------------------- | ------------------------------------------ |
 | `hooks` | `Record<string, HookDefinition \| string[]>` | Git hooks to configure -- key is hook name |
 
 A `HookDefinition` has a `commands` array. You can also pass an array of strings directly as a shorthand.
@@ -26,7 +26,7 @@ huskyAdapter({
       commands: ['npx commitlint --edit "$1"'],
     },
   },
-})
+});
 ```
 
 Each hook generates an executable shell script in `.husky/`:
