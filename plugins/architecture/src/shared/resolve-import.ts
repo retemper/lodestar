@@ -14,7 +14,7 @@ function resolveImport(importer: string, source: string, knownFiles: Set<string>
   if (!source.startsWith('.') && !source.startsWith('/')) return null;
 
   const importerDir = dirname(importer);
-  const base = normalizePath(join(importerDir, source));
+  const base = normalizePath(join(importerDir, source).replaceAll('\\', '/'));
 
   if (knownFiles.has(base)) return base;
 
