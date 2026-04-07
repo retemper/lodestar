@@ -1,5 +1,6 @@
 import { access } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import type { WrittenConfig } from '@lodestar/types';
 
 /** Supported config file names in priority order */
@@ -50,7 +51,7 @@ async function importConfig(configPath: string): Promise<unknown> {
     const jiti = createJiti(configPath, { interopDefault: true });
     return jiti.import(configPath);
   }
-  return import(configPath);
+  return import(pathToFileURL(configPath).href);
 }
 
 export { loadConfigFile, CONFIG_FILES };
