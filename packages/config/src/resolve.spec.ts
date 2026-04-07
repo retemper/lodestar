@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Plugin } from '@lodestar/types';
+import type { Plugin, PluginFactory } from '@lodestar/types';
 import { resolveConfig, resolvePluginEntry, normalizeRuleConfig } from './resolve';
 
 describe('normalizeRuleConfig', () => {
@@ -128,12 +128,13 @@ describe('resolveConfig', () => {
 
 describe('resolvePluginEntry', () => {
   it('[factoryFunction, options] 형식의 플러그인 엔트리를 해석한다', () => {
-    const factory = () => ({ name: 'my-plugin', rules: [{ name: 'my-rule' }] });
+    const factory: PluginFactory = () => ({ name: 'my-plugin', rules: [] });
     const result = resolvePluginEntry([factory, { key: 'value' }]);
 
     expect(result.name).toBe('my-plugin');
     expect(result.plugin.name).toBe('my-plugin');
     expect(result.options).toStrictEqual({ key: 'value' });
+    expect(result.plugin.rules).toStrictEqual([]);
   });
 
   it('[문자열, options] 형식의 플러그인 엔트리를 해석한다', () => {
