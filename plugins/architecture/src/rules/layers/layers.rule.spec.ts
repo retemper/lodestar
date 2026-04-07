@@ -325,6 +325,81 @@ describe('architecture/layers', () => {
     });
   });
 
+  describe('canImport가 빈 배열인 레이어', () => {
+    it('canImport가 빈 배열이면 다른 레이어를 import할 수 없다', async () => {
+      const layerDefs: readonly LayerDefinition[] = [
+        { name: 'core', path: 'src/core/**/*.ts', canImport: [] },
+        { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['core'] },
+      ];
+      const providers = createMockProviders({
+        glob: vi.fn().mockImplementation((pattern: string) => {
+          if (pattern === 'src/core/**/*.ts') {
+            return Promise.resolve(['src/core/entity.ts']);
+          }
+          if (pattern === 'src/infra/**/*.ts') {
+            return Promise.resolve(['src/infra/repo.ts']);
+          }
+          return Promise.resolve([]);
+        }),
+        getImports: vi.fn().mockImplementation((file: string) => {
+          if (file === 'src/core/entity.ts') {
+            return Promise.resolve([
+              makeImport('../infra/repo.ts', 'src/core/entity.ts'),
+            ]);
+          }
+          return Promise.resolve([]);
+        }),
+      });
+      const { ctx, violations } = createTestContext(
+        { layers: layerDefs },
+        providers,
+        'architecture/layers',
+      );
+
+      await layers.check(ctx);
+
+      expect(violations).toHaveLength(1);
+      expect(violations[0].message).toContain('core');
+      expect(violations[0].message).toContain('infra');
+    });
+  });
+
+  describe('allowTypeOnly가 false일 때 type-only import', () => {
+    it('allowTypeOnly가 false이면 type-only 크로스레이어 import도 위반이다', async () => {
+      const providers = createMockProviders({
+        glob: vi.fn().mockImplementation((pattern: string) => {
+          if (pattern === 'src/domain/**/*.ts') {
+            return Promise.resolve(['src/domain/entity.ts']);
+          }
+          if (pattern === 'src/application/**/*.ts') {
+            return Promise.resolve(['src/application/service.ts']);
+          }
+          if (pattern === 'src/infrastructure/**/*.ts') {
+            return Promise.resolve([]);
+          }
+          return Promise.resolve([]);
+        }),
+        getImports: vi.fn().mockImplementation((file: string) => {
+          if (file === 'src/domain/entity.ts') {
+            return Promise.resolve([
+              makeImport('../application/service.ts', 'src/domain/entity.ts', true),
+            ]);
+          }
+          return Promise.resolve([]);
+        }),
+      });
+      const { ctx, violations } = createTestContext(
+        { layers: makeStandardLayers(), allowTypeOnly: false },
+        providers,
+        'architecture/layers',
+      );
+
+      await layers.check(ctx);
+
+      expect(violations).toHaveLength(1);
+    });
+  });
+
   describe('메타데이터', () => {
     it('올바른 파일 수와 레이어 수를 메타에 출력한다', async () => {
       const metaSpy = vi.fn();

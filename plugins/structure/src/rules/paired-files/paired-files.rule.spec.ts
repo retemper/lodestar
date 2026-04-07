@@ -1,4 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
+import { mkdtemp, rm, stat } from 'node:fs/promises';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { createMockProviders, createTestContext } from '@lodestar/test-utils';
 import { pairedFiles } from './paired-files.rule';
 
@@ -181,6 +184,38 @@ describe('structure/paired-files', () => {
 
       expect(violations).toHaveLength(1);
       expect(violations[0].location).toStrictEqual({ file: 'src/core/engine.ts' });
+    });
+  });
+
+  describe('fix 적용', () => {
+    it('fix가 적용되면 companion 파일을 생성한다', async () => {
+      const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-paired-files-'));
+      try {
+        const providers = createMockProviders({
+          glob: vi.fn().mockResolvedValue(['src/utils/helper.ts']),
+          exists: vi.fn().mockResolvedValue(false),
+        });
+        const { ctx, violations } = createTestContext(
+          {
+            pairs: [{ source: 'src/**/*.ts', required: '{dir}/{name}.spec.ts' }],
+          },
+          providers,
+          'structure/paired-files',
+        );
+        const ctxWithRootDir = { ...ctx, rootDir };
+
+        await pairedFiles.check(ctxWithRootDir);
+
+        expect(violations).toHaveLength(1);
+        expect(violations[0].fix).toBeDefined();
+
+        await violations[0].fix!.apply();
+
+        const fileStat = await stat(join(rootDir, 'src/utils/helper.spec.ts'));
+        expect(fileStat.isFile()).toBe(true);
+      } finally {
+        await rm(rootDir, { recursive: true, force: true });
+      }
     });
   });
 

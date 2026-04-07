@@ -50,15 +50,16 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Phase 1: build-free checks (parallel)
+      - name: Lint & format
+        run: pnpm turbo lint & pnpm format:check & wait
+
+      # Phase 2: build
       - run: pnpm turbo build
 
-      - run: pnpm turbo lint
-
-      - run: pnpm format:check
-
-      - run: pnpm turbo type-check
-
-      - run: pnpm turbo lodestar
+      # Phase 3: build-dependent checks (parallel)
+      - name: Type-check & lodestar
+        run: pnpm turbo type-check lodestar
 
   test:
     needs: changed

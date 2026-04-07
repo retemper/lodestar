@@ -151,6 +151,61 @@ describe('discoverWorkspaces', () => {
     expect(packages[0].name).toBe('@my/lib');
   });
 
+  it('pnpm-workspace.yaml도 package.json도 없으면 빈 배열을 반환한다', async () => {
+    const { rootDir } = await setup({});
+
+    const packages = await discoverWorkspaces(rootDir);
+
+    expect(packages).toStrictEqual([]);
+  });
+
+  it('workspaces가 인식할 수 없는 형식이면 빈 배열을 반환한다', async () => {
+    const { rootDir } = await setup({
+      'package.json': JSON.stringify({ name: 'root', workspaces: 'invalid' }),
+    });
+
+    const packages = await discoverWorkspaces(rootDir);
+
+    expect(packages).toStrictEqual([]);
+  });
+
+  it('workspaces 배열에 비문자열 항목이 있으면 필터링한다', async () => {
+    const { rootDir } = await setup({
+      'package.json': JSON.stringify({ name: 'root', workspaces: ['packages/*', 123] }),
+      'packages/lib/package.json': JSON.stringify({ name: '@my/lib' }),
+    });
+
+    const packages = await discoverWorkspaces(rootDir);
+
+    expect(packages).toHaveLength(1);
+    expect(packages[0].name).toBe('@my/lib');
+  });
+
+  it('package.json에 name이 없는 워크스페이스 패키지는 basename을 사용한다', async () => {
+    const { rootDir } = await setup({
+      'pnpm-workspace.yaml': 'packages:\n  - packages/*\n',
+      'packages/unnamed/package.json': JSON.stringify({ version: '1.0.0' }),
+    });
+
+    const packages = await discoverWorkspaces(rootDir);
+
+    expect(packages).toHaveLength(1);
+    expect(packages[0].name).toBe('unnamed');
+  });
+
+  it('** 패턴을 사용하는 워크스페이스를 처리한다', async () => {
+    const { rootDir } = await setup({
+      'pnpm-workspace.yaml': 'packages:\n  - packages/**\n',
+      'packages/lib/package.json': JSON.stringify({ name: '@my/lib' }),
+    });
+
+    const packages = await discoverWorkspaces(rootDir);
+
+    expect(packages.length).toBeGreaterThanOrEqual(1);
+    const names = packages.map((p) => p.name);
+    expect(names).toContain('@my/lib');
+  });
+
   it('여러 glob 패턴을 처리한다', async () => {
     const { rootDir } = await setup({
       'pnpm-workspace.yaml': 'packages:\n  - packages/*\n  - apps/*\n',

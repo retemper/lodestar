@@ -148,6 +148,60 @@ describe('architecture/modules', () => {
     expect(violations[0].message).not.toContain('testing');
   });
 
+  it('allow 목록이 비어있으면 deep import를 모두 위반으로 보고한다', async () => {
+    const providers = createMockProviders({
+      glob: vi.fn().mockResolvedValue(['src/app.ts']),
+      getImports: vi
+        .fn()
+        .mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
+    });
+    const { ctx, violations } = createTestContext(
+      { modules: ['web/service'], allow: [] },
+      providers,
+      'architecture/modules',
+    );
+
+    await modules.check(ctx as never);
+
+    expect(violations).toHaveLength(1);
+  });
+
+  it('exclude 패턴에 매칭되는 파일은 검사하지 않는다', async () => {
+    const providers = createMockProviders({
+      glob: vi.fn().mockResolvedValue(['src/app.ts', 'src/app.spec.ts']),
+      getImports: vi
+        .fn()
+        .mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
+    });
+    const { ctx, violations } = createTestContext(
+      { modules: ['web/service'], exclude: ['*.spec.'] },
+      providers,
+      'architecture/modules',
+    );
+
+    await modules.check(ctx as never);
+
+    expect(violations).toHaveLength(1);
+  });
+
+  it('include 패턴을 사용하여 검사 범위를 지정한다', async () => {
+    const providers = createMockProviders({
+      glob: vi.fn().mockResolvedValue(['custom/path/app.ts']),
+      getImports: vi
+        .fn()
+        .mockResolvedValue([makeImport('./web/service/internal', 'custom/path/app.ts')]),
+    });
+    const { ctx, violations } = createTestContext(
+      { modules: ['web/service'], include: ['custom/**/*.ts'] },
+      providers,
+      'architecture/modules',
+    );
+
+    await modules.check(ctx as never);
+
+    expect(violations).toHaveLength(1);
+  });
+
   it('올바른 규칙 메타데이터를 가진다', () => {
     expect(modules.name).toBe('architecture/modules');
     expect(modules.needs).toStrictEqual(['ast', 'fs']);
