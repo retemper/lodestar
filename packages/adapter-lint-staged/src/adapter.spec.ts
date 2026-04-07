@@ -42,7 +42,7 @@ describe('lintStagedAdapter verifySetup()', () => {
     fixtures.length = 0;
   });
 
-  /** 임시 디렉토리 생성 */
+  /** Creates a temporary directory */
   async function createTempDir(): Promise<string> {
     const dir = await mkdtemp(join(tmpdir(), 'lint-staged-test-'));
     fixtures.push(dir);

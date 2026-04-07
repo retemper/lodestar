@@ -14,7 +14,7 @@ Run all rules against a single project.
 const summary = await run({
   config: resolvedConfig,
   reporter: myReporter, // optional
-  fix: true,            // optional -- auto-fix violations
+  fix: true, // optional -- auto-fix violations
 });
 ```
 
@@ -89,9 +89,9 @@ interface RuleResultSummary {
   readonly ruleId: string;
   readonly violations: readonly Violation[];
   readonly durationMs: number;
-  readonly meta?: string;       // e.g., "14 files", "0 cycles"
-  readonly docsUrl?: string;    // documentation URL for the rule
-  readonly error?: Error;       // set if the rule threw
+  readonly meta?: string; // e.g., "14 files", "0 cycles"
+  readonly docsUrl?: string; // documentation URL for the rule
+  readonly error?: Error; // set if the rule threw
 }
 ```
 
@@ -110,8 +110,8 @@ Where `WorkspacePackage` is:
 
 ```ts
 interface WorkspacePackage {
-  readonly name: string;  // package name from package.json
-  readonly dir: string;   // absolute path to the package directory
+  readonly name: string; // package name from package.json
+  readonly dir: string; // absolute path to the package directory
 }
 ```
 
@@ -151,10 +151,10 @@ function createMyReporter(): Reporter {
 
 ### Built-in reporters
 
-| Reporter | Output | Description |
-| --- | --- | --- |
+| Reporter                  | Output | Description                                                                                                                                      |
+| ------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `createConsoleReporter()` | stderr | Human-readable output with ANSI colors, per-rule pass/fail status, metadata, and durations. Implements `WorkspaceReporter` with package headers. |
-| `createJsonReporter()` | stdout | Collects all violations and writes a single JSON object on completion. Useful for CI pipelines and programmatic consumption. |
+| `createJsonReporter()`    | stdout | Collects all violations and writes a single JSON object on completion. Useful for CI pipelines and programmatic consumption.                     |
 
 ```ts
 import { createConsoleReporter } from '@lodestar/cli';

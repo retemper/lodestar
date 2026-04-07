@@ -1,5 +1,5 @@
 import { mkdtemp, mkdir, writeFile, rm, symlink } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import type { WrittenConfig } from 'lodestar';
 
@@ -28,7 +28,7 @@ async function createFixtureDir(
 
   for (const [relativePath, content] of Object.entries(structure)) {
     const fullPath = join(rootDir, relativePath);
-    const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
+    const dir = dirname(fullPath);
     await mkdir(dir, { recursive: true });
 
     await (content === null
@@ -55,7 +55,8 @@ async function createFixtureConfig(rootDir: string, config: WrittenConfig): Prom
   await writeFile(join(rootDir, 'lodestar.config.mjs'), configContent, 'utf-8');
 
   // Symlink @lodestar/* plugins specified in the config into the fixture's node_modules
-  const plugins = config.plugins ?? [];
+  const blocks = Array.isArray(config) ? config : [config];
+  const plugins = blocks.flatMap((block) => block.plugins ?? []);
   for (const entry of plugins) {
     const name = typeof entry === 'string' ? entry : (entry as readonly [string, ...unknown[]])[0];
     if (name.startsWith('@lodestar/')) {

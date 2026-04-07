@@ -26,22 +26,22 @@ const myRule = defineRule({
 
 규칙은 `needs` 배열을 통해 필요한 프로바이더를 선언합니다:
 
-| 프로바이더 | 접근 방법                | 사용 사례                                          |
+| 프로바이더 | 접근 방법              | 사용 사례                                          |
 | ---------- | ---------------------- | -------------------------------------------------- |
-| `fs`       | `ctx.providers.fs`     | 파일 글로빙, 내용 읽기, 존재 여부 확인                  |
-| `graph`    | `ctx.providers.graph`  | 의존성 조회, 의존자 조회, 순환 참조 탐지                 |
-| `ast`      | `ctx.providers.ast`    | 임포트/익스포트 파싱, TypeScript AST 접근              |
-| `config`   | `ctx.providers.config` | package.json, tsconfig.json, 커스텀 설정 파일 읽기    |
+| `fs`       | `ctx.providers.fs`     | 파일 글로빙, 내용 읽기, 존재 여부 확인             |
+| `graph`    | `ctx.providers.graph`  | 의존성 조회, 의존자 조회, 순환 참조 탐지           |
+| `ast`      | `ctx.providers.ast`    | 임포트/익스포트 파싱, TypeScript AST 접근          |
+| `config`   | `ctx.providers.config` | package.json, tsconfig.json, 커스텀 설정 파일 읽기 |
 
 ## 심각도(Severity)
 
 규칙은 세 가지 심각도 수준으로 설정할 수 있습니다:
 
-| 심각도     | 동작                                     |
-| --------- | ---------------------------------------- |
-| `'error'` | 오류로 보고되며, 0이 아닌 종료 코드를 발생시킴  |
+| 심각도    | 동작                                           |
+| --------- | ---------------------------------------------- |
+| `'error'` | 오류로 보고되며, 0이 아닌 종료 코드를 발생시킴 |
 | `'warn'`  | 경고로 보고되며, 빌드를 실패시키지 않음        |
-| `'off'`   | 규칙을 완전히 비활성화                       |
+| `'off'`   | 규칙을 완전히 비활성화                         |
 
 ## 규칙 설정
 

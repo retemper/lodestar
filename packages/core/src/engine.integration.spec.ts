@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { mkdtemp, mkdir, writeFile, rm, symlink } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { run } from './engine';
 import { resolveConfig } from '@lodestar/config';
@@ -12,7 +12,7 @@ interface FixtureResult {
   cleanup(): Promise<void>;
 }
 
-/** 주어진 파일 구조로 임시 디렉토리 생성 */
+/** Creates a temporary directory with the given file structure */
 async function createFixture(
   structure: Readonly<Record<string, string | null>>,
 ): Promise<FixtureResult> {
@@ -20,7 +20,7 @@ async function createFixture(
 
   for (const [relativePath, content] of Object.entries(structure)) {
     const fullPath = join(rootDir, relativePath);
-    const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
+    const dir = dirname(fullPath);
     await mkdir(dir, { recursive: true });
 
     await (content === null
@@ -37,8 +37,8 @@ async function createFixture(
 }
 
 /**
- * fixture의 node_modules에 워크스페이스 패키지 심링크 생성.
- * resolvePlugins()가 fixture에서 실제 플러그인을 import할 수 있도록 한다.
+ * Creates a symlink for a workspace package in the fixture's node_modules.
+ * Allows resolvePlugins() to import real plugins from the fixture.
  */
 async function linkPlugin(fixtureRoot: string, packageName: string): Promise<void> {
   const realPackagePath = join(process.cwd(), 'node_modules', ...packageName.split('/'));

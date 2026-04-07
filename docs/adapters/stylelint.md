@@ -31,7 +31,7 @@ stylelintAdapter({
   },
   ignore: ['dist/**', 'node_modules/**'],
   include: ['src/**/*.css', 'src/**/*.scss'],
-})
+});
 ```
 
 ## How verifySetup Works

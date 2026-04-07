@@ -66,11 +66,7 @@ describe('conventions/no-korean-comments', () => {
       glob: vi.fn().mockResolvedValue(['src/index.ts']),
       readFile: vi.fn().mockResolvedValue('const x = 1; // 변수 선언\n'),
     });
-    const { ctx, violations } = createTestContext(
-      {},
-      providers,
-      'conventions/no-korean-comments',
-    );
+    const { ctx, violations } = createTestContext({}, providers, 'conventions/no-korean-comments');
 
     await noKoreanComments.check(ctx);
 
@@ -85,11 +81,7 @@ describe('conventions/no-korean-comments', () => {
       glob: vi.fn().mockResolvedValue(['src/index.ts']),
       readFile: vi.fn().mockResolvedValue('const x = 1; // variable\n'),
     });
-    const { ctx, violations } = createTestContext(
-      {},
-      providers,
-      'conventions/no-korean-comments',
-    );
+    const { ctx, violations } = createTestContext({}, providers, 'conventions/no-korean-comments');
 
     await noKoreanComments.check(ctx);
 
@@ -118,11 +110,7 @@ describe('conventions/no-korean-comments', () => {
     const providers = createMockProviders({
       glob: vi.fn().mockResolvedValue([]),
     });
-    const { ctx, violations } = createTestContext(
-      {},
-      providers,
-      'conventions/no-korean-comments',
-    );
+    const { ctx, violations } = createTestContext({}, providers, 'conventions/no-korean-comments');
 
     await noKoreanComments.check(ctx);
 

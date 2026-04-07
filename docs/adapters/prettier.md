@@ -8,20 +8,20 @@ Runs Prettier via the CLI (`prettier --check` / `prettier --write`) and generate
 
 ## Config Options
 
-| Option          | Type                                    | Description                             |
-| --------------- | --------------------------------------- | --------------------------------------- |
-| `printWidth`    | `number`                                | Line width (default: 80)               |
-| `tabWidth`      | `number`                                | Spaces per indentation level (default: 2) |
-| `useTabs`       | `boolean`                               | Use tabs instead of spaces             |
-| `semi`          | `boolean`                               | Use semicolons                         |
-| `singleQuote`   | `boolean`                               | Use single quotes                      |
-| `trailingComma` | `'all'` \| `'es5'` \| `'none'`         | Trailing commas                        |
-| `bracketSpacing`| `boolean`                               | Spaces inside object braces            |
-| `arrowParens`   | `'always'` \| `'avoid'`                | Parens for single arrow function args  |
-| `endOfLine`     | `'lf'` \| `'crlf'` \| `'cr'` \| `'auto'` | Line ending style                   |
-| `ignore`        | `string[]`                              | Glob patterns to ignore                |
-| `bin`           | `string`                                | Binary name or path (default: `"prettier"`) |
-| `include`       | `string[]`                              | File patterns to check                 |
+| Option           | Type                                     | Description                                 |
+| ---------------- | ---------------------------------------- | ------------------------------------------- |
+| `printWidth`     | `number`                                 | Line width (default: 80)                    |
+| `tabWidth`       | `number`                                 | Spaces per indentation level (default: 2)   |
+| `useTabs`        | `boolean`                                | Use tabs instead of spaces                  |
+| `semi`           | `boolean`                                | Use semicolons                              |
+| `singleQuote`    | `boolean`                                | Use single quotes                           |
+| `trailingComma`  | `'all'` \| `'es5'` \| `'none'`           | Trailing commas                             |
+| `bracketSpacing` | `boolean`                                | Spaces inside object braces                 |
+| `arrowParens`    | `'always'` \| `'avoid'`                  | Parens for single arrow function args       |
+| `endOfLine`      | `'lf'` \| `'crlf'` \| `'cr'` \| `'auto'` | Line ending style                           |
+| `ignore`         | `string[]`                               | Glob patterns to ignore                     |
+| `bin`            | `string`                                 | Binary name or path (default: `"prettier"`) |
+| `include`        | `string[]`                               | File patterns to check                      |
 
 ## Example
 
@@ -34,7 +34,7 @@ prettierAdapter({
   semi: true,
   tabWidth: 2,
   printWidth: 100,
-})
+});
 ```
 
 ## How verifySetup Works

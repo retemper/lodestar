@@ -32,8 +32,8 @@ Verifies that required directories or files exist. Each entry is a glob pattern 
 
 **Options:**
 
-| Option     | Type       | Description                                           |
-| ---------- | ---------- | ----------------------------------------------------- |
+| Option     | Type       | Description                                            |
+| ---------- | ---------- | ------------------------------------------------------ |
 | `required` | `string[]` | Glob patterns for paths that must exist in the project |
 
 **Providers:** `fs`
@@ -77,8 +77,8 @@ Verifies that forbidden paths do not exist. Each entry is a glob pattern -- any 
 
 **Options:**
 
-| Option     | Type       | Description                                              |
-| ---------- | ---------- | -------------------------------------------------------- |
+| Option     | Type       | Description                                                |
+| ---------- | ---------- | ---------------------------------------------------------- |
 | `patterns` | `string[]` | Glob patterns for paths that must NOT exist in the project |
 
 **Providers:** `fs`
@@ -127,17 +127,17 @@ Verifies that source files matching a glob have required companion files. Use `{
 
 **Options:**
 
-| Option  | Type         | Description                                                 |
-| ------- | ------------ | ----------------------------------------------------------- |
+| Option  | Type         | Description                                                  |
+| ------- | ------------ | ------------------------------------------------------------ |
 | `pairs` | `FilePair[]` | Pair definitions linking source files to required companions |
 
 Each `FilePair` has:
 
-| Field      | Type     | Required | Description                                       |
-| ---------- | -------- | -------- | ------------------------------------------------- |
-| `source`   | `string` | Yes      | Glob pattern matching source files                |
+| Field      | Type     | Required | Description                                          |
+| ---------- | -------- | -------- | ---------------------------------------------------- |
+| `source`   | `string` | Yes      | Glob pattern matching source files                   |
 | `required` | `string` | Yes      | Template path with `{dir}` and `{name}` placeholders |
-| `message`  | `string` | No       | Custom message when the paired file is missing    |
+| `message`  | `string` | No       | Custom message when the paired file is missing       |
 
 **Providers:** `fs`
 
@@ -147,6 +147,7 @@ Each `FilePair` has:
 - `{name}` -- the filename without extension
 
 For a source file `src/utils/parser.ts`:
+
 - `{dir}` = `src/utils`
 - `{name}` = `parser`
 - Template `{dir}/{name}.spec.ts` resolves to `src/utils/parser.spec.ts`

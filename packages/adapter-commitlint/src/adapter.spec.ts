@@ -63,7 +63,7 @@ describe('commitlintAdapter verifySetup()', () => {
     fixtures.length = 0;
   });
 
-  /** 임시 디렉토리 생성 */
+  /** Creates a temporary directory */
   async function createTempDir(): Promise<string> {
     const dir = await mkdtemp(join(tmpdir(), 'commitlint-test-'));
     fixtures.push(dir);
@@ -86,7 +86,11 @@ describe('commitlintAdapter verifySetup()', () => {
 
   it('.commitlintrc.json 내용이 config과 다르면 setup violation을 보고한다', async () => {
     const rootDir = await createTempDir();
-    await writeFile(join(rootDir, '.commitlintrc.json'), '{"extends": ["other-config"]}\n', 'utf-8');
+    await writeFile(
+      join(rootDir, '.commitlintrc.json'),
+      '{"extends": ["other-config"]}\n',
+      'utf-8',
+    );
 
     const adapter = commitlintAdapter({
       extends: ['@commitlint/config-conventional'],

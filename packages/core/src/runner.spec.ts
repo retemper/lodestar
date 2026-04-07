@@ -36,8 +36,6 @@ function createRuleConfig(overrides: Partial<ResolvedRuleConfig> = {}): Resolved
     ruleId: 'test/rule',
     severity: 'error',
     options: {},
-    include: [],
-    exclude: [],
     ...overrides,
   };
 }
@@ -262,6 +260,59 @@ describe('runRule', () => {
       const result = await runRule(createThrowingRule(), createRuleConfig(), providers, '/root');
 
       expect(result.durationMs).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  describe('severity가 off인 경우', () => {
+    it('severity가 off이면 report를 호출해도 violations에 추가하지 않는다', async () => {
+      const result = await runRule(
+        createFailingRule(),
+        createRuleConfig({ severity: 'off' }),
+        providers,
+        '/root',
+      );
+
+      expect(result.violations).toStrictEqual([]);
+    });
+  });
+
+  describe('meta', () => {
+    it('ctx.meta를 호출하면 result.meta에 반영된다', async () => {
+      const rule: RuleDefinition = {
+        name: 'test/meta',
+        description: 'Reports meta',
+        needs: [],
+        async check(ctx) {
+          ctx.meta('14 files checked');
+        },
+      };
+
+      const result = await runRule(rule, createRuleConfig(), providers, '/root');
+
+      expect(result.meta).toBe('14 files checked');
+    });
+
+    it('ctx.meta를 호출하지 않으면 result.meta는 undefined이다', async () => {
+      const result = await runRule(createPassingRule(), createRuleConfig(), providers, '/root');
+
+      expect(result.meta).toBeUndefined();
+    });
+
+    it('에러 발생 시에도 이전에 설정한 meta를 유지한다', async () => {
+      const rule: RuleDefinition = {
+        name: 'test/meta-error',
+        description: 'Sets meta then throws',
+        needs: [],
+        async check(ctx) {
+          ctx.meta('partial progress');
+          throw new Error('crash');
+        },
+      };
+
+      const result = await runRule(rule, createRuleConfig(), providers, '/root');
+
+      expect(result.meta).toBe('partial progress');
+      expect(result.error?.message).toBe('crash');
     });
   });
 

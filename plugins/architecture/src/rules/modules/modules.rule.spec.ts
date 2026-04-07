@@ -3,7 +3,7 @@ import type { Violation, ImportInfo } from '@lodestar/types';
 import { createMockProviders, createTestContext } from '@lodestar/test-utils';
 import { modules } from './modules.rule';
 
-/** 모듈 경계 규칙 실행 후 위반 목록 반환 */
+/** Runs the module boundary rule and returns the list of violations */
 async function checkModules(
   modulePaths: readonly string[],
   files: readonly string[],
@@ -22,7 +22,7 @@ async function checkModules(
   return violations;
 }
 
-/** ImportInfo 스텁 생성 */
+/** Creates an ImportInfo stub */
 function makeImport(source: string, file: string): ImportInfo {
   return { source, specifiers: [], isTypeOnly: false, location: { file, line: 1 } };
 }
@@ -146,6 +146,56 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(1);
     expect(violations[0].message).toContain('web/service');
     expect(violations[0].message).not.toContain('testing');
+  });
+
+  it('allow 목록이 비어있으면 deep import를 모두 위반으로 보고한다', async () => {
+    const providers = createMockProviders({
+      glob: vi.fn().mockResolvedValue(['src/app.ts']),
+      getImports: vi.fn().mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
+    });
+    const { ctx, violations } = createTestContext(
+      { modules: ['web/service'], allow: [] },
+      providers,
+      'architecture/modules',
+    );
+
+    await modules.check(ctx as never);
+
+    expect(violations).toHaveLength(1);
+  });
+
+  it('exclude 패턴에 매칭되는 파일은 검사하지 않는다', async () => {
+    const providers = createMockProviders({
+      glob: vi.fn().mockResolvedValue(['src/app.ts', 'src/app.spec.ts']),
+      getImports: vi.fn().mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
+    });
+    const { ctx, violations } = createTestContext(
+      { modules: ['web/service'], exclude: ['*.spec.'] },
+      providers,
+      'architecture/modules',
+    );
+
+    await modules.check(ctx as never);
+
+    expect(violations).toHaveLength(1);
+  });
+
+  it('include 패턴을 사용하여 검사 범위를 지정한다', async () => {
+    const providers = createMockProviders({
+      glob: vi.fn().mockResolvedValue(['custom/path/app.ts']),
+      getImports: vi
+        .fn()
+        .mockResolvedValue([makeImport('./web/service/internal', 'custom/path/app.ts')]),
+    });
+    const { ctx, violations } = createTestContext(
+      { modules: ['web/service'], include: ['custom/**/*.ts'] },
+      providers,
+      'architecture/modules',
+    );
+
+    await modules.check(ctx as never);
+
+    expect(violations).toHaveLength(1);
   });
 
   it('올바른 규칙 메타데이터를 가진다', () => {

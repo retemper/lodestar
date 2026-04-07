@@ -165,6 +165,67 @@ describe('createConsoleReporter', () => {
       expect(violationLine).toContain('at src/MyComponent.ts:42');
     });
 
+    it('meta가 있으면 출력에 포함한다', () => {
+      const reporter = createConsoleReporter();
+      const result: RuleResultSummary = {
+        ruleId: 'naming-convention/file-naming',
+        violations: [],
+        durationMs: 5,
+        meta: '42 files checked',
+      };
+
+      reporter.onRuleComplete!(result);
+
+      const output = (console.error as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(output).toContain('42 files checked');
+    });
+
+    it('docsUrl이 있으면 경고에도 표시한다', () => {
+      const reporter = createConsoleReporter();
+      const result: RuleResultSummary = {
+        ruleId: 'naming-convention/file-naming',
+        violations: [
+          {
+            ruleId: 'naming-convention/file-naming',
+            message: 'Bad name',
+            severity: 'warn',
+          },
+        ],
+        durationMs: 2,
+        docsUrl: 'https://docs.example.com/naming',
+      };
+
+      reporter.onRuleComplete!(result);
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      expect(calls.some((c) => c.includes('docs: https://docs.example.com/naming'))).toBe(true);
+    });
+
+    it('docsUrl이 있으면 에러에도 표시한다', () => {
+      const reporter = createConsoleReporter();
+      const result: RuleResultSummary = {
+        ruleId: 'test/rule',
+        violations: [
+          {
+            ruleId: 'test/rule',
+            message: 'Violation',
+            severity: 'error',
+          },
+        ],
+        durationMs: 1,
+        docsUrl: 'https://docs.example.com/test',
+      };
+
+      reporter.onRuleComplete!(result);
+
+      const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
+        (c) => c[0] as string,
+      );
+      expect(calls.some((c) => c.includes('docs: https://docs.example.com/test'))).toBe(true);
+    });
+
     it('shows error message when rule threw', () => {
       const reporter = createConsoleReporter();
       const result: RuleResultSummary = {

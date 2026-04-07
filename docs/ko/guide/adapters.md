@@ -22,13 +22,13 @@ interface ToolAdapter<TConfig = unknown> {
 }
 ```
 
-| 메서드             | 목적                                                                     |
-| ---------------- | ----------------------------------------------------------------------- |
-| `check`          | 도구를 실행하고 위반(Violation)을 반환 (린터, 포매터)                          |
-| `fix`            | 자동 수정 -- 린터의 `--fix`, 포매터의 `--write`                              |
-| `generateConfig` | IDE/에디터 연동을 위한 네이티브 설정 객체 빌드                                  |
-| `verifySetup`    | 설정 파일 누락 또는 드리프트(Drift)를 감지하고 위반을 반환                       |
-| `setup`          | 도구 인프라 생성 (Git 훅, CI 설정) -- `lodestar init`에서 호출               |
+| 메서드           | 목적                                                           |
+| ---------------- | -------------------------------------------------------------- |
+| `check`          | 도구를 실행하고 위반(Violation)을 반환 (린터, 포매터)          |
+| `fix`            | 자동 수정 -- 린터의 `--fix`, 포매터의 `--write`                |
+| `generateConfig` | IDE/에디터 연동을 위한 네이티브 설정 객체 빌드                 |
+| `verifySetup`    | 설정 파일 누락 또는 드리프트(Drift)를 감지하고 위반을 반환     |
+| `setup`          | 도구 인프라 생성 (Git 훅, CI 설정) -- `lodestar init`에서 호출 |
 
 ## 설정에 어댑터 추가
 
@@ -40,10 +40,7 @@ import { eslintAdapter } from '@lodestar/adapter-eslint';
 import { prettierAdapter } from '@lodestar/adapter-prettier';
 
 export default defineConfig({
-  adapters: [
-    eslintAdapter({ presets: ['strict'] }),
-    prettierAdapter({ singleQuote: true }),
-  ],
+  adapters: [eslintAdapter({ presets: ['strict'] }), prettierAdapter({ singleQuote: true })],
 });
 ```
 
@@ -59,13 +56,13 @@ export default defineConfig({
 
 ## 사용 가능한 어댑터
 
-| 어댑터 | 패키지 | 관리 파일 | 설명 |
-| ------- | ------- | --------- | ---- |
-| [adapter-eslint](/ko/adapters/eslint) | `@lodestar/adapter-eslint` | `eslint.config.js` | Node API를 통한 ESLint와 브릿지 파일 |
-| [adapter-prettier](/ko/adapters/prettier) | `@lodestar/adapter-prettier` | `.prettierrc` | CLI를 통한 Prettier |
-| [adapter-biome](/ko/adapters/biome) | `@lodestar/adapter-biome` | `biome.json` | 임시 설정을 사용하는 CLI 기반 Biome |
-| [adapter-husky](/ko/adapters/husky) | `@lodestar/adapter-husky` | `.husky/<hook>` | Husky를 통한 Git 훅 |
-| [adapter-lint-staged](/ko/adapters/lint-staged) | `@lodestar/adapter-lint-staged` | `.lintstagedrc.json` | 스테이징된 파일 린팅 |
-| [adapter-commitlint](/ko/adapters/commitlint) | `@lodestar/adapter-commitlint` | `.commitlintrc.json` | 커밋 메시지 컨벤션 |
-| [adapter-knip](/ko/adapters/knip) | `@lodestar/adapter-knip` | `knip.json` | 미사용 export/의존성 감지 |
-| [adapter-stylelint](/ko/adapters/stylelint) | `@lodestar/adapter-stylelint` | `.stylelintrc.json` | CSS/SCSS 린팅 |
+| 어댑터                                          | 패키지                          | 관리 파일            | 설명                                 |
+| ----------------------------------------------- | ------------------------------- | -------------------- | ------------------------------------ |
+| [adapter-eslint](/ko/adapters/eslint)           | `@lodestar/adapter-eslint`      | `eslint.config.js`   | Node API를 통한 ESLint와 브릿지 파일 |
+| [adapter-prettier](/ko/adapters/prettier)       | `@lodestar/adapter-prettier`    | `.prettierrc`        | CLI를 통한 Prettier                  |
+| [adapter-biome](/ko/adapters/biome)             | `@lodestar/adapter-biome`       | `biome.json`         | 임시 설정을 사용하는 CLI 기반 Biome  |
+| [adapter-husky](/ko/adapters/husky)             | `@lodestar/adapter-husky`       | `.husky/<hook>`      | Husky를 통한 Git 훅                  |
+| [adapter-lint-staged](/ko/adapters/lint-staged) | `@lodestar/adapter-lint-staged` | `.lintstagedrc.json` | 스테이징된 파일 린팅                 |
+| [adapter-commitlint](/ko/adapters/commitlint)   | `@lodestar/adapter-commitlint`  | `.commitlintrc.json` | 커밋 메시지 컨벤션                   |
+| [adapter-knip](/ko/adapters/knip)               | `@lodestar/adapter-knip`        | `knip.json`          | 미사용 export/의존성 감지            |
+| [adapter-stylelint](/ko/adapters/stylelint)     | `@lodestar/adapter-stylelint`   | `.stylelintrc.json`  | CSS/SCSS 린팅                        |

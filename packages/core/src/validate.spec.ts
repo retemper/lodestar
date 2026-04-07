@@ -11,8 +11,6 @@ function makeConfig(ruleIds: string[]): ResolvedConfig {
         ruleId: id,
         severity: 'error' as const,
         options: {},
-        include: [],
-        exclude: [],
       },
     ]),
   );
@@ -20,8 +18,8 @@ function makeConfig(ruleIds: string[]): ResolvedConfig {
     rootDir: '/test',
     plugins: [],
     rules,
-    include: [],
-    exclude: [],
+    scopedRules: [],
+    adapters: [],
     baseline: null,
   };
 }

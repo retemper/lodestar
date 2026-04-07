@@ -4,7 +4,7 @@ import { createMockProviders, createTestContext } from '@lodestar/test-utils';
 import { noCircular, estimateChainLength } from './no-circular.rule';
 import { matchGlob } from '../../shared/match-glob';
 
-/** 순환 그래프 생성: a->b->a */
+/** Creates a cyclic graph: a->b->a */
 function cyclicGraph(): Map<string, ModuleNode> {
   return new Map([
     ['src/a.ts', { id: 'src/a.ts', dependencies: ['src/b.ts'], dependents: ['src/b.ts'] }],
@@ -106,6 +106,38 @@ describe('architecture/no-circular', () => {
     expect(violations).toHaveLength(0);
   });
 
+  it('maxDepth 이하의 순환은 위반으로 보고한다', async () => {
+    const nodes = new Map([
+      ['a.ts', { id: 'a.ts', dependencies: ['b.ts'], dependents: ['b.ts'] }],
+      ['b.ts', { id: 'b.ts', dependencies: ['a.ts'], dependents: ['a.ts'] }],
+    ]);
+    const providers = createMockProviders({
+      getModuleGraph: vi.fn().mockResolvedValue({ nodes }),
+      hasCircular: vi.fn().mockResolvedValue(true),
+    });
+    const { ctx, violations } = createTestContext({ maxDepth: 5 }, providers);
+
+    await noCircular.check(ctx as never);
+
+    expect(violations).toHaveLength(2);
+  });
+
+  it('entries와 ignore를 동시에 사용한다', async () => {
+    const nodes = cyclicGraph();
+    const providers = createMockProviders({
+      getModuleGraph: vi.fn().mockResolvedValue({ nodes }),
+      hasCircular: vi.fn().mockResolvedValue(true),
+    });
+    const { ctx, violations } = createTestContext(
+      { entries: ['src/**'], ignore: ['src/c.*'] },
+      providers,
+    );
+
+    await noCircular.check(ctx as never);
+
+    expect(violations).toHaveLength(2);
+  });
+
   it('올바른 규칙 메타데이터를 가진다', () => {
     expect(noCircular.name).toBe('architecture/no-circular');
     expect(noCircular.needs).toStrictEqual(['graph']);
@@ -144,6 +176,15 @@ describe('estimateChainLength', () => {
       ['b', { dependencies: [] as string[] }],
     ]);
     expect(estimateChainLength(nodes, 'a')).toBe(Infinity);
+  });
+
+  it('BFS에서 이미 방문한 노드를 건너뛴다', () => {
+    const nodes = new Map([
+      ['a', { dependencies: ['b', 'c'] }],
+      ['b', { dependencies: ['c'] }],
+      ['c', { dependencies: ['a'] }],
+    ]);
+    expect(estimateChainLength(nodes, 'a')).toBe(2);
   });
 
   it('그래프에 존재하지 않는 의존성 노드를 건너뛴다', () => {
