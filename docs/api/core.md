@@ -120,7 +120,7 @@ interface WorkspacePackage {
 A reporter is a plain object implementing the `Reporter` interface. Here is a minimal example:
 
 ```ts
-import type { Reporter, Violation, RunSummary, RuleResultSummary } from 'lodestar';
+import type { Reporter, Violation, RunSummary, RuleResultSummary } from '@retemper/lodestar';
 
 function createMyReporter(): Reporter {
   return {

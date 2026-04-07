@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { ModuleNode } from 'lodestar';
+import type { ModuleNode } from '@retemper/lodestar';
 import {
   collectEdges,
   collectLayerEdges,

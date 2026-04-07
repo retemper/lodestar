@@ -5,7 +5,7 @@ Write your own rules in TypeScript using `defineRule`.
 ## Basic Example
 
 ```ts
-import { defineRule } from 'lodestar';
+import { defineRule } from '@retemper/lodestar';
 
 const noUtilsBarrel = defineRule({
   name: 'my-team/no-utils-barrel',

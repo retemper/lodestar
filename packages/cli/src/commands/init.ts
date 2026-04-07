@@ -14,7 +14,7 @@ async function initCommand(_args: ArgumentsCamelCase<Record<string, unknown>>): 
 
 /** Generate a starter config template */
 function generateConfigTemplate(): string {
-  return `import { defineConfig } from 'lodestar';
+  return `import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({

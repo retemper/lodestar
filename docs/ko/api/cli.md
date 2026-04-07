@@ -51,7 +51,7 @@ npx lodestar init
 `defineConfig`와 `@retemper/lodestar-plugin-architecture`를 임포트하고, 샘플 `architecture/layers` 규칙이 사전 구성된 시작 설정을 생성합니다:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({

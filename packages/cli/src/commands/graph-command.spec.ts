@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { ModuleNode } from 'lodestar';
+import type { ModuleNode } from '@retemper/lodestar';
 
-vi.mock('lodestar', () => ({
+vi.mock('@retemper/lodestar', () => ({
   createProviders: vi.fn(),
   loadConfigFile: vi.fn(),
 }));
 
 import { graphCommand } from './graph';
-import { createProviders, loadConfigFile } from 'lodestar';
+import { createProviders, loadConfigFile } from '@retemper/lodestar';
 
 const mockCreateProviders = vi.mocked(createProviders);
 const mockLoadConfigFile = vi.mocked(loadConfigFile);

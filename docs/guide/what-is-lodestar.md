@@ -19,7 +19,7 @@ Lodestar makes architectural rules **explicit**, **declarative**, and **enforcea
 
 ```ts
 // lodestar.config.ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({

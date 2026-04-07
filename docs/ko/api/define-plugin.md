@@ -3,7 +3,7 @@
 여러 규칙(Rule)을 묶는 플러그인(Plugin)을 생성합니다.
 
 ```ts
-import { definePlugin } from 'lodestar';
+import { definePlugin } from '@retemper/lodestar';
 
 export default definePlugin((options) => ({
   name: 'my-plugin',

@@ -5,7 +5,7 @@ Lodestar is configured via a `lodestar.config.ts` file in your project root.
 ## Config File
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({

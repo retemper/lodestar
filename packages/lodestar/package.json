@@ -1,5 +1,5 @@
 {
-  "name": "lodestar",
+  "name": "@retemper/lodestar",
   "version": "0.0.0",
   "type": "module",
   "description": "Declare your architecture. Enforce it. Project-level rule engine for TypeScript.",

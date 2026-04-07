@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('lodestar', () => ({
+vi.mock('@retemper/lodestar', () => ({
   loadConfigFile: vi.fn(),
 }));
 
 import { setupCommand } from './setup';
-import { loadConfigFile } from 'lodestar';
+import { loadConfigFile } from '@retemper/lodestar';
 
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 

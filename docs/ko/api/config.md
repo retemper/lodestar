@@ -5,7 +5,7 @@
 `lodestar.config.ts`를 생성하기 위한 타입 안전한 헬퍼입니다. 단일 설정 블록 또는 블록 배열(플랫 설정)을 받습니다.
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 
 export default defineConfig({
   plugins: [...],
@@ -113,7 +113,7 @@ interface ToolAdapter<TConfig = unknown> {
 세 가지 공식 어댑터를 모두 사용하는 예시:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
 import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
@@ -152,7 +152,7 @@ export default defineConfig({
 배열 형태는 서로 다른 파일 집합에 대해 다른 규칙이나 어댑터를 허용합니다. `files`가 없는 블록은 전역으로 적용되고, `files`가 있는 블록은 일치하는 경로에만 적용됩니다:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig([

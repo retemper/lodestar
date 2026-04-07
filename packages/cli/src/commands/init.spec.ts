@@ -5,7 +5,7 @@ describe('generateConfigTemplate', () => {
   it('defineConfig import를 포함한다', () => {
     const result = generateConfigTemplate();
 
-    expect(result).toContain("import { defineConfig } from 'lodestar'");
+    expect(result).toContain("import { defineConfig } from '@retemper/lodestar'");
   });
 
   it('export default defineConfig을 포함한다', () => {

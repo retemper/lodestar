@@ -5,7 +5,7 @@
 ## 규칙의 구조
 
 ```ts
-import { defineRule } from 'lodestar';
+import { defineRule } from '@retemper/lodestar';
 
 const myRule = defineRule({
   name: 'my-plugin/my-rule',

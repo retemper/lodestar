@@ -15,7 +15,7 @@ npx lodestar init
 This creates a `lodestar.config.ts`:
 
 ```ts
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({

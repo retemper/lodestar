@@ -17,6 +17,12 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.1.0(jiti@2.6.1))
+      '@repo/lodestar-config':
+        specifier: workspace:*
+        version: link:internal/lodestar-config
+      '@retemper/lodestar':
+        specifier: workspace:*
+        version: link:packages/lodestar
       '@retemper/lodestar-adapter-commitlint':
         specifier: workspace:*
         version: link:packages/adapter-commitlint
@@ -47,9 +53,6 @@ importers:
       '@retemper/lodestar-plugin-structure':
         specifier: workspace:*
         version: link:plugins/structure
-      '@repo/lodestar-config':
-        specifier: workspace:*
-        version: link:internal/lodestar-config
       '@types/node':
         specifier: ^25.5.0
         version: 25.5.0
@@ -65,9 +68,6 @@ importers:
       eslint-plugin-unicorn:
         specifier: ^64.0.0
         version: 64.0.0(eslint@10.1.0(jiti@2.6.1))
-      lodestar:
-        specifier: workspace:*
-        version: link:packages/lodestar
       prettier:
         specifier: ^3.4.0
         version: 3.8.1
@@ -89,6 +89,9 @@ importers:
 
   examples/clean-architecture:
     devDependencies:
+      '@retemper/lodestar':
+        specifier: workspace:*
+        version: link:../../packages/lodestar
       '@retemper/lodestar-adapter-eslint':
         specifier: workspace:*
         version: link:../../packages/adapter-eslint
@@ -107,15 +110,15 @@ importers:
       '@retemper/lodestar-plugin-structure':
         specifier: workspace:*
         version: link:../../plugins/structure
-      lodestar:
-        specifier: workspace:*
-        version: link:../../packages/lodestar
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
 
   examples/hexagonal:
     devDependencies:
+      '@retemper/lodestar':
+        specifier: workspace:*
+        version: link:../../packages/lodestar
       '@retemper/lodestar-adapter-eslint':
         specifier: workspace:*
         version: link:../../packages/adapter-eslint
@@ -131,15 +134,15 @@ importers:
       '@retemper/lodestar-plugin-structure':
         specifier: workspace:*
         version: link:../../plugins/structure
-      lodestar:
-        specifier: workspace:*
-        version: link:../../packages/lodestar
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
 
   internal/lodestar-config:
     dependencies:
+      '@repo/plugin-conventions':
+        specifier: workspace:*
+        version: link:../plugin-conventions
       '@retemper/lodestar-adapter-eslint':
         specifier: workspace:*
         version: link:../../packages/adapter-eslint
@@ -158,9 +161,6 @@ importers:
       '@retemper/lodestar-types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@repo/plugin-conventions':
-        specifier: workspace:*
-        version: link:../plugin-conventions
       eslint-plugin-import-x:
         specifier: ^4.16.2
         version: 4.16.2(@typescript-eslint/utils@8.58.0(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3))(eslint@10.1.0(jiti@2.6.1))
@@ -330,7 +330,7 @@ importers:
 
   packages/cli:
     dependencies:
-      lodestar:
+      '@retemper/lodestar':
         specifier: workspace:*
         version: link:../lodestar
       yargs:

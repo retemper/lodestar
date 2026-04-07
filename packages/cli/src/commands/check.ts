@@ -1,7 +1,7 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import type { WrittenConfig, WrittenConfigBlock } from 'lodestar';
-import { loadConfigFile, discoverWorkspaces, resolveConfig, run, runWorkspace } from 'lodestar';
+import type { WrittenConfig, WrittenConfigBlock } from '@retemper/lodestar';
+import { loadConfigFile, discoverWorkspaces, resolveConfig, run, runWorkspace } from '@retemper/lodestar';
 import { createConsoleReporter } from '../reporters/console';
 import { createJsonReporter } from '../reporters/json';
 

@@ -5,7 +5,7 @@
 ## 기본 예제
 
 ```ts
-import { defineRule } from 'lodestar';
+import { defineRule } from '@retemper/lodestar';
 
 const noUtilsBarrel = defineRule({
   name: 'my-team/no-utils-barrel',

@@ -1,7 +1,7 @@
 import { mkdtemp, mkdir, writeFile, rm, symlink } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import type { WrittenConfig } from 'lodestar';
+import type { WrittenConfig } from '@retemper/lodestar';
 
 /** Absolute path to the monorepo packages directory */
 const PACKAGES_DIR = resolve(import.meta.dirname, '../../../../../packages');

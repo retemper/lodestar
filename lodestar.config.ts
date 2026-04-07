@@ -1,4 +1,4 @@
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { adapters, base } from '@repo/lodestar-config';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 import { pluginStructure } from '@retemper/lodestar-plugin-structure';

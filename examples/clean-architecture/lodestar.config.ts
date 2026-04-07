@@ -1,4 +1,4 @@
-import { defineConfig } from 'lodestar';
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 import { pluginStructure } from '@retemper/lodestar-plugin-structure';
 import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';

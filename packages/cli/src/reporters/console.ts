@@ -4,7 +4,7 @@ import type {
   RuleResultSummary,
   WorkspaceReporter,
   WorkspacePackage,
-} from 'lodestar';
+} from '@retemper/lodestar';
 
 /** ANSI color codes */
 const GREEN = '\x1b[32m';
