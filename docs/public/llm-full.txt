@@ -50,7 +50,6 @@ export default defineConfig({
   },
   include: ['src/**/*.ts'],               // optional, default: ['**/*']
   exclude: ['node_modules/**'],           // optional
-  root: true,                             // don't inherit parent config
   baseline: '.lodestar-baseline.json',    // suppress existing violations
 });
 ```
@@ -212,7 +211,7 @@ Exit code 0 = no errors. Exit code 1 = errors found. Warnings don't fail.
 
 ## Workspace Mode
 
-Auto-detected when pnpm-workspace.yaml exists. Root config runs globally, per-package `lodestar.config.ts` files run scoped. Packages without their own config are skipped. `root: true` opts out of inheritance.
+Auto-detected when pnpm-workspace.yaml exists. Root config runs globally, per-package `lodestar.config.ts` files run independently (no implicit inheritance). Packages without their own config are skipped.
 
 ## Native Acceleration
 

@@ -21,7 +21,7 @@ features:
   - title: Architecture rules that ESLint can't do
     details: Layer boundaries, module encapsulation, circular dependency detection. Declare your architecture in code and enforce it in CI.
   - title: Monorepo-native
-    details: One command checks every package. Shared config inheritance, per-package results, automatic workspace discovery.
+    details: One command checks every package. Independent per-package configs, per-package results, automatic workspace discovery.
   - title: Know your blast radius
     details: '`lodestar impact <file>` traces every file affected by a change. Review with confidence.'
   - title: Your rules, your plugins
