@@ -11,7 +11,7 @@ interface FixtureResult {
   cleanup(): Promise<void>;
 }
 
-/** 파일 구조 맵으로 임시 디렉토리 생성 */
+/** Creates a temporary directory from a file structure map */
 async function createFixtureDir(
   structure: Readonly<Record<string, string | null>> = {},
 ): Promise<FixtureResult> {

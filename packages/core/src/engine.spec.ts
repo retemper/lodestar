@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { run, createProviders } from './engine';
 import type { ResolvedConfig, Plugin, RuleDefinition, ToolAdapter } from '@lodestar/types';
 
-/** 테스트용 최소 ResolvedConfig 생성 */
+/** Creates a minimal ResolvedConfig for testing */
 function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
   return {
     rootDir: '/test',
@@ -15,12 +15,12 @@ function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
   };
 }
 
-/** 주어진 규칙으로 플러그인 생성 */
+/** Creates a plugin with the given rules */
 function makePlugin(name: string, rules: readonly RuleDefinition[]): Plugin {
   return { name, rules };
 }
 
-/** 통과하는 규칙 생성 */
+/** Creates a passing rule */
 function makeRule(name: string): RuleDefinition {
   return {
     name,
@@ -30,7 +30,7 @@ function makeRule(name: string): RuleDefinition {
   };
 }
 
-/** 위반을 보고하는 규칙 생성 */
+/** Creates a rule that reports a violation */
 function makeFailingRule(name: string, message: string): RuleDefinition {
   return {
     name,
@@ -197,7 +197,7 @@ describe('run', () => {
     const summary = await run({ config, fix: true });
 
     expect(fixApply).toHaveBeenCalledOnce();
-    // check가 실행되었으므로 adapter가 totalRules에 포함
+    // check was executed, so the adapter is included in totalRules
     expect(summary.totalRules).toBeGreaterThanOrEqual(1);
   });
 

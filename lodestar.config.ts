@@ -1,10 +1,11 @@
 import { defineConfig } from 'lodestar';
-import { base } from '@repo/lodestar-config';
+import { adapters, base } from '@repo/lodestar-config';
 import { pluginArchitecture } from '@lodestar/plugin-architecture';
 import { pluginStructure } from '@lodestar/plugin-structure';
 
 export default defineConfig([
   ...base,
+  adapters,
   {
     plugins: [pluginArchitecture, pluginStructure],
     rules: {

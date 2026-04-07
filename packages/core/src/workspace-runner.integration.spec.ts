@@ -13,7 +13,7 @@ interface FixtureResult {
   cleanup(): Promise<void>;
 }
 
-/** 임시 모노레포 fixture 생성 (pnpm-workspace.yaml 포함) */
+/** Creates a temporary monorepo fixture (including pnpm-workspace.yaml) */
 async function createMonorepoFixture(
   structure: Readonly<Record<string, string | null>>,
 ): Promise<FixtureResult> {
@@ -37,7 +37,7 @@ async function createMonorepoFixture(
   };
 }
 
-/** fixture의 node_modules에 워크스페이스 플러그인 심링크 생성 */
+/** Creates a symlink for a workspace plugin in the fixture's node_modules */
 async function linkPlugin(fixtureRoot: string, packageName: string): Promise<void> {
   const realPackagePath = join(process.cwd(), 'node_modules', ...packageName.split('/'));
   const targetPath = join(fixtureRoot, 'node_modules', ...packageName.split('/'));
@@ -45,7 +45,7 @@ async function linkPlugin(fixtureRoot: string, packageName: string): Promise<voi
   await symlink(realPackagePath, targetPath, 'dir');
 }
 
-/** 자식 패키지의 node_modules에도 플러그인 심링크 생성 */
+/** Creates a plugin symlink in a child package's node_modules */
 async function linkPluginToPackage(
   fixtureRoot: string,
   packageDir: string,
@@ -57,7 +57,7 @@ async function linkPluginToPackage(
   await symlink(realPackagePath, targetPath, 'dir');
 }
 
-/** architecture/layers 규칙 설정을 생성하는 헬퍼 */
+/** Helper to create an architecture/layers rule configuration */
 function makeLayersConfig(): WrittenConfig {
   return {
     plugins: ['@lodestar/plugin-architecture'],

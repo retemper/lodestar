@@ -4,7 +4,7 @@ import { createMockProviders, createTestContext } from '@lodestar/test-utils';
 import { noCircular, estimateChainLength } from './no-circular.rule';
 import { matchGlob } from '../../shared/match-glob';
 
-/** 순환 그래프 생성: a->b->a */
+/** Creates a cyclic graph: a->b->a */
 function cyclicGraph(): Map<string, ModuleNode> {
   return new Map([
     ['src/a.ts', { id: 'src/a.ts', dependencies: ['src/b.ts'], dependents: ['src/b.ts'] }],

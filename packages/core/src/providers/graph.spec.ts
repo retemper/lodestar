@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import type { ASTProvider, FileSystemProvider, ImportInfo } from '@lodestar/types';
 import { createGraphProvider } from './graph';
 
-/** 테스트용 모의 ASTProvider 생성 */
+/** Creates a mock ASTProvider for testing */
 function mockASTProvider(importMap: Record<string, readonly ImportInfo[]> = {}): ASTProvider {
   return {
     async getSourceFile(_path: string) {
@@ -17,7 +17,7 @@ function mockASTProvider(importMap: Record<string, readonly ImportInfo[]> = {}):
   };
 }
 
-/** 테스트용 모의 FileSystemProvider 생성 */
+/** Creates a mock FileSystemProvider for testing */
 function mockFSProvider(
   tsFiles: readonly string[] = [],
   tsxFiles: readonly string[] = [],

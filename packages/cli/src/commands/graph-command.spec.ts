@@ -12,7 +12,7 @@ import { createProviders, loadConfigFile } from 'lodestar';
 const mockCreateProviders = vi.mocked(createProviders);
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 
-/** 테스트용 모듈 노드 맵 생성 */
+/** Creates a module node map for testing */
 function makeNodes(defs: Record<string, string[]>): ReadonlyMap<string, ModuleNode> {
   const nodes = new Map<string, ModuleNode>();
   for (const [id, deps] of Object.entries(defs)) {

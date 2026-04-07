@@ -4,10 +4,10 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createASTProvider } from './ast';
 
-/** 테스트용 임시 디렉토리 경로 */
+/** Temporary directory paths for testing */
 const dirs: string[] = [];
 
-/** 임시 디렉토리에 TypeScript 파일을 생성하고 AST provider를 반환한다 */
+/** Creates TypeScript files in a temporary directory and returns an AST provider */
 async function setupFixture(
   files: Record<string, string>,
 ): Promise<{ rootDir: string; provider: ReturnType<typeof createASTProvider> }> {
@@ -278,7 +278,7 @@ import type { Foo } from './foo';
 
       const exports = await provider.getExports('unknown-decl.ts');
 
-      // TsModuleDeclaration은 switch의 default case로 처리되어 무시된다
+      // TsModuleDeclaration is handled by the switch default case and ignored
       expect(exports).toStrictEqual([]);
     });
 
@@ -299,7 +299,7 @@ import type { Foo } from './foo';
 
       const exports = await provider.getExports('destruct.ts');
 
-      // ObjectPattern은 Identifier가 아니므로 추출되지 않는다
+      // ObjectPattern is not an Identifier, so it is not extracted
       expect(exports).toStrictEqual([]);
     });
 

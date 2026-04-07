@@ -16,7 +16,7 @@ import { discoverWorkspaces, loadConfigFile, resolveConfig } from '@lodestar/con
 import { run } from './engine';
 import { runWorkspace } from './workspace-runner';
 
-/** mock RunSummary 생성 */
+/** Creates a mock RunSummary */
 function createMockSummary(overrides: Partial<RunSummary> = {}): RunSummary {
   return {
     totalFiles: 0,

@@ -9,7 +9,7 @@ import { createProviders } from 'lodestar';
 
 const mockCreateProviders = vi.mocked(createProviders);
 
-/** 테스트용 노드 맵 생성 */
+/** Creates a node map for testing */
 function makeNodes(
   defs: Record<string, string[]>,
 ): ReadonlyMap<string, { readonly dependents: readonly string[] }> {

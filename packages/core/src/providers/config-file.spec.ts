@@ -4,10 +4,10 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createConfigFileProvider } from './config-file';
 
-/** 정리할 임시 디렉토리 목록 */
+/** List of temporary directories to clean up */
 const dirs: string[] = [];
 
-/** 임시 디렉토리를 생성하고 JSON 파일을 배치한다 */
+/** Creates a temporary directory and places JSON files in it */
 async function setupFixture(files: Record<string, unknown>): Promise<string> {
   const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-config-test-'));
   dirs.push(rootDir);

@@ -4,12 +4,12 @@ import { createMockProviders, createTestContext } from '@lodestar/test-utils';
 import { layers } from './layers.rule';
 import type { LayerDefinition } from './layers.rule';
 
-/** ImportInfo 스텁 생성 */
+/** Creates an ImportInfo stub */
 function makeImport(source: string, file: string, isTypeOnly = false): ImportInfo {
   return { source, specifiers: [], isTypeOnly, location: { file, line: 1 } };
 }
 
-/** 표준 3계층 아키텍처 레이어 정의 */
+/** Defines standard 3-layer architecture layers */
 function makeStandardLayers(): readonly LayerDefinition[] {
   return [
     { name: 'domain', path: 'src/domain/**/*.ts' },

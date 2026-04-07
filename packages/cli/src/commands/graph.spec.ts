@@ -11,7 +11,7 @@ import {
 } from './graph';
 import type { LayerDef } from './graph';
 
-/** 테스트용 모듈 그래프 생성 */
+/** Creates a module graph for testing */
 function makeNodes(defs: Record<string, string[]>): ReadonlyMap<string, ModuleNode> {
   const nodes = new Map<string, ModuleNode>();
   for (const [id, deps] of Object.entries(defs)) {

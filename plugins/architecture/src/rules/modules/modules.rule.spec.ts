@@ -3,7 +3,7 @@ import type { Violation, ImportInfo } from '@lodestar/types';
 import { createMockProviders, createTestContext } from '@lodestar/test-utils';
 import { modules } from './modules.rule';
 
-/** 모듈 경계 규칙 실행 후 위반 목록 반환 */
+/** Runs the module boundary rule and returns the list of violations */
 async function checkModules(
   modulePaths: readonly string[],
   files: readonly string[],
@@ -22,7 +22,7 @@ async function checkModules(
   return violations;
 }
 
-/** ImportInfo 스텁 생성 */
+/** Creates an ImportInfo stub */
 function makeImport(source: string, file: string): ImportInfo {
   return { source, specifiers: [], isTypeOnly: false, location: { file, line: 1 } };
 }

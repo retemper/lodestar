@@ -11,7 +11,7 @@ interface FixtureResult {
   cleanup(): Promise<void>;
 }
 
-/** 파일 구조 맵으로 임시 디렉토리 생성 */
+/** Creates a temporary directory from a file structure map */
 async function createFixtureDir(
   structure: Readonly<Record<string, string | null>> = {},
 ): Promise<FixtureResult> {
@@ -35,7 +35,7 @@ async function createFixtureDir(
   };
 }
 
-/** config을 단일 블록으로 변환 (flat config 호환) */
+/** Converts config to a single block (flat config compatible) */
 function firstBlock(config: unknown): WrittenConfigBlock {
   if (Array.isArray(config)) return config[0];
   return config as WrittenConfigBlock;
