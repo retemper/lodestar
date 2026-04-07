@@ -1,4 +1,4 @@
-import { join, dirname, sep } from 'node:path';
+import { dirname, join } from 'node:path';
 import type {
   DependencyGraphProvider,
   ModuleGraph,
@@ -9,7 +9,7 @@ import type {
 
 /** Convert OS-specific path separators to forward slashes for consistent comparison */
 function toForwardSlash(p: string): string {
-  return sep === '\\' ? p.replaceAll('\\', '/') : p;
+  return p.replaceAll('\\', '/');
 }
 
 /** File extensions to try when resolving imports */
