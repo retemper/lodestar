@@ -1,12 +1,12 @@
 # Workspace Mode
 
-Lodestar supports monorepo workspace mode. Each package can have its own `lodestar.config.ts` that inherits from the root config.
+Lodestar supports monorepo workspace mode. Each package can have its own independent `lodestar.config.ts`.
 
 ## How It Works
 
 1. **Root config** runs against the monorepo root (e.g., "all packages must have `src/`")
 2. **Per-package configs** are discovered automatically and run scoped to each package
-3. Package configs **inherit** root rules by default (like ESLint's config cascade)
+3. Package configs run **independently** — no implicit inheritance from root
 
 ## Setup
 
@@ -41,22 +41,7 @@ export default {
 };
 ```
 
-This config merges with the root. The package gets both the root's `deps/no-circular` and its own stricter `directory-exists`.
-
-### Opting Out
-
-To prevent inheriting root rules, set `root: true`:
-
-```ts
-// packages/legacy/lodestar.config.mjs
-export default {
-  root: true, // standalone — ignores root config
-  plugins: ['@retemper/lodestar-plugin-structure'],
-  rules: {
-    /* only these rules apply */
-  },
-};
-```
+Each package config is standalone — only the rules defined in it apply.
 
 ## Running
 

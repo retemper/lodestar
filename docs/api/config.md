@@ -183,11 +183,11 @@ export default defineConfig([
 ]);
 ```
 
-## Workspace Config Inheritance
+## Workspace Config
 
 In a monorepo, the root `lodestar.config.ts` is loaded first. When running in workspace mode (`lodestar check --workspace`), lodestar discovers packages via `pnpm-workspace.yaml` or `package.json` workspaces and runs rules against each package.
 
-Each package can have its own `lodestar.config.ts` that overrides or extends the root config. If a package does not have its own config, the root config is used with the package directory as the resolution base.
+Each package can have its own independent `lodestar.config.ts`. Package configs do not inherit from the root config — packages without their own config are skipped.
 
 Config resolution during workspace mode:
 
@@ -195,4 +195,4 @@ Config resolution during workspace mode:
 2. Packages are discovered via workspace globs
 3. For each package, lodestar checks for a local `lodestar.config.ts`
 4. If found, the local config is resolved relative to the package directory
-5. If not found, the root config is resolved relative to the package directory
+5. If not found, the package is skipped

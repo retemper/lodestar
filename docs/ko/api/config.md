@@ -183,11 +183,11 @@ export default defineConfig([
 ]);
 ```
 
-## 워크스페이스 설정 상속 (Workspace Config Inheritance)
+## 워크스페이스 설정 (Workspace Config)
 
 모노레포에서 루트 `lodestar.config.ts`가 먼저 로드됩니다. 워크스페이스 모드(`lodestar check --workspace`)로 실행하면, lodestar는 `pnpm-workspace.yaml` 또는 `package.json`의 workspaces를 통해 패키지를 발견하고 각 패키지에 대해 규칙을 실행합니다.
 
-각 패키지는 루트 설정을 오버라이드하거나 확장하는 자체 `lodestar.config.ts`를 가질 수 있습니다. 패키지에 자체 설정이 없으면 루트 설정이 패키지 디렉토리를 해석 기준으로 사용됩니다.
+각 패키지는 독립적인 자체 `lodestar.config.ts`를 가질 수 있습니다. 패키지 설정은 루트 설정을 상속하지 않으며, 자체 설정이 없는 패키지는 건너뜁니다.
 
 워크스페이스 모드에서의 설정 해석 과정:
 
@@ -195,4 +195,4 @@ export default defineConfig([
 2. 워크스페이스 glob을 통해 패키지 발견
 3. 각 패키지에 대해 로컬 `lodestar.config.ts` 확인
 4. 발견되면 패키지 디렉토리 기준으로 로컬 설정 해석
-5. 발견되지 않으면 패키지 디렉토리 기준으로 루트 설정 해석
+5. 발견되지 않으면 해당 패키지는 건너뜀
