@@ -1,5 +1,5 @@
 import { mkdtemp, mkdir, writeFile, rm, symlink } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import type { WrittenConfig } from 'lodestar';
 
@@ -28,7 +28,7 @@ async function createFixtureDir(
 
   for (const [relativePath, content] of Object.entries(structure)) {
     const fullPath = join(rootDir, relativePath);
-    const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
+    const dir = dirname(fullPath);
     await mkdir(dir, { recursive: true });
 
     await (content === null

@@ -23,7 +23,10 @@ interface CommentToken {
  */
 function skipTemplateLiteral(source: string, start: number, len: number): number {
   for (let i = start; i < len; ) {
-    if (source[i] === '\\') { i += 2; continue; }
+    if (source[i] === '\\') {
+      i += 2;
+      continue;
+    }
     if (source[i] === '`') return i + 1;
     if (source[i] === '$' && source[i + 1] === '{') {
       i = skipTemplateExpression(source, i + 2, len);
@@ -44,8 +47,17 @@ function skipTemplateLiteral(source: string, start: number, len: number): number
 function skipTemplateExpression(source: string, start: number, len: number): number {
   for (let i = start, depth = 1; i < len; ) {
     const c = source[i];
-    if (c === '{') { depth++; i++; continue; }
-    if (c === '}') { depth--; if (depth === 0) return i + 1; i++; continue; }
+    if (c === '{') {
+      depth++;
+      i++;
+      continue;
+    }
+    if (c === '}') {
+      depth--;
+      if (depth === 0) return i + 1;
+      i++;
+      continue;
+    }
     if (c === "'" || c === '"') {
       i++;
       while (i < len && source[i] !== c) {
@@ -55,7 +67,10 @@ function skipTemplateExpression(source: string, start: number, len: number): num
       i++;
       continue;
     }
-    if (c === '`') { i = skipTemplateLiteral(source, i + 1, len); continue; }
+    if (c === '`') {
+      i = skipTemplateLiteral(source, i + 1, len);
+      continue;
+    }
     i++;
   }
   return len;

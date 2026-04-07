@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll } from 'vitest';
 import { mkdtemp, writeFile, rm, mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createFileSystemProvider } from './fs';
 
@@ -14,7 +14,7 @@ async function setupFixture(files: Record<string, string>): Promise<string> {
 
   for (const [relativePath, content] of Object.entries(files)) {
     const fullPath = join(rootDir, relativePath);
-    const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
+    const dir = dirname(fullPath);
     await mkdir(dir, { recursive: true });
     await writeFile(fullPath, content, 'utf-8');
   }

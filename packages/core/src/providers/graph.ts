@@ -1,4 +1,4 @@
-import { join, dirname } from 'node:path';
+import { join, dirname, sep } from 'node:path';
 import type {
   DependencyGraphProvider,
   ModuleGraph,
@@ -6,6 +6,11 @@ import type {
   ASTProvider,
   FileSystemProvider,
 } from '@lodestar/types';
+
+/** Convert OS-specific path separators to forward slashes for consistent comparison */
+function toForwardSlash(p: string): string {
+  return sep === '\\' ? p.replaceAll('\\', '/') : p;
+}
 
 /** File extensions to try when resolving imports */
 const RESOLVE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx'];
@@ -102,7 +107,7 @@ function resolveImport(importer: string, source: string, knownFiles: Set<string>
   if (!source.startsWith('.') && !source.startsWith('/')) return null;
 
   const importerDir = dirname(importer);
-  const base = normalizePath(join(importerDir, source));
+  const base = normalizePath(toForwardSlash(join(importerDir, source)));
 
   if (knownFiles.has(base)) return base;
 

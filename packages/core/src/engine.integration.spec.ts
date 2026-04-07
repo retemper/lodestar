@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { mkdtemp, mkdir, writeFile, rm, symlink } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { run } from './engine';
 import { resolveConfig } from '@lodestar/config';
@@ -20,7 +20,7 @@ async function createFixture(
 
   for (const [relativePath, content] of Object.entries(structure)) {
     const fullPath = join(rootDir, relativePath);
-    const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
+    const dir = dirname(fullPath);
     await mkdir(dir, { recursive: true });
 
     await (content === null
