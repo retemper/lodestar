@@ -76,6 +76,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo build
+      - name: Re-link workspace bins after build
+        run: pnpm install --frozen-lockfile
       - run: pnpm turbo lodestar
 
   test:
