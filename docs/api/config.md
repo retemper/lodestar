@@ -76,11 +76,11 @@ Plugins can be referenced in several ways:
 
 ```ts
 type PluginEntry =
-  | PluginFactory              // factory function (preferred)
-  | Plugin                     // direct plugin object
-  | [PluginFactory, options]   // factory with options
-  | [string, options]          // string name with options (legacy)
-  | string;                    // string name (legacy)
+  | PluginFactory // factory function (preferred)
+  | Plugin // direct plugin object
+  | [PluginFactory, options] // factory with options
+  | [string, options] // string name with options (legacy)
+  | string; // string name (legacy)
 ```
 
 Example:

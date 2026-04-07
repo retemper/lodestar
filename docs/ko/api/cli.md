@@ -8,13 +8,13 @@
 npx lodestar check [options]
 ```
 
-| 플래그 | 타입 | 기본값 | 설명 |
-| --- | --- | --- | --- |
-| `--format` | `string` | `console` | 출력 형식. 선택지: `console`, `json` |
-| `--workspace` | `boolean` | 자동 감지 | 워크스페이스 모드 강제 활성화 |
-| `--no-workspace` | `boolean` | | 워크스페이스 모드 비활성화 |
-| `--rule` | `string[]` | 전체 규칙 | 특정 규칙만 실행. 정확한 일치(`naming-convention/file-naming`) 및 접두사 와일드카드(`architecture/*`) 지원 |
-| `--fix` | `boolean` | `false` | 가능한 경우 위반 사항 자동 수정 |
+| 플래그           | 타입       | 기본값    | 설명                                                                                                       |
+| ---------------- | ---------- | --------- | ---------------------------------------------------------------------------------------------------------- |
+| `--format`       | `string`   | `console` | 출력 형식. 선택지: `console`, `json`                                                                       |
+| `--workspace`    | `boolean`  | 자동 감지 | 워크스페이스 모드 강제 활성화                                                                              |
+| `--no-workspace` | `boolean`  |           | 워크스페이스 모드 비활성화                                                                                 |
+| `--rule`         | `string[]` | 전체 규칙 | 특정 규칙만 실행. 정확한 일치(`naming-convention/file-naming`) 및 접두사 와일드카드(`architecture/*`) 지원 |
+| `--fix`          | `boolean`  | `false`   | 가능한 경우 위반 사항 자동 수정                                                                            |
 
 `--workspace`를 생략하면 `pnpm-workspace.yaml` 또는 `package.json`의 workspaces 필드를 확인하여 워크스페이스 모드를 자동 감지합니다. 워크스페이스 모드에서는 발견된 각 패키지와 루트에 대해 규칙을 실행한 뒤 집계 요약을 출력합니다.
 
@@ -33,10 +33,10 @@ npx lodestar check --rule architecture/layers --rule naming-convention/file-nami
 
 **종료 코드:**
 
-| 코드 | 의미 |
-| --- | --- |
-| `0` | 에러 없음 (경고는 허용) |
-| `1` | 하나 이상의 에러 발견 |
+| 코드 | 의미                    |
+| ---- | ----------------------- |
+| `0`  | 에러 없음 (경고는 허용) |
+| `1`  | 하나 이상의 에러 발견   |
 
 ---
 
@@ -93,11 +93,11 @@ npx lodestar setup
 npx lodestar graph [options]
 ```
 
-| 플래그 | 타입 | 기본값 | 설명 |
-| --- | --- | --- | --- |
-| `--scope` | `string` | 전체 파일 | 이 경로 접두사와 일치하는 파일만 표시 (예: `src/domain`) |
-| `--format` | `string` | `mermaid` | 출력 형식. 선택지: `mermaid`, `dot` |
-| `--layers` | `boolean` | `false` | 파일 수준 대신 레이어 수준 아키텍처 그래프 표시. 설정에 `architecture/layers` 규칙 필요 |
+| 플래그     | 타입      | 기본값    | 설명                                                                                    |
+| ---------- | --------- | --------- | --------------------------------------------------------------------------------------- |
+| `--scope`  | `string`  | 전체 파일 | 이 경로 접두사와 일치하는 파일만 표시 (예: `src/domain`)                                |
+| `--format` | `string`  | `mermaid` | 출력 형식. 선택지: `mermaid`, `dot`                                                     |
+| `--layers` | `boolean` | `false`   | 파일 수준 대신 레이어 수준 아키텍처 그래프 표시. 설정에 `architecture/layers` 규칙 필요 |
 
 **파일 수준 모드** (기본값)는 소스 파일 간의 모든 임포트 엣지를 출력합니다. `--scope`를 사용하여 특정 디렉토리로 출력을 제한할 수 있습니다:
 
@@ -123,11 +123,11 @@ npx lodestar graph --layers --format dot
 npx lodestar impact <file> [options]
 ```
 
-| 플래그 | 타입 | 기본값 | 설명 |
-| --- | --- | --- | --- |
-| `<file>` | `string` | **필수** | 분석 대상 파일 (프로젝트 루트 기준 상대 경로) |
-| `--json` | `boolean` | `false` | 사람이 읽을 수 있는 텍스트 대신 JSON으로 출력 |
-| `--depth` | `number` | 무제한 | 최대 BFS 순회 깊이 |
+| 플래그    | 타입      | 기본값   | 설명                                          |
+| --------- | --------- | -------- | --------------------------------------------- |
+| `<file>`  | `string`  | **필수** | 분석 대상 파일 (프로젝트 루트 기준 상대 경로) |
+| `--json`  | `boolean` | `false`  | 사람이 읽을 수 있는 텍스트 대신 JSON으로 출력 |
+| `--depth` | `number`  | 무제한   | 최대 BFS 순회 깊이                            |
 
 기본 출력은 직접 의존자(depth 1)와 간접 의존자(depth > 1)를 경유 경로와 함께 나열합니다:
 
@@ -143,9 +143,7 @@ JSON 출력 구조:
 {
   "target": "src/core/engine.ts",
   "directDependents": ["src/cli/commands/check.ts"],
-  "transitiveDependents": [
-    { "file": "src/cli/index.ts", "via": "src/cli/commands/check.ts" }
-  ],
+  "transitiveDependents": [{ "file": "src/cli/index.ts", "via": "src/cli/commands/check.ts" }],
   "totalAffected": 2
 }
 ```

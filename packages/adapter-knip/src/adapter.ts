@@ -73,11 +73,10 @@ function knipAdapter(config: KnipAdapterConfig = {}): ToolAdapter<KnipAdapterCon
     async check(rootDir: string, _include: readonly string[]): Promise<readonly Violation[]> {
       const bin = config.bin ?? 'knip';
 
-      const { stdout } = await execFileAsync(
-        bin,
-        ['--reporter', 'json'],
-        { cwd: rootDir, maxBuffer: 50 * 1024 * 1024 },
-      ).catch((error: { stdout?: string; stderr?: string }) => ({
+      const { stdout } = await execFileAsync(bin, ['--reporter', 'json'], {
+        cwd: rootDir,
+        maxBuffer: 50 * 1024 * 1024,
+      }).catch((error: { stdout?: string; stderr?: string }) => ({
         stdout: error.stdout ?? '{}',
         stderr: error.stderr ?? '',
       }));

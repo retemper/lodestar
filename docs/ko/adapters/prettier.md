@@ -8,20 +8,20 @@ Prettier를 CLI(`prettier --check` / `prettier --write`)로 실행하고, `.pret
 
 ## 설정 옵션
 
-| 옵션            | 타입                                      | 설명                                 |
-| --------------- | ---------------------------------------- | ----------------------------------- |
-| `printWidth`    | `number`                                 | 줄 너비 (기본값: 80)                  |
-| `tabWidth`      | `number`                                 | 들여쓰기 수준당 스페이스 수 (기본값: 2)   |
-| `useTabs`       | `boolean`                                | 스페이스 대신 탭 사용                   |
-| `semi`          | `boolean`                                | 세미콜론 사용                          |
-| `singleQuote`   | `boolean`                                | 작은따옴표 사용                        |
-| `trailingComma` | `'all'` \| `'es5'` \| `'none'`          | 후행 쉼표(Trailing Comma)             |
-| `bracketSpacing`| `boolean`                                | 객체 중괄호 내부 공백                   |
-| `arrowParens`   | `'always'` \| `'avoid'`                 | 단일 인자 화살표 함수 괄호              |
-| `endOfLine`     | `'lf'` \| `'crlf'` \| `'cr'` \| `'auto'` | 줄 끝 스타일                        |
-| `ignore`        | `string[]`                               | 무시할 글로브(Glob) 패턴               |
-| `bin`           | `string`                                 | 바이너리 이름 또는 경로 (기본값: `"prettier"`) |
-| `include`       | `string[]`                               | 검사할 파일 패턴                       |
+| 옵션             | 타입                                     | 설명                                           |
+| ---------------- | ---------------------------------------- | ---------------------------------------------- |
+| `printWidth`     | `number`                                 | 줄 너비 (기본값: 80)                           |
+| `tabWidth`       | `number`                                 | 들여쓰기 수준당 스페이스 수 (기본값: 2)        |
+| `useTabs`        | `boolean`                                | 스페이스 대신 탭 사용                          |
+| `semi`           | `boolean`                                | 세미콜론 사용                                  |
+| `singleQuote`    | `boolean`                                | 작은따옴표 사용                                |
+| `trailingComma`  | `'all'` \| `'es5'` \| `'none'`           | 후행 쉼표(Trailing Comma)                      |
+| `bracketSpacing` | `boolean`                                | 객체 중괄호 내부 공백                          |
+| `arrowParens`    | `'always'` \| `'avoid'`                  | 단일 인자 화살표 함수 괄호                     |
+| `endOfLine`      | `'lf'` \| `'crlf'` \| `'cr'` \| `'auto'` | 줄 끝 스타일                                   |
+| `ignore`         | `string[]`                               | 무시할 글로브(Glob) 패턴                       |
+| `bin`            | `string`                                 | 바이너리 이름 또는 경로 (기본값: `"prettier"`) |
+| `include`        | `string[]`                               | 검사할 파일 패턴                               |
 
 ## 예시
 
@@ -34,7 +34,7 @@ prettierAdapter({
   semi: true,
   tabWidth: 2,
   printWidth: 100,
-})
+});
 ```
 
 ## verifySetup 동작 방식

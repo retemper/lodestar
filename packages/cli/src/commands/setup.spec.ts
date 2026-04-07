@@ -82,18 +82,16 @@ describe('setupCommand', () => {
 
     await setupCommand({ _: ['setup'], $0: 'lodestar' });
 
-    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
-      (c) => c[0] as string,
-    );
+    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0] as string);
     expect(calls.some((c) => c.includes('Verifying ts-adapter'))).toBe(true);
     expect(calls.some((c) => c.includes('✓'))).toBe(true);
   });
 
   it('fix가 있는 위반이면 fix를 적용하고 done을 출력한다', async () => {
     const mockApply = vi.fn().mockResolvedValue(undefined);
-    const mockVerifySetup = vi.fn().mockResolvedValue([
-      { message: 'tsconfig missing', fix: { apply: mockApply } },
-    ]);
+    const mockVerifySetup = vi
+      .fn()
+      .mockResolvedValue([{ message: 'tsconfig missing', fix: { apply: mockApply } }]);
     mockLoadConfigFile.mockResolvedValue({
       plugins: [],
       rules: {},
@@ -103,17 +101,13 @@ describe('setupCommand', () => {
     await setupCommand({ _: ['setup'], $0: 'lodestar' });
 
     expect(mockApply).toHaveBeenCalledTimes(1);
-    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
-      (c) => c[0] as string,
-    );
+    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0] as string);
     expect(calls.some((c) => c.includes('Fixing: tsconfig missing'))).toBe(true);
     expect(calls.some((c) => c.includes('done'))).toBe(true);
   });
 
   it('fix가 없는 위반이면 메시지만 출력하고 done을 표시한다', async () => {
-    const mockVerifySetup = vi.fn().mockResolvedValue([
-      { message: 'manual fix needed' },
-    ]);
+    const mockVerifySetup = vi.fn().mockResolvedValue([{ message: 'manual fix needed' }]);
     mockLoadConfigFile.mockResolvedValue({
       plugins: [],
       rules: {},
@@ -122,9 +116,7 @@ describe('setupCommand', () => {
 
     await setupCommand({ _: ['setup'], $0: 'lodestar' });
 
-    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
-      (c) => c[0] as string,
-    );
+    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0] as string);
     expect(calls.some((c) => c.includes('manual fix needed'))).toBe(true);
     expect(calls.some((c) => c.includes('done'))).toBe(true);
   });

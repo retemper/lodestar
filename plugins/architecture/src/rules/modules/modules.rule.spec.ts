@@ -151,9 +151,7 @@ describe('architecture/modules', () => {
   it('allow 목록이 비어있으면 deep import를 모두 위반으로 보고한다', async () => {
     const providers = createMockProviders({
       glob: vi.fn().mockResolvedValue(['src/app.ts']),
-      getImports: vi
-        .fn()
-        .mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
+      getImports: vi.fn().mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
     });
     const { ctx, violations } = createTestContext(
       { modules: ['web/service'], allow: [] },
@@ -169,9 +167,7 @@ describe('architecture/modules', () => {
   it('exclude 패턴에 매칭되는 파일은 검사하지 않는다', async () => {
     const providers = createMockProviders({
       glob: vi.fn().mockResolvedValue(['src/app.ts', 'src/app.spec.ts']),
-      getImports: vi
-        .fn()
-        .mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
+      getImports: vi.fn().mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
     });
     const { ctx, violations } = createTestContext(
       { modules: ['web/service'], exclude: ['*.spec.'] },

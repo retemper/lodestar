@@ -55,7 +55,8 @@ async function createFixtureConfig(rootDir: string, config: WrittenConfig): Prom
   await writeFile(join(rootDir, 'lodestar.config.mjs'), configContent, 'utf-8');
 
   // Symlink @lodestar/* plugins specified in the config into the fixture's node_modules
-  const plugins = config.plugins ?? [];
+  const blocks = Array.isArray(config) ? config : [config];
+  const plugins = blocks.flatMap((block) => block.plugins ?? []);
   for (const entry of plugins) {
     const name = typeof entry === 'string' ? entry : (entry as readonly [string, ...unknown[]])[0];
     if (name.startsWith('@lodestar/')) {

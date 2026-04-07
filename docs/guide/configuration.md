@@ -71,10 +71,7 @@ import { eslintAdapter } from '@lodestar/adapter-eslint';
 import { prettierAdapter } from '@lodestar/adapter-prettier';
 
 export default defineConfig({
-  adapters: [
-    eslintAdapter({ presets: ['strict'] }),
-    prettierAdapter({ singleQuote: true }),
-  ],
+  adapters: [eslintAdapter({ presets: ['strict'] }), prettierAdapter({ singleQuote: true })],
 });
 ```
 
@@ -98,7 +95,9 @@ export default defineConfig([
     rules: {
       'architecture/layers': {
         severity: 'error',
-        options: { /* ... */ },
+        options: {
+          /* ... */
+        },
       },
     },
   },
@@ -111,8 +110,8 @@ Lodestar uses a flat config model. You can pass a single block or an array of bl
 
 ```ts
 export default defineConfig([
-  globalBlock,    // no `files` — applies everywhere
-  scopedBlock,    // has `files` — applies only to matching paths
+  globalBlock, // no `files` — applies everywhere
+  scopedBlock, // has `files` — applies only to matching paths
 ]);
 ```
 

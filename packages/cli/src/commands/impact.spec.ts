@@ -160,9 +160,7 @@ describe('impactCommand', () => {
 
     await impactCommand({ _: ['impact'], $0: 'lodestar', file: 'target.ts' });
 
-    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
-      (c) => c[0] as string,
-    );
+    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0] as string);
     expect(calls.some((c) => c.includes('Impact analysis'))).toBe(true);
     expect(calls.some((c) => c.includes('Direct dependents'))).toBe(true);
     expect(calls.some((c) => c.includes('Total:'))).toBe(true);
@@ -228,9 +226,7 @@ describe('impactCommand', () => {
 
     await impactCommand({ _: ['impact'], $0: 'lodestar', file: 'target.ts' });
 
-    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
-      (c) => c[0] as string,
-    );
+    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0] as string);
     expect(calls.some((c) => c.includes('Transitive dependents'))).toBe(true);
     expect(calls.some((c) => c.includes('via a.ts'))).toBe(true);
   });
@@ -248,9 +244,7 @@ describe('impactCommand', () => {
 
     await impactCommand({ _: ['impact'], $0: 'lodestar', file: 'target.ts' });
 
-    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
-      (c) => c[0] as string,
-    );
+    const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0] as string);
     expect(calls.some((c) => c.includes('Transitive dependents'))).toBe(false);
   });
 

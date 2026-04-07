@@ -8,9 +8,7 @@ import { createFileSystemProvider } from './fs';
 const dirs: string[] = [];
 
 /** 임시 디렉토리를 생성하고 파일을 배치한다 */
-async function setupFixture(
-  files: Record<string, string>,
-): Promise<string> {
+async function setupFixture(files: Record<string, string>): Promise<string> {
   const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-fs-test-'));
   dirs.push(rootDir);
 

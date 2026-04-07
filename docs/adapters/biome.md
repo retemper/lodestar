@@ -8,12 +8,12 @@ Runs Biome via the CLI and generates a `biome.json` config file.
 
 ## Config Options
 
-| Option    | Type                          | Description                                         |
-| --------- | ----------------------------- | --------------------------------------------------- |
+| Option    | Type                                | Description                                                                  |
+| --------- | ----------------------------------- | ---------------------------------------------------------------------------- |
 | `rules`   | `Record<string, BiomeRuleSeverity>` | Rule overrides -- keys are `group/rule` (e.g., `"style/noNonNullAssertion"`) |
-| `ignore`  | `string[]`                    | Glob patterns to ignore                             |
-| `extends` | `string`                      | Path to existing biome.json to extend               |
-| `bin`     | `string`                      | Binary name or path (default: `"biome"`)            |
+| `ignore`  | `string[]`                          | Glob patterns to ignore                                                      |
+| `extends` | `string`                            | Path to existing biome.json to extend                                        |
+| `bin`     | `string`                            | Binary name or path (default: `"biome"`)                                     |
 
 `BiomeRuleSeverity` is `'error' | 'warn' | 'info' | 'off'`.
 
@@ -29,7 +29,7 @@ biomeAdapter({
   },
   ignore: ['dist/**', 'node_modules/**'],
   extends: './biome-base.json',
-})
+});
 ```
 
 ## Temporary Config File

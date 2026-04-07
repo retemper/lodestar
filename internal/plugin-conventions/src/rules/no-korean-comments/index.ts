@@ -3,9 +3,6 @@ import { defineRule } from '@lodestar/types';
 /** 한글 문자 범위 (가-힣, ㄱ-ㅎ, ㅏ-ㅣ) */
 const KOREAN_PATTERN = /[\uAC00-\uD7AF\u3130-\u318F\u3200-\u321E]/;
 
-/** 한 줄 주석 패턴 */
-const SINGLE_LINE_COMMENT = /\/\/(.+)/g;
-
 /** 블록 주석 패턴 (여러 줄 포함) */
 const BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g;
 

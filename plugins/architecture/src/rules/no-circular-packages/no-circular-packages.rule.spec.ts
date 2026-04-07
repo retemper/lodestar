@@ -139,9 +139,7 @@ describe('architecture/no-circular-packages', () => {
       .fn()
       .mockResolvedValueOnce(['packages/core/package.json'])
       .mockResolvedValueOnce([]);
-    const readJson = vi
-      .fn()
-      .mockResolvedValueOnce({ name: '@noslash', dependencies: {} });
+    const readJson = vi.fn().mockResolvedValueOnce({ name: '@noslash', dependencies: {} });
     const providers = createMockProviders({ glob, readJson });
     const { ctx, violations } = createTestContext(
       {},

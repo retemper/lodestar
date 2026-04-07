@@ -18,22 +18,22 @@ function createMockProviders(overrides?: MockProviderOverrides): RuleProviders;
 
 All fields are optional. Each overrides one provider method:
 
-| Field              | Default Return         | Provider  | Description                            |
-| ------------------ | ---------------------- | --------- | -------------------------------------- |
-| `glob`             | `[]`                   | `fs`      | Find files matching a pattern          |
-| `readFile`         | `''`                   | `fs`      | Read file contents                     |
-| `exists`           | `true`                 | `fs`      | Check if a path exists                 |
-| `readJson`         | `{}`                   | `fs`      | Read and parse a JSON file             |
-| `getDependencies`  | `[]`                   | `graph`   | Get files that a file imports          |
-| `getDependents`    | `[]`                   | `graph`   | Get files that import a file           |
-| `hasCircular`      | `false`                | `graph`   | Check for circular dependencies        |
-| `getModuleGraph`   | `{ nodes: new Map() }` | `graph`   | Get the full module graph              |
-| `getSourceFile`    | `null`                 | `ast`     | Get AST source file                    |
-| `getImports`       | `[]`                   | `ast`     | Get import declarations from a file    |
-| `getExports`       | `[]`                   | `ast`     | Get export declarations from a file    |
-| `getPackageJson`   | `{}`                   | `config`  | Read package.json                      |
-| `getTsConfig`      | `{}`                   | `config`  | Read tsconfig.json                     |
-| `getCustomConfig`  | `{}`                   | `config`  | Read a custom config file              |
+| Field             | Default Return         | Provider | Description                         |
+| ----------------- | ---------------------- | -------- | ----------------------------------- |
+| `glob`            | `[]`                   | `fs`     | Find files matching a pattern       |
+| `readFile`        | `''`                   | `fs`     | Read file contents                  |
+| `exists`          | `true`                 | `fs`     | Check if a path exists              |
+| `readJson`        | `{}`                   | `fs`     | Read and parse a JSON file          |
+| `getDependencies` | `[]`                   | `graph`  | Get files that a file imports       |
+| `getDependents`   | `[]`                   | `graph`  | Get files that import a file        |
+| `hasCircular`     | `false`                | `graph`  | Check for circular dependencies     |
+| `getModuleGraph`  | `{ nodes: new Map() }` | `graph`  | Get the full module graph           |
+| `getSourceFile`   | `null`                 | `ast`    | Get AST source file                 |
+| `getImports`      | `[]`                   | `ast`    | Get import declarations from a file |
+| `getExports`      | `[]`                   | `ast`    | Get export declarations from a file |
+| `getPackageJson`  | `{}`                   | `config` | Read package.json                   |
+| `getTsConfig`     | `{}`                   | `config` | Read tsconfig.json                  |
+| `getCustomConfig` | `{}`                   | `config` | Read a custom config file           |
 
 ### Example
 
@@ -66,20 +66,21 @@ function createTestContext<TOptions = Record<string, unknown>>(
 
 ### Parameters
 
-| Parameter   | Type            | Default  | Description                          |
-| ----------- | --------------- | -------- | ------------------------------------ |
-| `options`   | `TOptions`      | --       | Rule options to pass to the rule     |
-| `providers` | `RuleProviders` | --       | Providers (use `createMockProviders`) |
+| Parameter   | Type            | Default  | Description                             |
+| ----------- | --------------- | -------- | --------------------------------------- |
+| `options`   | `TOptions`      | --       | Rule options to pass to the rule        |
+| `providers` | `RuleProviders` | --       | Providers (use `createMockProviders`)   |
 | `ruleId`    | `string`        | `'test'` | Rule ID assigned to reported violations |
 
 ### TestContextResult
 
-| Field        | Type                    | Description                                    |
-| ------------ | ----------------------- | ---------------------------------------------- |
-| `ctx`        | `RuleContext<TOptions>` | The context to pass to `rule.check()`          |
+| Field        | Type                    | Description                                     |
+| ------------ | ----------------------- | ----------------------------------------------- |
+| `ctx`        | `RuleContext<TOptions>` | The context to pass to `rule.check()`           |
 | `violations` | `Violation[]`           | Mutable array that collects reported violations |
 
 The returned `ctx` has:
+
 - `rootDir` set to `'/test'`
 - `report()` that pushes to `violations` with severity `'error'`
 - `meta()` as a no-op
@@ -142,7 +143,9 @@ describe('my-plugin/my-custom-rule', () => {
       exists: vi.fn().mockResolvedValue(true),
     });
     const { ctx, violations } = createTestContext(
-      { /* rule options */ },
+      {
+        /* rule options */
+      },
       providers,
       'my-plugin/my-custom-rule',
     );
@@ -157,7 +160,9 @@ describe('my-plugin/my-custom-rule', () => {
       glob: vi.fn().mockResolvedValue(['src/bad-file.ts']),
     });
     const { ctx, violations } = createTestContext(
-      { /* rule options */ },
+      {
+        /* rule options */
+      },
       providers,
     );
 

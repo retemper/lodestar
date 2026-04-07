@@ -8,10 +8,10 @@
 
 ## 설정 옵션
 
-| 옵션      | 타입                       | 설명                                                                          |
-| --------- | -------------------------- | ---------------------------------------------------------------------------- |
-| `extends` | `string[]`                 | 확장할 공유 설정 -- 예: `'@commitlint/config-conventional'`                      |
-| `rules`   | `Record<string, unknown>`  | 커스텀 규칙 -- 예: `{"type-enum": [2, "always", ["feat", "fix", "chore"]]}` |
+| 옵션      | 타입                      | 설명                                                                        |
+| --------- | ------------------------- | --------------------------------------------------------------------------- |
+| `extends` | `string[]`                | 확장할 공유 설정 -- 예: `'@commitlint/config-conventional'`                 |
+| `rules`   | `Record<string, unknown>` | 커스텀 규칙 -- 예: `{"type-enum": [2, "always", ["feat", "fix", "chore"]]}` |
 
 모든 옵션은 선택 사항입니다. 인자 없이 `commitlintAdapter()`를 호출하면 빈 설정이 생성됩니다.
 
@@ -26,7 +26,7 @@ commitlintAdapter({
     'type-enum': [2, 'always', ['feat', 'fix', 'chore', 'docs', 'refactor', 'test']],
     'subject-case': [2, 'always', 'lower-case'],
   },
-})
+});
 ```
 
 ## verifySetup 동작 방식

@@ -40,7 +40,9 @@ function buildCommitlintConfig(config: CommitlintAdapterConfig): Record<string, 
  * This is a setup-only adapter: commitlint is invoked by husky, not by lodestar directly.
  * @param config - commitlint-specific configuration
  */
-function commitlintAdapter(config: CommitlintAdapterConfig = {}): ToolAdapter<CommitlintAdapterConfig> {
+function commitlintAdapter(
+  config: CommitlintAdapterConfig = {},
+): ToolAdapter<CommitlintAdapterConfig> {
   return {
     name: 'commitlint',
     config,

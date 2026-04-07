@@ -8,9 +8,7 @@ import { createConfigFileProvider } from './config-file';
 const dirs: string[] = [];
 
 /** 임시 디렉토리를 생성하고 JSON 파일을 배치한다 */
-async function setupFixture(
-  files: Record<string, unknown>,
-): Promise<string> {
+async function setupFixture(files: Record<string, unknown>): Promise<string> {
   const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-config-test-'));
   dirs.push(rootDir);
 

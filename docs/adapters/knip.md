@@ -8,13 +8,13 @@ Runs Knip via the CLI and parses JSON output to find unused files, dependencies,
 
 ## Config Options
 
-| Option               | Type       | Description                                        |
-| -------------------- | ---------- | -------------------------------------------------- |
-| `entry`              | `string[]` | Entry file patterns                                |
-| `project`            | `string[]` | Project file patterns                              |
-| `ignore`             | `string[]` | Glob patterns to ignore                            |
-| `ignoreDependencies` | `string[]` | Dependency names to ignore                         |
-| `bin`                | `string`   | Binary name or path (default: `"knip"`)            |
+| Option               | Type       | Description                             |
+| -------------------- | ---------- | --------------------------------------- |
+| `entry`              | `string[]` | Entry file patterns                     |
+| `project`            | `string[]` | Project file patterns                   |
+| `ignore`             | `string[]` | Glob patterns to ignore                 |
+| `ignoreDependencies` | `string[]` | Dependency names to ignore              |
+| `bin`                | `string`   | Binary name or path (default: `"knip"`) |
 
 All options are optional. Calling `knipAdapter()` with no arguments uses Knip defaults.
 
@@ -28,7 +28,7 @@ knipAdapter({
   project: ['src/**/*.ts'],
   ignore: ['src/generated/**'],
   ignoreDependencies: ['@types/node'],
-})
+});
 ```
 
 ## How verifySetup Works

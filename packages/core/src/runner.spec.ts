@@ -36,8 +36,6 @@ function createRuleConfig(overrides: Partial<ResolvedRuleConfig> = {}): Resolved
     ruleId: 'test/rule',
     severity: 'error',
     options: {},
-    include: [],
-    exclude: [],
     ...overrides,
   };
 }

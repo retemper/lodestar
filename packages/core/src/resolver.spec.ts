@@ -364,8 +364,7 @@ describe('importPlugin', () => {
     process.env['NODE_PATH'] = `:${nodeModulesDir}: :`;
 
     try {
-      const plugin = await importPlugin('nodepath-plugin', undefined);
-      // NODE_PATH을 통한 해석을 시도하며 빈 항목은 무시된다
+      await importPlugin('nodepath-plugin', undefined);
     } finally {
       if (originalNodePath === undefined) {
         delete process.env['NODE_PATH'];
@@ -391,10 +390,7 @@ describe('importPlugin', () => {
       join(pluginDir, 'package.json'),
       JSON.stringify({ name: 'no-entry', type: 'module' }),
     );
-    await writeFile(
-      join(pluginDir, 'index.js'),
-      `export default { name: 'no-entry', rules: [] };`,
-    );
+    await writeFile(join(pluginDir, 'index.js'), `export default { name: 'no-entry', rules: [] };`);
 
     const plugin = await importPlugin('no-entry', rootDir);
 

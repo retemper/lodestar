@@ -343,9 +343,7 @@ describe('architecture/layers', () => {
         }),
         getImports: vi.fn().mockImplementation((file: string) => {
           if (file === 'src/core/entity.ts') {
-            return Promise.resolve([
-              makeImport('../infra/repo.ts', 'src/core/entity.ts'),
-            ]);
+            return Promise.resolve([makeImport('../infra/repo.ts', 'src/core/entity.ts')]);
           }
           return Promise.resolve([]);
         }),

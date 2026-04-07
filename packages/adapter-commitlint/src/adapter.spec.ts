@@ -86,7 +86,11 @@ describe('commitlintAdapter verifySetup()', () => {
 
   it('.commitlintrc.json 내용이 config과 다르면 setup violation을 보고한다', async () => {
     const rootDir = await createTempDir();
-    await writeFile(join(rootDir, '.commitlintrc.json'), '{"extends": ["other-config"]}\n', 'utf-8');
+    await writeFile(
+      join(rootDir, '.commitlintrc.json'),
+      '{"extends": ["other-config"]}\n',
+      'utf-8',
+    );
 
     const adapter = commitlintAdapter({
       extends: ['@commitlint/config-conventional'],

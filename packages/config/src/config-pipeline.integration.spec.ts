@@ -1,10 +1,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { loadConfigFile } from './load';
 import { resolveConfig } from './resolve';
-import type { WrittenConfigBlock } from '@lodestar/types';
 
 /** Result of creating a test fixture directory */
 interface FixtureResult {
@@ -20,7 +19,7 @@ async function createFixtureDir(
 
   for (const [relativePath, content] of Object.entries(structure)) {
     const fullPath = join(rootDir, relativePath);
-    const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
+    const dir = dirname(fullPath);
     await mkdir(dir, { recursive: true });
     await (content === null
       ? mkdir(fullPath, { recursive: true })
@@ -33,12 +32,6 @@ async function createFixtureDir(
       await rm(rootDir, { recursive: true, force: true });
     },
   };
-}
-
-/** config을 단일 블록으로 변환 */
-function firstBlock(config: unknown): WrittenConfigBlock {
-  if (Array.isArray(config)) return config[0];
-  return config as WrittenConfigBlock;
 }
 
 describe('Config pipeline integration test', () => {

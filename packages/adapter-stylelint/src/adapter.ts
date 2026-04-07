@@ -69,7 +69,9 @@ function mapSeverity(severity: string): 'error' | 'warn' {
  * Implements ToolAdapter — runs Stylelint CLI and parses JSON output for CSS lint violations.
  * @param config - Stylelint-specific configuration (extends, rules, ignore patterns)
  */
-function stylelintAdapter(config: StylelintAdapterConfig = {}): ToolAdapter<StylelintAdapterConfig> {
+function stylelintAdapter(
+  config: StylelintAdapterConfig = {},
+): ToolAdapter<StylelintAdapterConfig> {
   return {
     name: 'stylelint',
     config,
@@ -79,11 +81,10 @@ function stylelintAdapter(config: StylelintAdapterConfig = {}): ToolAdapter<Styl
       const patterns = config.include ?? (include.length > 0 ? [...include] : ['**/*.css']);
       const args = ['--formatter', 'json', ...patterns];
 
-      const { stdout } = await execFileAsync(
-        bin,
-        args,
-        { cwd: rootDir, maxBuffer: 50 * 1024 * 1024 },
-      ).catch((error: { stdout?: string; stderr?: string }) => ({
+      const { stdout } = await execFileAsync(bin, args, {
+        cwd: rootDir,
+        maxBuffer: 50 * 1024 * 1024,
+      }).catch((error: { stdout?: string; stderr?: string }) => ({
         stdout: error.stdout ?? '[]',
         stderr: error.stderr ?? '',
       }));

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { RunSummary, WrittenConfig } from 'lodestar';
-import type { WorkspaceSummary } from 'lodestar';
+import type { RunSummary, WorkspaceSummary, WrittenConfig } from 'lodestar';
 
 vi.mock('lodestar', () => ({
   loadConfigFile: vi.fn(),
@@ -31,8 +30,7 @@ vi.mock('../reporters/console', () => ({
 }));
 
 import { checkCommand } from './check';
-import { loadConfigFile, discoverWorkspaces } from 'lodestar';
-import { run, runWorkspace } from 'lodestar';
+import { discoverWorkspaces, loadConfigFile, run, runWorkspace } from 'lodestar';
 
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 const mockDiscoverWorkspaces = vi.mocked(discoverWorkspaces);
@@ -362,9 +360,7 @@ describe('checkCommand', () => {
         fix: true,
       });
 
-      expect(mockRun).toHaveBeenCalledWith(
-        expect.objectContaining({ fix: true }),
-      );
+      expect(mockRun).toHaveBeenCalledWith(expect.objectContaining({ fix: true }));
     });
   });
 });

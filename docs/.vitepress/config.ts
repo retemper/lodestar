@@ -22,7 +22,8 @@ export default defineConfig({
       'meta',
       {
         property: 'og:description',
-        content: 'One config to govern your project — architecture rules, tool configs, and setup verification.',
+        content:
+          'One config to govern your project — architecture rules, tool configs, and setup verification.',
       },
     ],
     ['meta', { name: 'twitter:title', content: 'Lodestar' }],
@@ -30,7 +31,8 @@ export default defineConfig({
       'meta',
       {
         name: 'twitter:description',
-        content: 'One config to govern your project — architecture rules, tool configs, and setup verification.',
+        content:
+          'One config to govern your project — architecture rules, tool configs, and setup verification.',
       },
     ],
   ],
@@ -44,8 +46,7 @@ export default defineConfig({
     ko: {
       label: '한국어',
       lang: 'ko-KR',
-      description:
-        '하나의 설정으로 프로젝트를 통치합니다 — 아키텍처 규칙, 도구 설정, 셋업 검증.',
+      description: '하나의 설정으로 프로젝트를 통치합니다 — 아키텍처 규칙, 도구 설정, 셋업 검증.',
       themeConfig: {
         nav: [
           { text: '가이드', link: '/ko/guide/getting-started' },

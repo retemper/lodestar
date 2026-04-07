@@ -71,10 +71,7 @@ import { eslintAdapter } from '@lodestar/adapter-eslint';
 import { prettierAdapter } from '@lodestar/adapter-prettier';
 
 export default defineConfig({
-  adapters: [
-    eslintAdapter({ presets: ['strict'] }),
-    prettierAdapter({ singleQuote: true }),
-  ],
+  adapters: [eslintAdapter({ presets: ['strict'] }), prettierAdapter({ singleQuote: true })],
 });
 ```
 
@@ -98,7 +95,9 @@ export default defineConfig([
     rules: {
       'architecture/layers': {
         severity: 'error',
-        options: { /* ... */ },
+        options: {
+          /* ... */
+        },
       },
     },
   },
@@ -111,8 +110,8 @@ Lodestar는 플랫 설정 모델을 사용합니다. 단일 블록 또는 블록
 
 ```ts
 export default defineConfig([
-  globalBlock,    // `files` 없음 — 모든 곳에 적용
-  scopedBlock,    // `files` 있음 — 매칭되는 경로에만 적용
+  globalBlock, // `files` 없음 — 모든 곳에 적용
+  scopedBlock, // `files` 있음 — 매칭되는 경로에만 적용
 ]);
 ```
 

@@ -3,11 +3,9 @@ import type { ASTProvider, FileSystemProvider, ImportInfo } from '@lodestar/type
 import { createGraphProvider } from './graph';
 
 /** 테스트용 모의 ASTProvider 생성 */
-function mockASTProvider(
-  importMap: Record<string, readonly ImportInfo[]> = {},
-): ASTProvider {
+function mockASTProvider(importMap: Record<string, readonly ImportInfo[]> = {}): ASTProvider {
   return {
-    async getSourceFile(path: string) {
+    async getSourceFile(_path: string) {
       return { type: 'Module', body: [] };
     },
     async getImports(path: string) {
@@ -161,12 +159,8 @@ describe('createGraphProvider', () => {
           { source: './b', specifiers: [], isTypeOnly: false, location: { file: 'a.ts' } },
           { source: './c', specifiers: [], isTypeOnly: false, location: { file: 'a.ts' } },
         ],
-        'b.ts': [
-          { source: './d', specifiers: [], isTypeOnly: false, location: { file: 'b.ts' } },
-        ],
-        'c.ts': [
-          { source: './d', specifiers: [], isTypeOnly: false, location: { file: 'c.ts' } },
-        ],
+        'b.ts': [{ source: './d', specifiers: [], isTypeOnly: false, location: { file: 'b.ts' } }],
+        'c.ts': [{ source: './d', specifiers: [], isTypeOnly: false, location: { file: 'c.ts' } }],
         'd.ts': [],
       });
       const fs = mockFSProvider(['a.ts', 'b.ts', 'c.ts', 'd.ts']);
@@ -227,16 +221,23 @@ describe('createGraphProvider', () => {
     });
 
     it('그래프를 캐시한다', async () => {
-      const globFn = vi.fn()
+      const globFn = vi
+        .fn()
         .mockResolvedValueOnce(['src/a.ts'])
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce(['src/a.ts'])
         .mockResolvedValueOnce([]);
       const fs: FileSystemProvider = {
         glob: globFn,
-        async readFile() { return ''; },
-        async exists() { return true; },
-        async readJson() { return {} as never; },
+        async readFile() {
+          return '';
+        },
+        async exists() {
+          return true;
+        },
+        async readJson() {
+          return {} as never;
+        },
       };
       const ast = mockASTProvider({ 'src/a.ts': [] });
       const provider = createGraphProvider('/root', ast, fs);

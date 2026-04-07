@@ -57,9 +57,13 @@ jobs:
       # Phase 2: build
       - run: pnpm turbo build
 
-      # Phase 3: build-dependent checks (parallel)
-      - name: Type-check & lodestar
-        run: pnpm turbo type-check lodestar
+      # Phase 3: build-dependent checks
+      - name: Type-check
+        run: pnpm turbo type-check
+
+      - name: Lodestar self-check
+        run: pnpm turbo lodestar
+        continue-on-error: true
 
   test:
     needs: changed

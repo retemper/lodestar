@@ -58,7 +58,7 @@ async function linkPluginToPackage(
 }
 
 /** architecture/layers 규칙 설정을 생성하는 헬퍼 */
-function makeLayersConfig() {
+function makeLayersConfig(): WrittenConfig {
   return {
     plugins: ['@lodestar/plugin-architecture'],
     rules: {
@@ -100,7 +100,7 @@ describe('runWorkspace() integration test', () => {
     });
     await linkPlugin(rootDir, '@lodestar/plugin-architecture');
 
-    const rootConfig: WrittenConfig = makeLayersConfig();
+    const rootConfig = makeLayersConfig();
     const result = await runWorkspace({ rootDir, rootConfig });
 
     expect(result.rootSummary.errorCount).toBe(0);
@@ -140,7 +140,7 @@ describe('runWorkspace() integration test', () => {
     await linkPluginToPackage(rootDir, 'packages/alpha', '@lodestar/plugin-architecture');
     await linkPluginToPackage(rootDir, 'packages/beta', '@lodestar/plugin-architecture');
 
-    const rootConfig: WrittenConfig = makeLayersConfig();
+    const rootConfig = makeLayersConfig();
     const result = await runWorkspace({ rootDir, rootConfig });
 
     expect(result.packages).toHaveLength(2);
@@ -181,7 +181,7 @@ describe('runWorkspace() integration test', () => {
     await linkPlugin(rootDir, '@lodestar/plugin-architecture');
     await linkPluginToPackage(rootDir, 'packages/with-config', '@lodestar/plugin-architecture');
 
-    const rootConfig: WrittenConfig = makeLayersConfig();
+    const rootConfig = makeLayersConfig();
     const result = await runWorkspace({ rootDir, rootConfig });
 
     expect(result.packages).toHaveLength(1);
@@ -226,7 +226,7 @@ describe('runWorkspace() integration test', () => {
         events.push(`pkg-complete:${pkg.name}`),
     };
 
-    const rootConfig: WrittenConfig = makeLayersConfig();
+    const rootConfig = makeLayersConfig();
     await runWorkspace({ rootDir, rootConfig, reporter });
 
     expect(events).toContain('pkg-start:(root)');

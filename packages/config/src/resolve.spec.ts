@@ -106,10 +106,7 @@ describe('resolveConfig', () => {
   });
 
   it('scoped rules에 ignores가 없으면 빈 배열을 기본값으로 설정한다', () => {
-    const result = resolveConfig(
-      [{ files: ['src/**'], rules: { 'a/rule': 'warn' } }],
-      '/root',
-    );
+    const result = resolveConfig([{ files: ['src/**'], rules: { 'a/rule': 'warn' } }], '/root');
 
     expect(result.scopedRules[0].ignores).toStrictEqual([]);
   });

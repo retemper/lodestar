@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { run, createProviders } from './engine';
 import type { ResolvedConfig, Plugin, RuleDefinition, ToolAdapter } from '@lodestar/types';
 
@@ -202,9 +202,11 @@ describe('run', () => {
   });
 
   it('verifySetup이 통과하면 check를 정상 실행한다', async () => {
-    const checkFn = vi.fn().mockResolvedValue([
-      { ruleId: 'test-tool/some-rule', message: 'lint error', severity: 'error' as const },
-    ]);
+    const checkFn = vi
+      .fn()
+      .mockResolvedValue([
+        { ruleId: 'test-tool/some-rule', message: 'lint error', severity: 'error' as const },
+      ]);
     const adapter: ToolAdapter = {
       name: 'test-tool',
       config: {},
@@ -267,6 +269,7 @@ describe('run', () => {
       scopedRules: [
         {
           files: ['src/**/*.ts'],
+          ignores: [],
           rules: new Map([
             [
               'test/scoped',
@@ -274,8 +277,6 @@ describe('run', () => {
                 ruleId: 'test/scoped',
                 severity: 'error',
                 options: {},
-                include: [],
-                exclude: [],
               },
             ],
           ]),
@@ -590,9 +591,7 @@ describe('run', () => {
       name: 'lint',
       config: {},
       verifySetup: async () => [],
-      check: async () => [
-        { ruleId: 'lint/rule', message: 'issue', severity: 'warn' as const },
-      ],
+      check: async () => [{ ruleId: 'lint/rule', message: 'issue', severity: 'warn' as const }],
     };
 
     const config = makeConfig({ adapters: [adapter] });
@@ -648,6 +647,7 @@ describe('run', () => {
       scopedRules: [
         {
           files: ['src/**/*.ts'],
+          ignores: [],
           rules: new Map([
             [
               'test/scoped-reporter',
@@ -655,8 +655,6 @@ describe('run', () => {
                 ruleId: 'test/scoped-reporter',
                 severity: 'error',
                 options: {},
-                include: [],
-                exclude: [],
               },
             ],
           ]),

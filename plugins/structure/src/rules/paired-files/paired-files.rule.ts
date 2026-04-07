@@ -17,7 +17,7 @@ function buildRequiredPath(sourceFile: string, template: string): string {
   const dir = dirname(sourceFile);
   const ext = extname(sourceFile);
   const name = basename(sourceFile, ext);
-  return template.replace(/\{dir\}/g, dir).replace(/\{name\}/g, name);
+  return template.replaceAll('{dir}', dir).replaceAll('{name}', name);
 }
 
 /** Ensure that source files have required companion files */
