@@ -88,19 +88,9 @@ async function runRules(
   providers: RuleProviders,
   rootDir: string,
 ): Promise<readonly RuleResult[]> {
-  const results = await Promise.allSettled(
+  return Promise.all(
     rules.map(({ rule, config }) => runRule(rule, config, providers, rootDir)),
   );
-
-  return results.map((result, index) => {
-    if (result.status === 'fulfilled') return result.value;
-    return {
-      ruleId: rules[index].rule.name,
-      violations: [],
-      durationMs: 0,
-      error: result.reason instanceof Error ? result.reason : new Error(String(result.reason)),
-    };
-  });
 }
 
 export { runRule, runRules };

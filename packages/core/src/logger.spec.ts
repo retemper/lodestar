@@ -68,6 +68,28 @@ describe('createLogger', () => {
     expect(write).toHaveBeenCalledWith('경고');
     expect(write).toHaveBeenCalledWith('에러');
   });
+
+  it('write 옵션이 없으면 stderr에 출력한다', () => {
+    const stderrWrite = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    const logger = createLogger();
+
+    logger.info('test message');
+
+    expect(stderrWrite).toHaveBeenCalledWith('test message\n');
+    stderrWrite.mockRestore();
+  });
+
+  it('옵션 없이 생성하면 기본 info 레벨이다', () => {
+    const stderrWrite = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    const logger = createLogger();
+
+    logger.debug('should not appear');
+    expect(stderrWrite).not.toHaveBeenCalled();
+
+    logger.info('should appear');
+    expect(stderrWrite).toHaveBeenCalledTimes(1);
+    stderrWrite.mockRestore();
+  });
 });
 
 describe('silentLogger', () => {

@@ -197,10 +197,11 @@ function createTsconfigPathsResolver(
 }
 
 export {
-  createTsconfigPathsResolver,
-  parseTsconfigPaths,
   compileMappings,
+  createTsconfigPathsResolver,
   matchPattern,
+  parseTsconfigPaths,
   stripJsonComments,
+  toRootRelative,
 };
 export type { TsconfigPathsResolverOptions, TsconfigPaths, PathMapping, PathTarget };

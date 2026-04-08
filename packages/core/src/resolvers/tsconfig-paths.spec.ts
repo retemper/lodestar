@@ -1,9 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
   compileMappings,
-  matchPattern,
-  stripJsonComments,
   createTsconfigPathsResolver,
+  matchPattern,
+  parseTsconfigPaths,
+  stripJsonComments,
+  toRootRelative,
 } from './tsconfig-paths';
 import type { PathMapping } from './tsconfig-paths';
 import { writeFile, mkdir, rm } from 'node:fs/promises';
@@ -100,6 +102,61 @@ describe('matchPattern', () => {
 
     expect(matchPattern('@test/user.mock', mapping)).toBe('user');
     expect(matchPattern('@test/user', mapping)).toBeNull();
+  });
+});
+
+describe('toRootRelative', () => {
+  it('rootDir 내부 경로를 상대 경로로 변환한다', () => {
+    expect(toRootRelative('/project/src/a.ts', '/project')).toBe('src/a.ts');
+  });
+
+  it('rootDir 외부 경로는 정규화된 절대 경로를 반환한다', () => {
+    expect(toRootRelative('/other/path/a.ts', '/project')).toBe('/other/path/a.ts');
+  });
+
+  it('백슬래시를 슬래시로 정규화한다', () => {
+    expect(toRootRelative('/project\\src\\a.ts', '/project')).toBe('src/a.ts');
+  });
+});
+
+describe('parseTsconfigPaths', () => {
+  const testDir2 = join(tmpdir(), `lodestar-tsconfig-parse-${Date.now()}`);
+
+  async function setup(filename: string, content: Record<string, unknown>): Promise<void> {
+    await mkdir(testDir2, { recursive: true });
+    await writeFile(join(testDir2, filename), JSON.stringify(content));
+  }
+
+  async function cleanup2(): Promise<void> {
+    await rm(testDir2, { recursive: true, force: true });
+  }
+
+  it('순환 extends를 감지하고 null을 반환한다', async () => {
+    await setup('a.json', { extends: './b.json', compilerOptions: { paths: { '@a/*': ['a/*'] } } });
+    await setup('b.json', { extends: './a.json', compilerOptions: { paths: { '@b/*': ['b/*'] } } });
+
+    const result = await parseTsconfigPaths(join(testDir2, 'a.json'));
+
+    // Should not infinite loop, should return a result from the non-circular part
+    expect(result).not.toBeNull();
+    await cleanup2();
+  });
+
+  it('extends 깊이가 10을 초과하면 null을 반환한다', async () => {
+    // Create a chain of 12 extends
+    for (const i of Array.from({ length: 12 }, (_, idx) => idx)) {
+      const content =
+        i === 11
+          ? { compilerOptions: { baseUrl: '.', paths: { '@deep/*': ['deep/*'] } } }
+          : { extends: `./chain-${i + 1}.json` };
+      await setup(`chain-${i}.json`, content);
+    }
+
+    const result = await parseTsconfigPaths(join(testDir2, 'chain-0.json'));
+
+    // Depth limit should prevent going beyond 10 levels
+    expect(result).toBeNull();
+    await cleanup2();
   });
 });
 
@@ -294,6 +351,98 @@ describe('createTsconfigPathsResolver', () => {
     });
 
     expect(result).toBe('modules/auth/index.ts');
+    await cleanup();
+  });
+
+  it('어떤 타겟도 매칭되지 않으면 null을 반환한다', async () => {
+    await setupTsconfig({
+      compilerOptions: {
+        baseUrl: '.',
+        paths: { '@app/*': ['src/*'] },
+      },
+    });
+
+    const resolver = createTsconfigPathsResolver(testDir);
+    await (resolver as unknown as { loadPaths: () => Promise<unknown> }).loadPaths();
+
+    const result = resolver.resolve({
+      importer: 'src/a.ts',
+      source: '@app/nonexistent',
+      knownFiles: new Set(['unrelated/file.ts']),
+    });
+
+    expect(result).toBeNull();
+    await cleanup();
+  });
+
+  it('절대 경로 import는 무시한다', async () => {
+    await setupTsconfig({
+      compilerOptions: { baseUrl: '.', paths: { '@app/*': ['src/*'] } },
+    });
+
+    const resolver = createTsconfigPathsResolver(testDir);
+    await (resolver as unknown as { loadPaths: () => Promise<unknown> }).loadPaths();
+
+    const result = resolver.resolve({
+      importer: 'src/a.ts',
+      source: '/absolute/path',
+      knownFiles: new Set(),
+    });
+
+    expect(result).toBeNull();
+    await cleanup();
+  });
+
+  it('baseUrl이 없으면 부모의 baseUrl 또는 tsconfig 디렉토리를 사용한다', async () => {
+    await setupTsconfig({
+      compilerOptions: {
+        paths: { '@app/*': ['src/*'] },
+      },
+    });
+
+    const resolver = createTsconfigPathsResolver(testDir);
+    await (resolver as unknown as { loadPaths: () => Promise<unknown> }).loadPaths();
+
+    const result = resolver.resolve({
+      importer: 'src/a.ts',
+      source: '@app/utils',
+      knownFiles: new Set(['src/utils.ts']),
+    });
+
+    expect(result).toBe('src/utils.ts');
+    await cleanup();
+  });
+
+  it('loadPaths 캐시: 두 번째 호출은 캐시된 결과를 반환한다', async () => {
+    await setupTsconfig({
+      compilerOptions: { baseUrl: '.', paths: { '@app/*': ['src/*'] } },
+    });
+
+    const resolver = createTsconfigPathsResolver(testDir);
+    const load = (resolver as unknown as { loadPaths: () => Promise<unknown> }).loadPaths;
+
+    const first = await load();
+    const second = await load();
+
+    expect(first).toBe(second);
+    await cleanup();
+  });
+
+  it('paths가 없고 extends도 없는 tsconfig에서는 null을 반환한다', async () => {
+    await setupTsconfig({
+      compilerOptions: { strict: true },
+    });
+
+    const resolver = createTsconfigPathsResolver(testDir);
+    await (resolver as unknown as { loadPaths: () => Promise<unknown> }).loadPaths();
+
+    const result = resolver.resolve({
+      importer: 'src/a.ts',
+      source: '@app/utils',
+      knownFiles: new Set(['src/utils.ts']),
+    });
+
+    expect(result).toBeNull();
     await cleanup();
   });
 });

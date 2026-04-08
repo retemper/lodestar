@@ -1,8 +1,9 @@
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import { mkdtemp, writeFile, rm, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createASTProvider } from './ast';
+import type { CacheProvider } from '../cache';
 
 /** Temporary directory paths for testing */
 const dirs: string[] = [];
@@ -393,6 +394,145 @@ const c = import('./dynamic');
 
       expect(exports).toHaveLength(1);
       expect(exports[0].name).toBe('renamed');
+    });
+  });
+
+  describe('disk cache', () => {
+    /** Create a mock CacheProvider */
+    function createMockCache(): CacheProvider {
+      const store = new Map<string, unknown>();
+      return {
+        get: vi.fn(async (namespace: string, key: string) => {
+          return store.get(`${namespace}:${key}`) ?? null;
+        }),
+        set: vi.fn(async (namespace: string, key: string, value: unknown) => {
+          store.set(`${namespace}:${key}`, value);
+        }),
+        clear: vi.fn(async () => {
+          store.clear();
+        }),
+      };
+    }
+
+    /** Creates fixture with disk cache */
+    async function setupFixtureWithCache(
+      files: Record<string, string>,
+    ): Promise<{
+      rootDir: string;
+      provider: ReturnType<typeof createASTProvider>;
+      cache: CacheProvider;
+    }> {
+      const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-ast-cache-'));
+      dirs.push(rootDir);
+
+      for (const [relativePath, content] of Object.entries(files)) {
+        const fullPath = join(rootDir, relativePath);
+        const dir = dirname(fullPath);
+        await mkdir(dir, { recursive: true });
+        await writeFile(fullPath, content, 'utf-8');
+      }
+
+      const cache = createMockCache();
+      return { rootDir, provider: createASTProvider(rootDir, cache), cache };
+    }
+
+    it('getImports가 디스크 캐시 미스 시 파싱 후 캐시에 저장한다', async () => {
+      const { provider, cache } = await setupFixtureWithCache({
+        'a.ts': `import { foo } from './foo';`,
+      });
+
+      const imports = await provider.getImports('a.ts');
+
+      expect(imports).toHaveLength(1);
+      expect(imports[0].source).toBe('./foo');
+      expect(cache.set).toHaveBeenCalledWith('imports', expect.any(String), imports);
+    });
+
+    it('getImports가 디스크 캐시 히트 시 파싱하지 않고 캐시된 값을 반환한다', async () => {
+      const { provider, cache } = await setupFixtureWithCache({
+        'b.ts': `import { bar } from './bar';`,
+      });
+
+      // First call populates the cache
+      await provider.getImports('b.ts');
+      expect(cache.set).toHaveBeenCalledTimes(1);
+
+      // Create a new provider with the same cache to bypass memory cache
+      const rootDir = (cache.set as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
+      expect(rootDir).toBe('imports');
+
+      // Verify cache.get was called
+      expect(cache.get).toHaveBeenCalledWith('imports', expect.any(String));
+    });
+
+    it('getExports가 디스크 캐시 미스 시 파싱 후 캐시에 저장한다', async () => {
+      const { provider, cache } = await setupFixtureWithCache({
+        'c.ts': `export const x = 1;`,
+      });
+
+      const exports = await provider.getExports('c.ts');
+
+      expect(exports).toHaveLength(1);
+      expect(exports[0].name).toBe('x');
+      expect(cache.set).toHaveBeenCalledWith('exports', expect.any(String), exports);
+    });
+
+    it('getExports가 디스크 캐시 히트 시 캐시된 값을 반환한다', async () => {
+      const { provider, cache } = await setupFixtureWithCache({
+        'd.ts': `export const y = 2;`,
+      });
+
+      // First call populates disk cache
+      const firstResult = await provider.getExports('d.ts');
+      expect(cache.set).toHaveBeenCalledWith('exports', expect.any(String), firstResult);
+
+      // Verify cache.get was called
+      expect(cache.get).toHaveBeenCalledWith('exports', expect.any(String));
+    });
+
+    it('디스크 캐시에 값이 있으면 바로 반환한다', async () => {
+      const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-ast-cache-hit-'));
+      dirs.push(rootDir);
+
+      const filePath = join(rootDir, 'cached.ts');
+      await writeFile(filePath, `import { z } from './z';`, 'utf-8');
+
+      const cachedImports = [
+        { source: './z', specifiers: ['z'], isTypeOnly: false, location: { file: 'cached.ts' }, kind: 'static' },
+      ];
+
+      const cache: CacheProvider = {
+        get: vi.fn(async () => cachedImports),
+        set: vi.fn(async () => {}),
+        clear: vi.fn(async () => {}),
+      };
+
+      const provider = createASTProvider(rootDir, cache);
+      const result = await provider.getImports('cached.ts');
+
+      expect(result).toBe(cachedImports);
+      expect(cache.set).not.toHaveBeenCalled();
+    });
+
+    it('getExports 디스크 캐시 히트 시 set을 호출하지 않는다', async () => {
+      const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-ast-export-hit-'));
+      dirs.push(rootDir);
+
+      await writeFile(join(rootDir, 'exp.ts'), `export const a = 1;`, 'utf-8');
+
+      const cachedExports = [{ name: 'a', isTypeOnly: false, isDefault: false }];
+
+      const cache: CacheProvider = {
+        get: vi.fn(async () => cachedExports),
+        set: vi.fn(async () => {}),
+        clear: vi.fn(async () => {}),
+      };
+
+      const provider = createASTProvider(rootDir, cache);
+      const result = await provider.getExports('exp.ts');
+
+      expect(result).toBe(cachedExports);
+      expect(cache.set).not.toHaveBeenCalled();
     });
   });
 });

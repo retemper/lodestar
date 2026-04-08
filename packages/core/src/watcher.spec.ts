@@ -269,4 +269,49 @@ describe('createWatcher', () => {
 
     handle.close();
   });
+
+  it('실행 중 파일이 변경되면 완료 후 재실행을 스케줄한다', async () => {
+    let runResolve: (() => void) | undefined;
+    mockRun.mockImplementationOnce(
+      () =>
+        new Promise<RunSummary>((resolve) => {
+          runResolve = () => resolve(createMockSummary());
+        }),
+    );
+
+    const handle = createWatcher({ config: baseConfig, debounceMs: 50 });
+
+    // Trigger first run
+    watchCallback('change', 'src/a.ts');
+    await vi.advanceTimersByTimeAsync(50);
+
+    // While first run is in progress, a new file changes
+    watchCallback('change', 'src/b.ts');
+
+    // Complete the first run
+    runResolve!();
+    await vi.advanceTimersByTimeAsync(0);
+
+    // The re-schedule debounce fires
+    await vi.advanceTimersByTimeAsync(50);
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(mockRun).toHaveBeenCalledTimes(2);
+    handle.close();
+  });
+
+  it('Windows 스타일 백슬래시 경로를 정규화한다', async () => {
+    const handle = createWatcher({ config: baseConfig, debounceMs: 50 });
+
+    watchCallback('change', 'src\\utils\\helper.ts');
+    await vi.advanceTimersByTimeAsync(50);
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(mockComputeImpactScope).toHaveBeenCalledWith(
+      expect.arrayContaining(['src/utils/helper.ts']),
+      expect.anything(),
+    );
+
+    handle.close();
+  });
 });

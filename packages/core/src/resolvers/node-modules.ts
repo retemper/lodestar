@@ -1,5 +1,3 @@
-import { join } from 'node:path';
-import { readFile } from 'node:fs/promises';
 import type { ModuleResolver, ResolveContext } from '@retemper/lodestar-types';
 
 /**
@@ -20,9 +18,7 @@ function createNodeModulesResolver(rootDir: string): ModuleResolver {
       const cached = cache.get(ctx.source);
       if (cached !== undefined) return cached;
 
-      /* Synchronous lookup — package.json must be pre-loaded.
-         The graph provider calls setup() before iteration. */
-      const result = resolveNodeModule(rootDir, ctx.source, packageName);
+      const result = `node_modules/${ctx.source}`;
       cache.set(ctx.source, result);
       return result;
     },
@@ -41,25 +37,6 @@ function extractPackageName(source: string): string | null {
     return `${parts[0]}/${parts[1]}`;
   }
   return source.split('/')[0];
-}
-
-/**
- * Try to resolve a node_modules import synchronously.
- * Returns a normalized identifier like "node_modules/lodash" (not an actual file path).
- * @param rootDir - project root
- * @param source - full import specifier
- * @param packageName - extracted package name
- */
-function resolveNodeModule(rootDir: string, source: string, packageName: string): string | null {
-  const packageJsonPath = join(rootDir, 'node_modules', packageName, 'package.json');
-
-  try {
-    /* Use a synchronous approach to keep resolver interface sync.
-       Package existence is validated during setup. */
-    return `node_modules/${source}`;
-  } catch {
-    return null;
-  }
 }
 
 export { createNodeModulesResolver, extractPackageName };
