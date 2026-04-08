@@ -1,6 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { RunSummary, WorkspaceSummary, WrittenConfig } from '@retemper/lodestar';
 
+/** Creates a test logger that delegates to console.error (spied in beforeEach) */
+function createMockLogger() {
+  return {
+    debug: vi.fn((...args: unknown[]) => console.error(...args)),
+    error: vi.fn((...args: unknown[]) => console.error(...args)),
+    info: vi.fn((...args: unknown[]) => console.error(...args)),
+    warn: vi.fn((...args: unknown[]) => console.error(...args)),
+  };
+}
+
 vi.mock('@retemper/lodestar', () => ({
   loadConfigFile: vi.fn(),
   discoverWorkspaces: vi.fn(),
@@ -11,9 +21,17 @@ vi.mock('@retemper/lodestar', () => ({
     scopedRules: [],
     baseline: null,
     adapters: [],
+    reporters: [],
   })),
   run: vi.fn(),
   runWorkspace: vi.fn(),
+  createCompositeReporter: vi.fn(),
+  createDiskCacheProvider: vi.fn(() => ({
+    get: vi.fn().mockResolvedValue(null),
+    set: vi.fn().mockResolvedValue(undefined),
+    clear: vi.fn().mockResolvedValue(undefined),
+  })),
+  createLogger: vi.fn(() => createMockLogger()),
 }));
 
 vi.mock('../reporters/console', () => ({
@@ -90,7 +108,6 @@ describe('checkCommand', () => {
 
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('No lodestar.config.ts found'),
-        expect.any(String),
       );
       expect(process.exitCode).toBe(1);
     });
@@ -282,7 +299,9 @@ describe('checkCommand', () => {
         rule: ['test/specific'],
       });
 
-      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<typeof vi.fn>;
+      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<
+        typeof vi.fn
+      >;
       const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
       const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
       expect(blocks[0].rules).toStrictEqual({ 'test/specific': 'error' });
@@ -308,7 +327,9 @@ describe('checkCommand', () => {
         rule: ['architecture/*'],
       });
 
-      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<typeof vi.fn>;
+      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<
+        typeof vi.fn
+      >;
       const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
       const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
       expect(Object.keys(blocks[0].rules ?? {})).toStrictEqual([

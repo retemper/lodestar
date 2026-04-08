@@ -122,6 +122,87 @@ import type { Foo } from './foo';
 
       expect(imports[0].specifiers).toStrictEqual(['a', 'b', 'c']);
     });
+
+    it('static import의 kind는 "static"이다', async () => {
+      const { provider } = await setupFixture({
+        'static.ts': `import { foo } from './foo';`,
+      });
+
+      const imports = await provider.getImports('static.ts');
+
+      expect(imports[0].kind).toBe('static');
+    });
+
+    it('require() 호출을 추출한다', async () => {
+      const { provider } = await setupFixture({
+        'cjs.ts': `const foo = require('./foo');\nconst { bar } = require('./bar');`,
+      });
+
+      const imports = await provider.getImports('cjs.ts');
+
+      expect(imports).toHaveLength(2);
+      expect(imports[0].source).toBe('./foo');
+      expect(imports[0].kind).toBe('require');
+      expect(imports[0].isTypeOnly).toBe(false);
+      expect(imports[1].source).toBe('./bar');
+      expect(imports[1].kind).toBe('require');
+    });
+
+    it('dynamic import()를 추출한다', async () => {
+      const { provider } = await setupFixture({
+        'dynamic.ts': `const mod = import('./lazy');\nimport('./chunk').then(m => m.default);`,
+      });
+
+      const imports = await provider.getImports('dynamic.ts');
+
+      expect(imports).toHaveLength(2);
+      expect(imports[0].source).toBe('./lazy');
+      expect(imports[0].kind).toBe('dynamic');
+      expect(imports[1].source).toBe('./chunk');
+      expect(imports[1].kind).toBe('dynamic');
+    });
+
+    it('동적 인자의 require()는 무시한다', async () => {
+      const { provider } = await setupFixture({
+        'dynamic-require.ts': `const name = 'foo';\nconst mod = require(name);`,
+      });
+
+      const imports = await provider.getImports('dynamic-require.ts');
+
+      expect(imports).toHaveLength(0);
+    });
+
+    it('static, require, dynamic import를 모두 추출한다', async () => {
+      const { provider } = await setupFixture({
+        'mixed.ts': `
+import { a } from './static';
+const b = require('./cjs');
+const c = import('./dynamic');
+`,
+      });
+
+      const imports = await provider.getImports('mixed.ts');
+
+      expect(imports).toHaveLength(3);
+      expect(imports[0].kind).toBe('static');
+      expect(imports[0].source).toBe('./static');
+      expect(imports[1].kind).toBe('require');
+      expect(imports[1].source).toBe('./cjs');
+      expect(imports[2].kind).toBe('dynamic');
+      expect(imports[2].source).toBe('./dynamic');
+    });
+
+    it('중첩 함수 내 require()를 추출한다', async () => {
+      const { provider } = await setupFixture({
+        'nested.ts': `function load() { const x = require('./nested-dep'); return x; }`,
+      });
+
+      const imports = await provider.getImports('nested.ts');
+
+      expect(imports).toHaveLength(1);
+      expect(imports[0].source).toBe('./nested-dep');
+      expect(imports[0].kind).toBe('require');
+    });
   });
 
   describe('getExports', () => {

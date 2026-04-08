@@ -3,15 +3,18 @@ import type {
   Violation,
   RunSummary,
   Reporter,
+  WorkspaceReporter,
   RuleProviders,
   ResolvedRuleConfig,
 } from '@retemper/lodestar-types';
+import type { CacheProvider } from './cache';
+import { createScopedFsProvider } from './incremental';
 import { createFileSystemProvider } from './providers/fs';
 import { createGraphProvider } from './providers/graph';
 import { createASTProvider } from './providers/ast';
 import { createConfigFileProvider } from './providers/config-file';
 import { resolvePlugins } from './resolver';
-import { runRule } from './runner';
+import { runRule, runRules } from './runner';
 import { validateConfig } from './validate';
 import type { RuleResult } from './runner';
 import type { ResolvedRule } from './resolver';
@@ -24,15 +27,20 @@ interface RunOptions {
   readonly reporter?: Reporter;
   /** When true, apply auto-fixes for violations that support it */
   readonly fix?: boolean;
+  /** Disk cache provider for persisting parse results */
+  readonly cache?: CacheProvider;
+  /** File scope for incremental analysis — only check files in this set */
+  readonly scope?: ReadonlySet<string>;
 }
 
 /**
  * Create providers for the given root directory.
  * @param rootDir - absolute path used as the project root for all providers
+ * @param cache - optional disk cache for cross-run persistence
  */
-function createProviders(rootDir: string): RuleProviders {
+function createProviders(rootDir: string, cache?: CacheProvider): RuleProviders {
   const fsProvider = createFileSystemProvider(rootDir);
-  const astProvider = createASTProvider(rootDir);
+  const astProvider = createASTProvider(rootDir, cache);
 
   return {
     fs: fsProvider,
@@ -49,7 +57,10 @@ async function run(options: RunOptions): Promise<RunSummary> {
   const { config, reporter } = options;
   const startTime = performance.now();
 
-  const providers = createProviders(config.rootDir);
+  const baseProviders = createProviders(config.rootDir, options.cache);
+  const providers = options.scope
+    ? { ...baseProviders, fs: createScopedFsProvider(baseProviders.fs, options.scope) }
+    : baseProviders;
   const resolvedRules = await resolvePlugins(config.plugins, config.rootDir);
 
   const availableRuleIds = new Set(resolvedRules.map((r) => r.rule.name));
@@ -65,42 +76,48 @@ async function run(options: RunOptions): Promise<RunSummary> {
     ruleCount: 0,
   });
 
-  // 1. Run global rules (blocks without `files`)
-  const results: RuleResult[] = [];
+  // 1. Run global rules in parallel (blocks without `files`)
   const globalActiveRules = filterActiveRules(resolvedRules, config.rules);
-
-  for (const { rule, config: ruleConfig } of globalActiveRules) {
+  for (const { rule } of globalActiveRules) {
     reporter?.onRuleStart?.(rule.name);
-    const result = await runRule(rule, ruleConfig, providers, config.rootDir);
-    results.push(result);
+  }
+  const globalResults = await runRules(globalActiveRules, providers, config.rootDir);
+
+  for (let i = 0; i < globalResults.length; i++) {
+    const result = globalResults[i];
     reporter?.onRuleComplete?.({
       ruleId: result.ruleId,
       violations: result.violations,
       durationMs: result.durationMs,
       meta: result.meta,
-      docsUrl: rule.docs?.url,
+      docsUrl: globalActiveRules[i].rule.docs?.url,
       error: result.error,
     });
   }
 
-  // 2. Run scoped rules (blocks with `files`)
+  // 2. Run scoped rules in parallel (blocks with `files`)
+  const allScopedResults: RuleResult[] = [];
   for (const scope of config.scopedRules) {
     const scopedActiveRules = filterActiveRules(resolvedRules, scope.rules);
-
-    for (const { rule, config: ruleConfig } of scopedActiveRules) {
+    for (const { rule } of scopedActiveRules) {
       reporter?.onRuleStart?.(rule.name);
-      const result = await runRule(rule, ruleConfig, providers, config.rootDir);
-      results.push(result);
+    }
+    const scopedResults = await runRules(scopedActiveRules, providers, config.rootDir);
+    for (let i = 0; i < scopedResults.length; i++) {
+      const result = scopedResults[i];
       reporter?.onRuleComplete?.({
         ruleId: result.ruleId,
         violations: result.violations,
         durationMs: result.durationMs,
         meta: result.meta,
-        docsUrl: rule.docs?.url,
+        docsUrl: scopedActiveRules[i].rule.docs?.url,
         error: result.error,
       });
     }
+    allScopedResults.push(...scopedResults);
   }
+
+  const results = [...globalResults, ...allScopedResults];
 
   // 3. Verify adapter setup — missing/drifted config files are errors
   let setupViolations: Violation[] = [];

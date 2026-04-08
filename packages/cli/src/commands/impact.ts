@@ -1,6 +1,7 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import { createProviders } from '@retemper/lodestar';
+import type { Logger } from '@retemper/lodestar';
+import { createProviders, createLogger } from '@retemper/lodestar';
 
 /** Options for the impact analysis command */
 interface ImpactOptions {
@@ -77,30 +78,34 @@ function collectTransitiveDependents(
 }
 
 /**
- * Print the impact analysis result to stderr in human-readable format.
+ * Print the impact analysis result in human-readable format.
  * @param targetFile - the file being analyzed
  * @param entries - BFS results partitioned into direct and transitive
  */
-function printHumanOutput(targetFile: string, entries: readonly ImpactEntry[]): void {
-  console.error(`Impact analysis for ${targetFile}\n`);
+function printHumanOutput(
+  targetFile: string,
+  entries: readonly ImpactEntry[],
+  logger: import('@retemper/lodestar').Logger,
+): void {
+  logger.info(`Impact analysis for ${targetFile}\n`);
 
   const direct = entries.filter((e) => e.depth === 1);
   const transitive = entries.filter((e) => e.depth > 1);
 
-  console.error(`Direct dependents (${direct.length}):`);
+  logger.info(`Direct dependents (${direct.length}):`);
   for (const entry of direct) {
-    console.error(`  ${entry.file}`);
+    logger.info(`  ${entry.file}`);
   }
 
   if (transitive.length > 0) {
-    console.error(`\nTransitive dependents (${transitive.length}):`);
+    logger.info(`\nTransitive dependents (${transitive.length}):`);
     for (const entry of transitive) {
       const viaSuffix = entry.via ? ` (via ${entry.via})` : '';
-      console.error(`  ${entry.file}${viaSuffix}`);
+      logger.info(`  ${entry.file}${viaSuffix}`);
     }
   }
 
-  console.error(`\nTotal: ${entries.length} files affected`);
+  logger.info(`\nTotal: ${entries.length} files affected`);
 }
 
 /**
@@ -125,6 +130,7 @@ function printJsonOutput(targetFile: string, entries: readonly ImpactEntry[]): v
  * @param args - parsed CLI arguments including the target file path
  */
 async function impactCommand(args: ArgumentsCamelCase<ImpactOptions>): Promise<void> {
+  const logger = createLogger();
   const rootDir = resolve(process.cwd());
   const targetFile = String(args.file);
 
@@ -132,7 +138,7 @@ async function impactCommand(args: ArgumentsCamelCase<ImpactOptions>): Promise<v
   const graph = await providers.graph.getModuleGraph();
 
   if (!graph.nodes.has(targetFile)) {
-    console.error(`File not found in module graph: ${targetFile}`);
+    logger.error(`File not found in module graph: ${targetFile}`);
     process.exitCode = 1;
     return;
   }
@@ -142,7 +148,7 @@ async function impactCommand(args: ArgumentsCamelCase<ImpactOptions>): Promise<v
   if (args.json) {
     printJsonOutput(targetFile, entries);
   } else {
-    printHumanOutput(targetFile, entries);
+    printHumanOutput(targetFile, entries, logger);
   }
 }
 

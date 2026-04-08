@@ -1,7 +1,11 @@
-import type { WrittenConfig, Reporter, RunSummary } from '@retemper/lodestar-types';
+import type { WrittenConfig, WorkspaceReporter, RunSummary } from '@retemper/lodestar-types';
 import type { WorkspacePackage } from '@retemper/lodestar-config';
 import { discoverWorkspaces, loadConfigFile, resolveConfig } from '@retemper/lodestar-config';
 import { run } from './engine';
+import type { CacheProvider } from './cache';
+
+/** Default number of packages to run concurrently */
+const DEFAULT_CONCURRENCY = 4;
 
 /** Options for workspace-aware execution */
 interface WorkspaceRunOptions {
@@ -13,14 +17,10 @@ interface WorkspaceRunOptions {
   readonly reporter?: WorkspaceReporter;
   /** When true, apply auto-fixes for fixable violations */
   readonly fix?: boolean;
-}
-
-/** Extended reporter that understands workspace structure */
-interface WorkspaceReporter extends Reporter {
-  /** Called when starting a workspace package check */
-  onPackageStart?(pkg: WorkspacePackage): void;
-  /** Called when a workspace package check completes */
-  onPackageComplete?(pkg: WorkspacePackage, summary: RunSummary): void;
+  /** Disk cache provider shared across packages */
+  readonly cache?: CacheProvider;
+  /** Max packages to run in parallel (default: 4, use 1 for sequential) */
+  readonly concurrency?: number;
 }
 
 /** Summary for the entire workspace run */
@@ -47,34 +47,33 @@ interface PackageSummary {
 
 /**
  * Run checks in workspace mode.
- * 1. Run root config against rootDir
- * 2. For each package with its own config, run independently (no merge — flat config)
+ * 1. Run root config against rootDir (always first, sequential)
+ * 2. For each package with its own config, run with concurrency control
  */
 async function runWorkspace(options: WorkspaceRunOptions): Promise<WorkspaceSummary> {
-  const { rootDir, rootConfig, reporter, fix } = options;
+  const { rootDir, rootConfig, reporter, fix, cache } = options;
+  const concurrency = Math.max(1, options.concurrency ?? DEFAULT_CONCURRENCY);
   const startTime = performance.now();
 
+  // Root always runs first, sequentially
   const rootPkg: WorkspacePackage = { name: '(root)', dir: rootDir };
   reporter?.onPackageStart?.(rootPkg);
 
   const rootResolved = resolveConfig(rootConfig, rootDir);
-  const rootSummary = await run({ config: rootResolved, reporter, fix });
+  const rootSummary = await run({ config: rootResolved, reporter, fix, cache });
   reporter?.onPackageComplete?.(rootPkg, rootSummary);
 
   const packages = await discoverWorkspaces(rootDir);
-  const packageSummaries: PackageSummary[] = [];
 
-  for (const pkg of packages) {
-    const packageConfig = await loadConfigFile(pkg.dir);
-    if (!packageConfig) continue;
+  // Load configs and filter packages that have one
+  const packagesWithConfig = await filterPackagesWithConfig(packages);
 
-    reporter?.onPackageStart?.(pkg);
-    const resolved = resolveConfig(packageConfig, pkg.dir);
-    const summary = await run({ config: resolved, reporter, fix });
-
-    packageSummaries.push({ package: pkg, summary });
-    reporter?.onPackageComplete?.(pkg, summary);
-  }
+  // Run packages with concurrency control
+  const packageSummaries = await runPackagesParallel(
+    packagesWithConfig,
+    { reporter, fix, cache },
+    concurrency,
+  );
 
   const pkgErrors = packageSummaries.reduce((sum, p) => sum + p.summary.errorCount, 0);
   const pkgWarns = packageSummaries.reduce((sum, p) => sum + p.summary.warnCount, 0);
@@ -88,5 +87,88 @@ async function runWorkspace(options: WorkspaceRunOptions): Promise<WorkspaceSumm
   };
 }
 
+/** Load config for each package and return only those with a config file */
+async function filterPackagesWithConfig(
+  packages: readonly WorkspacePackage[],
+): Promise<readonly { pkg: WorkspacePackage; config: WrittenConfig }[]> {
+  const results: { pkg: WorkspacePackage; config: WrittenConfig }[] = [];
+  for (const pkg of packages) {
+    const config = await loadConfigFile(pkg.dir);
+    if (config) {
+      results.push({ pkg, config });
+    }
+  }
+  return results;
+}
+
+/** Run packages in parallel with a concurrency limit, emitting reporter events in order */
+async function runPackagesParallel(
+  packagesWithConfig: readonly { pkg: WorkspacePackage; config: WrittenConfig }[],
+  context: { reporter?: WorkspaceReporter; fix?: boolean; cache?: CacheProvider },
+  concurrency: number,
+): Promise<readonly PackageSummary[]> {
+  const { reporter, fix, cache } = context;
+
+  if (packagesWithConfig.length === 0) return [];
+
+  // Pre-allocate result slots to preserve input order
+  const results: (PackageSummary | null)[] = new Array(packagesWithConfig.length).fill(null);
+  const reporterEmitted = new Array<boolean>(packagesWithConfig.length).fill(false);
+
+  // Track the next index whose reporter events should be emitted
+  const state = { nextToEmit: 0 };
+
+  const executePackage = async (index: number): Promise<void> => {
+    const { pkg, config } = packagesWithConfig[index];
+    const resolved = resolveConfig(config, pkg.dir);
+    const summary = await run({ config: resolved, fix, cache });
+    results[index] = { package: pkg, summary };
+
+    // Emit reporter events in order — flush all consecutive completed results
+    flushReporterEvents(results, reporterEmitted, packagesWithConfig, state, reporter);
+  };
+
+  await pLimit(
+    packagesWithConfig.map((_, i) => () => executePackage(i)),
+    concurrency,
+  );
+
+  return results.filter((r): r is PackageSummary => r !== null);
+}
+
+/** Emit reporter events for completed packages in sequential order */
+function flushReporterEvents(
+  results: readonly (PackageSummary | null)[],
+  emitted: boolean[],
+  packagesWithConfig: readonly { pkg: WorkspacePackage; config: WrittenConfig }[],
+  state: { nextToEmit: number },
+  reporter?: WorkspaceReporter,
+): void {
+  while (state.nextToEmit < results.length) {
+    const result = results[state.nextToEmit];
+    if (!result || emitted[state.nextToEmit]) break;
+
+    reporter?.onPackageStart?.(packagesWithConfig[state.nextToEmit].pkg);
+    reporter?.onPackageComplete?.(result.package, result.summary);
+    emitted[state.nextToEmit] = true;
+    state.nextToEmit++;
+  }
+}
+
+/** Run async tasks with a concurrency limit */
+async function pLimit(tasks: readonly (() => Promise<void>)[], concurrency: number): Promise<void> {
+  const executing = new Set<Promise<void>>();
+  for (const task of tasks) {
+    const promise = task().then(() => {
+      executing.delete(promise);
+    });
+    executing.add(promise);
+    if (executing.size >= concurrency) {
+      await Promise.race(executing);
+    }
+  }
+  await Promise.all(executing);
+}
+
 export { runWorkspace };
-export type { WorkspaceRunOptions, WorkspaceReporter, WorkspaceSummary, PackageSummary };
+export type { WorkspaceRunOptions, WorkspaceSummary, PackageSummary };

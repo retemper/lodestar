@@ -32,6 +32,15 @@ export type { ModuleGraph, ModuleNode, ImportInfo, ExportInfo };
 // Reporter
 export type { Reporter, RunSummary };
 
+// Logger
+export type { Logger, LogLevel };
+
+// Resolver
+export type { Resolver };
+
+// Cache
+export type { CacheProvider };
+
 // Helpers
 export { defineRule, definePlugin };
 ```

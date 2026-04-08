@@ -4,6 +4,12 @@ import type { ModuleNode } from '@retemper/lodestar';
 vi.mock('@retemper/lodestar', () => ({
   createProviders: vi.fn(),
   loadConfigFile: vi.fn(),
+  createLogger: vi.fn(() => ({
+    debug: vi.fn((...args: unknown[]) => console.error(...args)),
+    error: vi.fn((...args: unknown[]) => console.error(...args)),
+    info: vi.fn((...args: unknown[]) => console.error(...args)),
+    warn: vi.fn((...args: unknown[]) => console.error(...args)),
+  })),
 }));
 
 import { graphCommand } from './graph';

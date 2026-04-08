@@ -4,8 +4,8 @@ A plugin is a named collection of rules. Lodestar ships one official plugin and 
 
 ## Official Plugin
 
-| Plugin                                                   | Focus                                                                 |
-| -------------------------------------------------------- | --------------------------------------------------------------------- |
+| Plugin                                                            | Focus                                                                 |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------- |
 | [`@retemper/lodestar-plugin-architecture`](/plugins/architecture) | Layer boundaries, module encapsulation, circular dependency detection |
 
 ## Using Plugins

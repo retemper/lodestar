@@ -82,6 +82,7 @@ export default defineConfig({
                 { text: '규칙(Rules)', link: '/ko/guide/rules' },
                 { text: '플러그인(Plugins)', link: '/ko/guide/plugins' },
                 { text: '설정(Configuration)', link: '/ko/guide/configuration' },
+                { text: '리포터(Reporters)', link: '/ko/guide/reporters' },
               ],
             },
             {
@@ -185,6 +186,7 @@ export default defineConfig({
             { text: 'Rules', link: '/guide/rules' },
             { text: 'Plugins', link: '/guide/plugins' },
             { text: 'Configuration', link: '/guide/configuration' },
+            { text: 'Reporters', link: '/guide/reporters' },
           ],
         },
         {

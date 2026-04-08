@@ -104,6 +104,22 @@ export default defineConfig([
 ]);
 ```
 
+### `reporters`
+
+Array of reporter instances for additional output formats. See the [Reporters guide](/guide/reporters) for details.
+
+```ts
+import { sarifReporter } from '@retemper/lodestar-reporter-sarif';
+import { junitReporter } from '@retemper/lodestar-reporter-junit';
+
+export default defineConfig({
+  reporters: [
+    sarifReporter({ output: 'reports/lodestar.sarif' }),
+    junitReporter({ output: 'reports/lodestar.xml' }),
+  ],
+});
+```
+
 ## Flat Config (Array Form)
 
 Lodestar uses a flat config model. You can pass a single block or an array of blocks. Array form enables file-scoped rules via `files` and `ignores` on each block:

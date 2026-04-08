@@ -5,6 +5,15 @@ vi.mock('node:fs/promises', () => ({
   writeFile: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('@retemper/lodestar', () => ({
+  createLogger: vi.fn(() => ({
+    debug: vi.fn((...args: unknown[]) => console.error(...args)),
+    error: vi.fn((...args: unknown[]) => console.error(...args)),
+    info: vi.fn((...args: unknown[]) => console.error(...args)),
+    warn: vi.fn((...args: unknown[]) => console.error(...args)),
+  })),
+}));
+
 describe('initCommand', () => {
   beforeEach(() => {
     vi.restoreAllMocks();

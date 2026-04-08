@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import type { ModuleNode } from '@retemper/lodestar';
 import {
+  buildGraphApiResponse,
   collectEdges,
   collectLayerEdges,
-  formatMermaid,
   formatDot,
-  formatLayerMermaid,
   formatLayerDot,
+  formatLayerMermaid,
+  formatMermaid,
   matchesScope,
 } from './graph';
 import type { LayerDef } from './graph';
@@ -203,6 +204,118 @@ describe('formatLayerMermaid', () => {
 
     expect(result).toContain('-.->');
     expect(result).toContain('violation');
+  });
+});
+
+describe('buildGraphApiResponse', () => {
+  it('레이어 없이 노드와 edge를 반환한다', () => {
+    const nodes = makeNodes({
+      'src/a.ts': ['src/b.ts'],
+      'src/b.ts': [],
+    });
+
+    const result = buildGraphApiResponse(nodes, undefined, null);
+
+    expect(result.nodes).toHaveLength(2);
+    expect(result.edges).toHaveLength(1);
+    expect(result.layers).toHaveLength(0);
+    expect(result.edges[0]).toStrictEqual({
+      source: 'src/a.ts',
+      target: 'src/b.ts',
+      allowed: true,
+    });
+  });
+
+  it('레이어 정보를 포함하여 노드와 edge를 반환한다', () => {
+    const layerDefs: LayerDef[] = [
+      { name: 'domain', path: 'src/domain/**/*.ts' },
+      { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['domain'] },
+    ];
+    const nodes = makeNodes({
+      'src/domain/entity.ts': [],
+      'src/infra/repo.ts': ['src/domain/entity.ts'],
+    });
+
+    const result = buildGraphApiResponse(nodes, undefined, layerDefs);
+
+    expect(result.nodes).toHaveLength(2);
+    const domainNode = result.nodes.find((n) => n.id === 'src/domain/entity.ts');
+    const infraNode = result.nodes.find((n) => n.id === 'src/infra/repo.ts');
+    expect(domainNode?.layer).toBe('domain');
+    expect(infraNode?.layer).toBe('infra');
+    expect(result.edges[0].allowed).toBe(true);
+    expect(result.layers).toHaveLength(2);
+  });
+
+  it('허용되지 않은 의존성을 violation으로 표시한다', () => {
+    const layerDefs: LayerDef[] = [
+      { name: 'domain', path: 'src/domain/**/*.ts' },
+      { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['domain'] },
+    ];
+    const nodes = makeNodes({
+      'src/domain/entity.ts': ['src/infra/repo.ts'],
+      'src/infra/repo.ts': [],
+    });
+
+    const result = buildGraphApiResponse(nodes, undefined, layerDefs);
+
+    expect(result.edges[0].allowed).toBe(false);
+  });
+
+  it('scope로 필터링한다', () => {
+    const nodes = makeNodes({
+      'src/domain/a.ts': ['src/infra/b.ts'],
+      'src/infra/b.ts': [],
+    });
+
+    const result = buildGraphApiResponse(nodes, 'src/domain', null);
+
+    expect(result.nodes).toHaveLength(1);
+    expect(result.edges).toHaveLength(0);
+  });
+
+  it('노드 size는 의존성 개수를 반영한다', () => {
+    const nodes = makeNodes({
+      'src/a.ts': ['src/b.ts', 'src/c.ts'],
+      'src/b.ts': [],
+      'src/c.ts': [],
+    });
+
+    const result = buildGraphApiResponse(nodes, undefined, null);
+    const nodeA = result.nodes.find((n) => n.id === 'src/a.ts');
+
+    expect(nodeA?.size).toBe(2);
+  });
+
+  it('레이어별 파일 수를 계산한다', () => {
+    const layerDefs: LayerDef[] = [
+      { name: 'domain', path: 'src/domain/**/*.ts' },
+      { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['domain'] },
+    ];
+    const nodes = makeNodes({
+      'src/domain/a.ts': [],
+      'src/domain/b.ts': [],
+      'src/infra/c.ts': [],
+    });
+
+    const result = buildGraphApiResponse(nodes, undefined, layerDefs);
+
+    const domainLayer = result.layers.find((l) => l.name === 'domain');
+    const infraLayer = result.layers.find((l) => l.name === 'infra');
+    expect(domainLayer?.fileCount).toBe(2);
+    expect(infraLayer?.fileCount).toBe(1);
+  });
+
+  it('같은 레이어 내 edge는 allowed로 표시한다', () => {
+    const layerDefs: LayerDef[] = [{ name: 'domain', path: 'src/domain/**/*.ts' }];
+    const nodes = makeNodes({
+      'src/domain/a.ts': ['src/domain/b.ts'],
+      'src/domain/b.ts': [],
+    });
+
+    const result = buildGraphApiResponse(nodes, undefined, layerDefs);
+
+    expect(result.edges[0].allowed).toBe(true);
   });
 });
 

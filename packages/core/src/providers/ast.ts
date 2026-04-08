@@ -1,19 +1,25 @@
 import { join } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { parseSync } from '@swc/core';
-import type { Module, ModuleItem } from '@swc/core';
+import type { Module, ModuleItem, Expression, Statement } from '@swc/core';
 import type { ASTProvider, ImportInfo, ExportInfo } from '@retemper/lodestar-types';
+import type { CacheProvider } from '../cache';
+import { contentHash } from '../cache';
 
 /**
  * Create an AST provider backed by SWC for TypeScript source analysis.
+ * Supports optional disk cache for persisting import/export info across runs.
  * @param rootDir - absolute path; all file paths are resolved relative to this
+ * @param diskCache - optional disk cache provider for cross-run persistence
  */
-function createASTProvider(rootDir: string): ASTProvider {
-  const cache = new Map<string, Module>();
+function createASTProvider(rootDir: string, diskCache?: CacheProvider): ASTProvider {
+  const memoryCache = new Map<string, Module>();
+  const importCache = new Map<string, readonly ImportInfo[]>();
+  const exportCache = new Map<string, readonly ExportInfo[]>();
 
   /** Parse a file and cache the result */
   async function parse(relativePath: string): Promise<Module> {
-    const cached = cache.get(relativePath);
+    const cached = memoryCache.get(relativePath);
     if (cached) return cached;
 
     const fullPath = join(rootDir, relativePath);
@@ -26,8 +32,15 @@ function createASTProvider(rootDir: string): ASTProvider {
       decorators: true,
     });
 
-    cache.set(relativePath, module);
+    memoryCache.set(relativePath, module);
     return module;
+  }
+
+  /** Read file content and compute its hash for disk cache lookup */
+  async function readAndHash(relativePath: string): Promise<{ content: string; hash: string }> {
+    const fullPath = join(rootDir, relativePath);
+    const content = await readFile(fullPath, 'utf-8');
+    return { content, hash: contentHash(content) };
   }
 
   return {
@@ -36,19 +49,63 @@ function createASTProvider(rootDir: string): ASTProvider {
     },
 
     async getImports(path: string): Promise<readonly ImportInfo[]> {
+      const memoryCached = importCache.get(path);
+      if (memoryCached) return memoryCached;
+
+      if (diskCache) {
+        const { content, hash } = await readAndHash(path);
+        const diskCached = await diskCache.get<ImportInfo[]>('imports', hash);
+        if (diskCached) {
+          importCache.set(path, diskCached);
+          return diskCached;
+        }
+
+        const isTsx = path.endsWith('.tsx');
+        const module = parseSync(content, { syntax: 'typescript', tsx: isTsx, decorators: true });
+        memoryCache.set(path, module);
+        const imports = extractImports(module, path);
+        importCache.set(path, imports);
+        await diskCache.set('imports', hash, imports);
+        return imports;
+      }
+
       const module = await parse(path);
-      return extractImports(module, path);
+      const imports = extractImports(module, path);
+      importCache.set(path, imports);
+      return imports;
     },
 
     async getExports(path: string): Promise<readonly ExportInfo[]> {
+      const memoryCached = exportCache.get(path);
+      if (memoryCached) return memoryCached;
+
+      if (diskCache) {
+        const { content, hash } = await readAndHash(path);
+        const diskCached = await diskCache.get<ExportInfo[]>('exports', hash);
+        if (diskCached) {
+          exportCache.set(path, diskCached);
+          return diskCached;
+        }
+
+        const isTsx = path.endsWith('.tsx');
+        const module = parseSync(content, { syntax: 'typescript', tsx: isTsx, decorators: true });
+        memoryCache.set(path, module);
+        const exports = extractExports(module);
+        exportCache.set(path, exports);
+        await diskCache.set('exports', hash, exports);
+        return exports;
+      }
+
       const module = await parse(path);
-      return extractExports(module);
+      const exports = extractExports(module);
+      exportCache.set(path, exports);
+      return exports;
     },
   };
 }
 
 /**
- * Extract imports from a parsed SWC module.
+ * Extract imports from a parsed SWC module — static, require(), and dynamic import().
  * @param module - parsed AST module
  * @param file - relative file path used for location metadata
  */
@@ -56,28 +113,100 @@ function extractImports(module: Module, file: string): readonly ImportInfo[] {
   const imports: ImportInfo[] = [];
 
   for (const item of module.body) {
-    if (item.type !== 'ImportDeclaration') continue;
-
-    const specifiers: string[] = [];
-    for (const s of item.specifiers) {
-      if (s.type === 'ImportDefaultSpecifier') {
-        specifiers.push(s.local.value);
-      } else if (s.type === 'ImportNamespaceSpecifier') {
-        specifiers.push(`* as ${s.local.value}`);
-      } else if (s.type === 'ImportSpecifier') {
-        specifiers.push(s.local.value);
+    if (item.type === 'ImportDeclaration') {
+      const specifiers: string[] = [];
+      for (const s of item.specifiers) {
+        if (s.type === 'ImportDefaultSpecifier') {
+          specifiers.push(s.local.value);
+        } else if (s.type === 'ImportNamespaceSpecifier') {
+          specifiers.push(`* as ${s.local.value}`);
+        } else if (s.type === 'ImportSpecifier') {
+          specifiers.push(s.local.value);
+        }
       }
+
+      imports.push({
+        source: item.source.value,
+        specifiers,
+        isTypeOnly: item.typeOnly,
+        location: { file },
+        kind: 'static',
+      });
+      continue;
     }
 
-    imports.push({
-      source: item.source.value,
-      specifiers,
-      isTypeOnly: item.typeOnly,
-      location: { file },
+    visitCallExpressions(item, (call) => {
+      const source = extractCallImportSource(call);
+      if (!source) return;
+
+      imports.push({
+        source: source.value,
+        specifiers: [],
+        isTypeOnly: false,
+        location: { file },
+        kind: source.kind,
+      });
     });
   }
 
   return imports;
+}
+
+/** Extracted import source from a call expression */
+interface CallImportSource {
+  readonly value: string;
+  readonly kind: 'require' | 'dynamic';
+}
+
+/**
+ * Extract import source from a require() or import() call expression.
+ * Only string literal arguments are supported — dynamic expressions are ignored.
+ */
+function extractCallImportSource(node: Expression): CallImportSource | null {
+  if (node.type !== 'CallExpression') return null;
+
+  const { callee } = node;
+  const firstArg = node.arguments[0]?.expression;
+  if (!firstArg || firstArg.type !== 'StringLiteral') return null;
+
+  if (callee.type === 'Identifier' && callee.value === 'require') {
+    return { value: firstArg.value, kind: 'require' };
+  }
+
+  if (callee.type === 'Import') {
+    return { value: firstArg.value, kind: 'dynamic' };
+  }
+
+  return null;
+}
+
+/**
+ * Walk an AST node tree to find all call expressions.
+ * @param node - root AST node to traverse
+ * @param visitor - callback invoked for each CallExpression found
+ */
+function visitCallExpressions(
+  node: ModuleItem | Statement | Expression | Record<string, unknown>,
+  visitor: (expr: Expression) => void,
+): void {
+  if (!node || typeof node !== 'object') return;
+
+  const typed = node as Record<string, unknown>;
+  if (typed.type === 'CallExpression') {
+    visitor(node as Expression);
+  }
+
+  for (const value of Object.values(typed)) {
+    if (Array.isArray(value)) {
+      for (const child of value) {
+        if (child && typeof child === 'object' && 'type' in child) {
+          visitCallExpressions(child as Record<string, unknown>, visitor);
+        }
+      }
+    } else if (value && typeof value === 'object' && 'type' in (value as Record<string, unknown>)) {
+      visitCallExpressions(value as Record<string, unknown>, visitor);
+    }
+  }
 }
 
 /**

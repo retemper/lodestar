@@ -3,7 +3,8 @@ import type {
   RunSummary,
   RuleResultSummary,
   WorkspaceReporter,
-  WorkspacePackage,
+  WorkspacePackageInfo,
+  Logger,
 } from '@retemper/lodestar';
 
 /** ANSI color codes */
@@ -13,8 +14,16 @@ const YELLOW = '\x1b[33m';
 const DIM = '\x1b[2m';
 const RESET = '\x1b[0m';
 
+/** Options for the console reporter */
+interface ConsoleReporterOptions {
+  /** Logger to write output through (default: stderr logger) */
+  readonly logger?: Logger;
+}
+
 /** Create a console reporter that shows per-rule progress with metadata */
-function createConsoleReporter(): WorkspaceReporter {
+function createConsoleReporter(options?: ConsoleReporterOptions): WorkspaceReporter {
+  const log = options?.logger ?? createStderrLogger();
+
   return {
     name: 'console',
 
@@ -28,7 +37,7 @@ function createConsoleReporter(): WorkspaceReporter {
       const suffix = [meta, duration].filter(Boolean).join('  ');
 
       if (result.error) {
-        console.error(`  ${RED}✗${RESET} ${result.ruleId}  ${RED}${result.error.message}${RESET}`);
+        log.error(`  ${RED}✗${RESET} ${result.ruleId}  ${RED}${result.error.message}${RESET}`);
         return;
       }
 
@@ -36,23 +45,23 @@ function createConsoleReporter(): WorkspaceReporter {
       const warnCount = result.violations.filter((v) => v.severity === 'warn').length;
 
       if (errorCount > 0) {
-        console.error(`  ${RED}✗${RESET} ${result.ruleId}  ${suffix}`);
+        log.error(`  ${RED}✗${RESET} ${result.ruleId}  ${suffix}`);
         for (const v of result.violations) {
-          console.error(`    ${v.message} ${formatLocation(v)}`);
+          log.error(`    ${v.message} ${formatLocation(v)}`);
         }
         if (result.docsUrl) {
-          console.error(`    ${DIM}docs: ${result.docsUrl}${RESET}`);
+          log.info(`    ${DIM}docs: ${result.docsUrl}${RESET}`);
         }
       } else if (warnCount > 0) {
-        console.error(`  ${YELLOW}!${RESET} ${result.ruleId}  ${suffix}`);
+        log.warn(`  ${YELLOW}!${RESET} ${result.ruleId}  ${suffix}`);
         for (const v of result.violations) {
-          console.error(`    ${v.message} ${formatLocation(v)}`);
+          log.warn(`    ${v.message} ${formatLocation(v)}`);
         }
         if (result.docsUrl) {
-          console.error(`    ${DIM}docs: ${result.docsUrl}${RESET}`);
+          log.info(`    ${DIM}docs: ${result.docsUrl}${RESET}`);
         }
       } else {
-        console.error(`  ${GREEN}✓${RESET} ${result.ruleId}  ${suffix}`);
+        log.info(`  ${GREEN}✓${RESET} ${result.ruleId}  ${suffix}`);
       }
     },
 
@@ -64,14 +73,14 @@ function createConsoleReporter(): WorkspaceReporter {
         ? summary.ruleResults.filter((r) => r.violations.length === 0).length
         : summary.totalRules - (summary.errorCount > 0 ? 1 : 0);
 
-      console.error(
+      log.info(
         `  ${passed} rules passed, ${summary.errorCount} errors, ${summary.warnCount} warnings ${DIM}(${summary.durationMs.toFixed(0)}ms)${RESET}`,
       );
     },
 
     /** Print package header */
-    onPackageStart(pkg: WorkspacePackage) {
-      console.error(`\n${pkg.name}`);
+    onPackageStart(pkg: WorkspacePackageInfo) {
+      log.info(`\n${pkg.name}`);
     },
 
     onPackageComplete() {},
@@ -85,4 +94,16 @@ function formatLocation(v: Violation): string {
   return `${DIM}at ${v.location.file}${line}${RESET}`;
 }
 
+/** Create a minimal logger that writes directly to stderr */
+function createStderrLogger(): Logger {
+  const write = (message: string) => process.stderr.write(message + '\n');
+  return {
+    debug: write,
+    error: write,
+    info: write,
+    warn: write,
+  };
+}
+
 export { createConsoleReporter };
+export type { ConsoleReporterOptions };

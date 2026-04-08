@@ -6,7 +6,7 @@ import type { LayerDefinition } from './layers.rule';
 
 /** Creates an ImportInfo stub */
 function makeImport(source: string, file: string, isTypeOnly = false): ImportInfo {
-  return { source, specifiers: [], isTypeOnly, location: { file, line: 1 } };
+  return { source, specifiers: [], isTypeOnly, kind: 'static', location: { file, line: 1 } };
 }
 
 /** Defines standard 3-layer architecture layers */

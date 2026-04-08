@@ -46,6 +46,7 @@ describe('resolveConfig', () => {
       scopedRules: [],
       adapters: [],
       baseline: null,
+      reporters: [],
     });
   });
 

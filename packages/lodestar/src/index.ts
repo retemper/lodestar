@@ -19,6 +19,18 @@ export {
   validateConfig,
   runRule,
   resolvePlugins,
+  createCompositeReporter,
+  createDiskCacheProvider,
+  createDefaultResolverChain,
+  createLogger,
+  silentLogger,
+  createRelativeResolver,
+  createResolverChain,
+  createTsconfigPathsResolver,
+  createWatcher,
+  getChangedFiles,
+  computeImpactScope,
+  createScopedFsProvider,
 } from '@retemper/lodestar-core';
 
 // Re-export all types
@@ -54,18 +66,34 @@ export type {
   ModuleGraph,
   ModuleNode,
   ImportInfo,
+  ImportKind,
   ExportInfo,
+
+  // Logger
+  LogLevel,
+  Logger,
+
+  // Resolver
+  ModuleResolver,
+  ResolveContext,
 
   // Reporter
   Reporter,
+  WorkspaceReporter,
+  WorkspacePackageInfo,
+  ReporterFactory,
+  ReporterEntry,
   RuleResultSummary,
   RunSummary,
 } from '@retemper/lodestar-types';
 
 export type {
+  CreateLoggerOptions,
   RunOptions,
+  WatchCycleSummary,
+  WatcherHandle,
+  WatchOptions,
   WorkspaceRunOptions,
-  WorkspaceReporter,
   WorkspaceSummary,
   PackageSummary,
 } from '@retemper/lodestar-core';

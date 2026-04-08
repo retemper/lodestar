@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@retemper/lodestar', () => ({
   loadConfigFile: vi.fn(),
+  createLogger: vi.fn(() => ({
+    debug: vi.fn((...args: unknown[]) => console.error(...args)),
+    error: vi.fn((...args: unknown[]) => console.error(...args)),
+    info: vi.fn((...args: unknown[]) => console.error(...args)),
+    warn: vi.fn((...args: unknown[]) => console.error(...args)),
+  })),
 }));
 
 import { setupCommand } from './setup';
@@ -27,7 +33,6 @@ describe('setupCommand', () => {
 
     expect(console.error).toHaveBeenCalledWith(
       expect.stringContaining('No lodestar.config.ts found'),
-      expect.any(String),
     );
     expect(process.exitCode).toBe(1);
   });

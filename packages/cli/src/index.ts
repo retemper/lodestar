@@ -5,6 +5,7 @@ import { initCommand } from './commands/init';
 import { impactCommand } from './commands/impact';
 import { graphCommand } from './commands/graph';
 import { setupCommand } from './commands/setup';
+import { watchCommand } from './commands/watch';
 
 /** Create the lodestar CLI instance */
 function createCli() {
@@ -19,7 +20,7 @@ function createCli() {
           .option('format', {
             type: 'string',
             default: 'console',
-            choices: ['console', 'json'],
+            choices: ['console', 'json', 'sarif', 'junit'],
             describe: 'Output format',
           })
           .option('workspace', {
@@ -35,6 +36,24 @@ function createCli() {
             type: 'boolean',
             default: false,
             describe: 'Auto-fix violations where possible',
+          })
+          .option('cache', {
+            type: 'boolean',
+            default: true,
+            describe: 'Use disk cache for faster repeated runs (--no-cache to disable)',
+          })
+          .option('clear-cache', {
+            type: 'boolean',
+            default: false,
+            describe: 'Clear the disk cache before running',
+          })
+          .option('changed', {
+            type: 'string',
+            describe: 'Only check files changed since a base ref (default: git status)',
+          })
+          .option('concurrency', {
+            type: 'number',
+            describe: 'Max packages to run in parallel in workspace mode (default: 4)',
           }),
       checkCommand,
     )
@@ -79,10 +98,53 @@ function createCli() {
             type: 'boolean',
             default: false,
             describe: 'Show layer-level architecture graph (requires architecture/layers rule)',
+          })
+          .option('serve', {
+            type: 'boolean',
+            default: false,
+            describe: 'Start interactive graph viewer in the browser',
+          })
+          .option('port', {
+            type: 'number',
+            default: 4040,
+            describe: 'Port for the interactive graph server',
           }),
       graphCommand,
     )
     .command('setup', 'Run adapter setup (e.g., husky git hooks)', () => {}, setupCommand)
+    .command(
+      'watch',
+      'Watch for file changes and re-run affected rules',
+      (y) =>
+        y
+          .option('format', {
+            type: 'string',
+            default: 'console',
+            choices: ['console', 'json'],
+            describe: 'Output format',
+          })
+          .option('rule', {
+            type: 'array',
+            string: true,
+            describe: 'Only run specific rules',
+          })
+          .option('fix', {
+            type: 'boolean',
+            default: false,
+            describe: 'Auto-fix violations where possible',
+          })
+          .option('cache', {
+            type: 'boolean',
+            default: true,
+            describe: 'Use disk cache (--no-cache to disable)',
+          })
+          .option('debounce', {
+            type: 'number',
+            default: 300,
+            describe: 'Debounce interval in milliseconds',
+          }),
+      watchCommand,
+    )
     .demandCommand(1, 'Please specify a command')
     .strict()
     .help();
@@ -94,5 +156,6 @@ export { initCommand } from './commands/init';
 export { impactCommand } from './commands/impact';
 export { graphCommand } from './commands/graph';
 export { setupCommand } from './commands/setup';
+export { watchCommand } from './commands/watch';
 export { createConsoleReporter } from './reporters/console';
 export { createJsonReporter } from './reporters/json';
