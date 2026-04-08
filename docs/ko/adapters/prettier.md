@@ -46,3 +46,17 @@ prettierAdapter({
 5. `.prettierrc`가 일치하면 위반을 반환하지 않습니다.
 
 드리프트는 `.prettierrc` 파일이 수동으로 편집되었거나 다른 도구에 의해 덮어씌워져, lodestar 설정을 더 이상 반영하지 않음을 의미합니다. `lodestar check --fix`를 실행하면 파일을 재생성하여 위반을 해결합니다.
+
+## check 동작 방식
+
+어댑터는 CLI를 통해 Prettier를 실행합니다:
+
+1. 설정된 파일 패턴(또는 기본 파일 타입)으로 `prettier --check`를 실행합니다.
+2. 출력을 파싱하여 올바르게 포맷되지 않은 파일을 식별합니다.
+3. 포맷되지 않은 각 파일은 규칙 ID `prettier/format`으로 `Violation`을 보고합니다.
+
+모든 포맷팅 위반은 심각도 `'warn'`으로 보고됩니다.
+
+## 자동 수정
+
+어댑터는 `fix()`를 구현하며, 설정된 파일 패턴에 대해 `prettier --write`를 실행합니다. `lodestar check --fix`를 실행하면 모든 파일을 자동 포맷합니다.

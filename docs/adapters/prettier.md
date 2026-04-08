@@ -46,3 +46,17 @@ prettierAdapter({
 5. Returns no violations if `.prettierrc` matches.
 
 Drift means the `.prettierrc` file was manually edited or overwritten by another tool, so it no longer reflects the lodestar config. Running `lodestar check --fix` regenerates the file to resolve the violation.
+
+## How check Works
+
+The adapter runs Prettier via the CLI:
+
+1. Executes `prettier --check` with the configured file patterns (or defaults to common file types).
+2. Parses the output to identify files that are not formatted correctly.
+3. Each unformatted file is reported as a `Violation` with rule ID `prettier/format`.
+
+All formatting violations are reported with severity `'warn'`.
+
+## Auto-fix
+
+The adapter implements `fix()`, which runs `prettier --write` on the configured file patterns. Running `lodestar check --fix` invokes this to auto-format all files in place.

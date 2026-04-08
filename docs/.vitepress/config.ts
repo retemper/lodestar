@@ -93,6 +93,17 @@ export default defineConfig({
               items: [
                 { text: '커스텀 규칙', link: '/ko/guide/custom-rules' },
                 { text: '커스텀 플러그인', link: '/ko/guide/custom-plugins' },
+                { text: '자동 수정', link: '/ko/guide/fixes' },
+                { text: '커스텀 Reporter', link: '/ko/guide/custom-reporters' },
+              ],
+            },
+            {
+              text: '참고',
+              items: [
+                { text: 'CI/CD 연동', link: '/ko/guide/ci' },
+                { text: '기존 프로젝트 도입', link: '/ko/guide/migration' },
+                { text: '고급 패턴', link: '/ko/guide/advanced-patterns' },
+                { text: '문제 해결', link: '/ko/guide/troubleshooting' },
               ],
             },
           ],
@@ -196,6 +207,17 @@ export default defineConfig({
           items: [
             { text: 'Custom Rules', link: '/guide/custom-rules' },
             { text: 'Custom Plugins', link: '/guide/custom-plugins' },
+            { text: 'Auto-fix', link: '/guide/fixes' },
+            { text: 'Custom Reporters', link: '/guide/custom-reporters' },
+          ],
+        },
+        {
+          text: 'Reference',
+          items: [
+            { text: 'CI/CD Integration', link: '/guide/ci' },
+            { text: 'Adopting Lodestar', link: '/guide/migration' },
+            { text: 'Advanced Patterns', link: '/guide/advanced-patterns' },
+            { text: 'Troubleshooting', link: '/guide/troubleshooting' },
           ],
         },
       ],
