@@ -76,9 +76,10 @@ function createWatcher(options: WatchOptions): WatcherHandle {
 
   const fsWatcher = watch(rootDir, { recursive: true }, (_event, filename) => {
     if (closed || !filename) return;
-    if (shouldIgnore(filename, ignorePatterns)) return;
+    const normalized = filename.replace(/\\/g, '/');
+    if (shouldIgnore(normalized, ignorePatterns)) return;
 
-    pendingFiles.add(filename);
+    pendingFiles.add(normalized);
     scheduleRun();
   });
 
@@ -102,8 +103,10 @@ function createWatcher(options: WatchOptions): WatcherHandle {
       const providers = createProviders(rootDir, cache);
       const graph = await providers.graph.getModuleGraph();
 
-      // Resolve changed file paths relative to rootDir
-      const resolvedChanges = changedFiles.map((f) => relative(rootDir, resolve(rootDir, f)));
+      // Resolve changed file paths relative to rootDir (normalize to forward slashes for cross-platform)
+      const resolvedChanges = changedFiles.map((f) =>
+        relative(rootDir, resolve(rootDir, f)).replace(/\\/g, '/'),
+      );
       const scope = computeImpactScope(resolvedChanges, graph);
 
       const summary = await run({ config, reporter, fix, cache, scope });
@@ -140,7 +143,7 @@ function createWatcher(options: WatchOptions): WatcherHandle {
 
 /** Check if a file path matches any ignore pattern */
 function shouldIgnore(filePath: string, patterns: readonly string[]): boolean {
-  const segments = filePath.split('/');
+  const segments = filePath.split(/[/\\]/);
   return segments.some((segment) => patterns.includes(segment));
 }
 

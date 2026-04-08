@@ -182,7 +182,7 @@ describe('resolveReporterEntry', () => {
       onViolation() {},
       onComplete() {},
     };
-    const factory: ReporterFactory = { create: () => mockReporter };
+    const factory: ReporterFactory = { name: 'mock', create: () => mockReporter };
 
     const result = resolveReporterEntry(factory);
     expect(result).toBe(mockReporter);
@@ -195,7 +195,7 @@ describe('resolveReporterEntry', () => {
       onViolation() {},
       onComplete() {},
     };
-    const factory: ReporterFactory = { create: () => mockReporter };
+    const factory: ReporterFactory = { name: 'mock', create: () => mockReporter };
 
     const result = resolveReporterEntry([factory, { output: 'test.sarif' }]);
     expect(result).toBe(mockReporter);
@@ -210,7 +210,7 @@ describe('resolveConfig — reporters', () => {
       onViolation() {},
       onComplete() {},
     };
-    const factory: ReporterFactory = { create: () => mockReporter };
+    const factory: ReporterFactory = { name: 'mock', create: () => mockReporter };
 
     const result = resolveConfig(
       { plugins: [], rules: {}, reporters: [factory] },

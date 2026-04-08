@@ -11,9 +11,11 @@ export default defineConfig([
         severity: 'error',
         options: {
           layers: [
-            { name: 'providers', path: 'src/providers/**/*.ts' },
+            { name: 'utils', path: 'src/{cache,logger,incremental}.ts' },
+            { name: 'resolvers', path: 'src/resolvers/**/*.ts', canImport: ['utils'] },
+            { name: 'providers', path: 'src/providers/**/*.ts', canImport: ['utils'] },
             { name: 'eslint', path: 'src/eslint/**/*.ts' },
-            { name: 'engine', path: 'src/*.ts', canImport: ['providers', 'eslint'] },
+            { name: 'engine', path: 'src/{engine,workspace-runner,watcher,composite-reporter,validate}.ts', canImport: ['providers', 'resolvers', 'eslint', 'utils'] },
           ],
         },
       },
