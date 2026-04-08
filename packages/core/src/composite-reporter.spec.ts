@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import type { WorkspaceReporter, RunSummary, RuleResultSummary } from '@retemper/lodestar-types';
 import { createCompositeReporter } from './composite-reporter';
 
-/** 모든 메서드가 spy인 WorkspaceReporter 생성 */
+/** Create a WorkspaceReporter where every method is a spy */
 function makeReporter(name: string): WorkspaceReporter {
   return {
     name,
@@ -16,7 +16,7 @@ function makeReporter(name: string): WorkspaceReporter {
   };
 }
 
-/** 최소 RunSummary */
+/** Create a minimal RunSummary */
 function makeSummary(): RunSummary {
   return {
     totalFiles: 0,
