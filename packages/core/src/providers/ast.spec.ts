@@ -399,19 +399,18 @@ const c = import('./dynamic');
 
   describe('disk cache', () => {
     /** Create a mock CacheProvider */
-    function createMockCache(): CacheProvider {
+    function createMockCache(): CacheProvider & { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn>; clear: ReturnType<typeof vi.fn> } {
       const store = new Map<string, unknown>();
-      return {
-        get: vi.fn(async (namespace: string, key: string) => {
-          return store.get(`${namespace}:${key}`) ?? null;
-        }),
-        set: vi.fn(async (namespace: string, key: string, value: unknown) => {
-          store.set(`${namespace}:${key}`, value);
-        }),
-        clear: vi.fn(async () => {
-          store.clear();
-        }),
-      };
+      const get = vi.fn(async (namespace: string, key: string) => {
+        return store.get(`${namespace}:${key}`) ?? null;
+      });
+      const set = vi.fn(async (namespace: string, key: string, value: unknown) => {
+        store.set(`${namespace}:${key}`, value);
+      });
+      const clear = vi.fn(async () => {
+        store.clear();
+      });
+      return { get, set, clear } as CacheProvider & { get: typeof get; set: typeof set; clear: typeof clear };
     }
 
     /** Creates fixture with disk cache */
@@ -501,17 +500,16 @@ const c = import('./dynamic');
         { source: './z', specifiers: ['z'], isTypeOnly: false, location: { file: 'cached.ts' }, kind: 'static' },
       ];
 
-      const cache: CacheProvider = {
-        get: vi.fn(async () => cachedImports),
-        set: vi.fn(async () => {}),
-        clear: vi.fn(async () => {}),
-      };
+      const get = vi.fn(async () => cachedImports);
+      const set = vi.fn();
+      const clear = vi.fn();
+      const cache = { get, set, clear } as unknown as CacheProvider;
 
       const provider = createASTProvider(rootDir, cache);
       const result = await provider.getImports('cached.ts');
 
       expect(result).toBe(cachedImports);
-      expect(cache.set).not.toHaveBeenCalled();
+      expect(set).not.toHaveBeenCalled();
     });
 
     it('getExports 디스크 캐시 히트 시 set을 호출하지 않는다', async () => {
@@ -522,17 +520,16 @@ const c = import('./dynamic');
 
       const cachedExports = [{ name: 'a', isTypeOnly: false, isDefault: false }];
 
-      const cache: CacheProvider = {
-        get: vi.fn(async () => cachedExports),
-        set: vi.fn(async () => {}),
-        clear: vi.fn(async () => {}),
-      };
+      const get = vi.fn(async () => cachedExports);
+      const set = vi.fn();
+      const clear = vi.fn();
+      const cache = { get, set, clear } as unknown as CacheProvider;
 
       const provider = createASTProvider(rootDir, cache);
       const result = await provider.getExports('exp.ts');
 
       expect(result).toBe(cachedExports);
-      expect(cache.set).not.toHaveBeenCalled();
+      expect(set).not.toHaveBeenCalled();
     });
   });
 });
