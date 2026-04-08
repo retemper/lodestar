@@ -64,3 +64,18 @@ export default await fromLodestar();
 5. 브릿지 파일이 정확하면 위반을 반환하지 않습니다.
 
 드리프트는 브릿지 파일이 수동으로 편집되었거나 다른 도구에 의해 생성되었음을 의미합니다. 수정 방법은 lodestar가 파일을 재생성하도록 하는 것입니다.
+
+## check 동작 방식
+
+어댑터는 ESLint의 Node API를 사용하여 프로그래밍 방식으로 파일을 린트합니다:
+
+1. 어댑터 옵션(presets, plugins, rules, overrides)으로 flat config를 빌드합니다.
+2. `overrideConfigFile: true`로 `ESLint` 인스턴스를 생성하여 검사 중에는 브릿지 파일을 우회합니다.
+3. 설정된 파일 패턴에 대해 `eslint.lintFiles()`를 실행합니다.
+4. 각 ESLint 메시지를 원본 ESLint 규칙 ID에 `eslint/` 접두사를 붙여 lodestar `Violation`으로 매핑합니다.
+
+심각도 매핑: ESLint 심각도 `2`는 `'error'`, 심각도 `1`은 `'warn'`이 됩니다.
+
+## 자동 수정
+
+어댑터는 `fix()`를 구현하며, `fix: true`가 활성화된 상태로 ESLint를 실행합니다. `lodestar check --fix`를 실행하면 적용 가능한 ESLint 위반을 자동 수정한 후 `ESLint.outputFixes()`를 통해 변경 사항을 디스크에 기록합니다.

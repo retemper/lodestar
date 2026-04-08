@@ -103,6 +103,13 @@ npx lodestar graph --layers
 
 심각도가 `error`인 위반이 있으면 0이 아닌 종료 코드를 반환합니다.
 
+## 예제
+
+[`examples/`](https://github.com/retemper/lodestar/tree/main/examples) 디렉토리에서 완전한 작동 프로젝트를 확인하세요:
+
+- **[클린 아키텍처](https://github.com/retemper/lodestar/tree/main/examples/clean-architecture)** — Domain/Application/Infra 레이어와 ESLint, Prettier, Husky 어댑터
+- **[헥사고날 아키텍처](https://github.com/retemper/lodestar/tree/main/examples/hexagonal)** — Ports & Adapters 패턴의 Core/Adapters/Config 레이어
+
 ## 다음 단계
 
 - [규칙(Rules)](/ko/guide/rules) -- 규칙의 작동 방식

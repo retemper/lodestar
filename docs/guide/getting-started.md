@@ -103,6 +103,13 @@ Shows your declared architecture as a Mermaid diagram with actual dependency cou
 
 Any violation with severity `error` causes a non-zero exit code.
 
+## Examples
+
+See complete working projects in the [`examples/`](https://github.com/retemper/lodestar/tree/main/examples) directory:
+
+- **[Clean Architecture](https://github.com/retemper/lodestar/tree/main/examples/clean-architecture)** — Domain/Application/Infra layers with ESLint, Prettier, and Husky adapters
+- **[Hexagonal Architecture](https://github.com/retemper/lodestar/tree/main/examples/hexagonal)** — Ports & Adapters pattern with Core/Adapters/Config layers
+
 ## Next Steps
 
 - [Rules](/guide/rules) — How rules work
