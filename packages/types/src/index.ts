@@ -18,6 +18,7 @@ export type {
   ImportKind,
   ExportInfo,
   ConfigFileProvider,
+  GitProvider,
   RuleContext,
   RuleProviders,
   RuleDefinition,

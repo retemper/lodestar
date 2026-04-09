@@ -1,7 +1,7 @@
 import type { JSONSchema7 } from './json-schema';
 
 /** Data source identifiers that rules can request */
-type ProviderKey = 'fs' | 'graph' | 'ast' | 'config';
+type ProviderKey = 'fs' | 'graph' | 'ast' | 'config' | 'git';
 
 /** Source location within a file */
 interface SourceLocation {
@@ -127,13 +127,30 @@ interface ConfigFileProvider {
   getCustomConfig<T = unknown>(filename: string, dir?: string): Promise<T>;
 }
 
+/** Git provider — read-only git operations for diff-aware rules */
+interface GitProvider {
+  /** List files staged in the current index */
+  stagedFiles(): Promise<readonly string[]>;
+  /** List files changed between two refs (defaults head to 'HEAD') */
+  diffFiles(base: string, head?: string): Promise<readonly string[]>;
+  /** Get the unified diff content for a single file */
+  diffContent(
+    file: string,
+    options?: { staged?: boolean; base?: string },
+  ): Promise<string>;
+  /** Get the current branch name, or null if in detached HEAD */
+  currentBranch(): Promise<string | null>;
+  /** Check whether ancestor is an ancestor of descendant (defaults to 'HEAD') */
+  isAncestor(ancestor: string, descendant?: string): Promise<boolean>;
+}
+
 /** Context injected into every rule's check function */
 interface RuleContext<TOptions = Record<string, unknown>> {
   /** Absolute path to the project root directory */
   readonly rootDir: string;
   /** User-supplied options for this rule, validated against the rule's schema */
   readonly options: Readonly<TOptions>;
-  /** Data providers (fs, graph, ast, config) available for inspection */
+  /** Data providers (fs, graph, ast, config, git) available for inspection */
   readonly providers: RuleProviders;
   /** Report a violation — ruleId and severity are filled in automatically by the engine */
   report(violation: Omit<Violation, 'ruleId' | 'severity'>): void;
@@ -151,6 +168,8 @@ interface RuleProviders {
   readonly ast: ASTProvider;
   /** Project configuration file access */
   readonly config: ConfigFileProvider;
+  /** Git operations — available when the project is inside a git repository */
+  readonly git: GitProvider;
 }
 
 /** Rule definition — the unit of architectural enforcement */
@@ -187,6 +206,7 @@ export type {
   ImportKind,
   ExportInfo,
   ConfigFileProvider,
+  GitProvider,
   RuleContext,
   RuleProviders,
   RuleDefinition,

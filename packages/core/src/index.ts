@@ -21,6 +21,7 @@ export {
   createResolverChain,
   createTsconfigPathsResolver,
 } from './resolvers';
+export { createGitProvider } from './providers/git';
 
 export type { RunOptions } from './engine';
 export type { RuleResult } from './runner';
