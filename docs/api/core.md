@@ -15,6 +15,8 @@ const summary = await run({
   config: resolvedConfig,
   reporter: myReporter, // optional
   fix: true, // optional -- auto-fix violations
+  cache: cacheProvider, // optional -- disk cache provider
+  scope: fileSet, // optional -- Set<string> to limit checked files
 });
 ```
 
@@ -41,6 +43,9 @@ const summary = await runWorkspace({
   rootDir: '/monorepo/root',
   rootConfig: writtenConfig,
   reporter: workspaceReporter, // optional
+  fix: true, // optional
+  cache: cacheProvider, // optional
+  concurrency: 4, // optional -- parallel package limit (default: 4)
 });
 ```
 
@@ -53,6 +58,80 @@ Create the provider map for a given root directory.
 ```ts
 const providers = createProviders('/project/root');
 // providers.fs, providers.graph, providers.ast, providers.config
+```
+
+## `createLogger(options?)`
+
+Create a structured logger with level filtering.
+
+```ts
+import { createLogger, silentLogger } from '@retemper/lodestar-core';
+
+const logger = createLogger({ level: 'warn' }); // only warn + error
+logger.info('skipped'); // not printed
+logger.error('printed'); // printed to stderr
+```
+
+| Option  | Type                    | Default                | Description                                                        |
+| ------- | ----------------------- | ---------------------- | ------------------------------------------------------------------ |
+| `level` | `LogLevel`              | `'info'`               | Minimum level to emit (`debug`, `info`, `warn`, `error`, `silent`) |
+| `write` | `(msg: string) => void` | `process.stderr.write` | Custom output function                                             |
+
+`silentLogger` is a no-op logger that discards all messages. Useful for testing.
+
+## `createDiskCacheProvider(rootDir)`
+
+Create a file-system cache provider for rule result caching.
+
+```ts
+import { createDiskCacheProvider } from '@retemper/lodestar-core';
+
+const cache = createDiskCacheProvider('/project/root');
+await cache.clear(); // manually clear cache
+```
+
+The cache stores rule results keyed by file content hash. Unchanged files are skipped on subsequent runs.
+
+## `createWatcher(options)`
+
+Start watching a project for file changes and re-run rules on each change.
+
+```ts
+import { createWatcher } from '@retemper/lodestar-core';
+
+const handle = createWatcher({
+  config: resolvedConfig,
+  debounceMs: 300,
+  logger,
+  onCycle(summary) {
+    console.log(`${summary.changedFiles.length} changed, ${summary.errorCount} errors`);
+  },
+});
+
+// Later: stop watching
+handle.close();
+```
+
+## `getChangedFiles(rootDir, base?)`
+
+Get files changed since a git ref using `git diff`.
+
+```ts
+import { getChangedFiles } from '@retemper/lodestar-core';
+
+const files = await getChangedFiles('/project', 'main');
+// ['src/a.ts', 'src/b.ts']
+```
+
+## `computeImpactScope(changedFiles, graph)`
+
+Compute the transitive set of files affected by a list of changed files, using the module dependency graph.
+
+```ts
+import { computeImpactScope } from '@retemper/lodestar-core';
+
+const scope = computeImpactScope(changedFiles, moduleGraph);
+// Set<string> of all affected files
 ```
 
 ---

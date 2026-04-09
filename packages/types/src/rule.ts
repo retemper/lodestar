@@ -88,6 +88,9 @@ interface ASTProvider {
   getExports(path: string): Promise<readonly ExportInfo[]>;
 }
 
+/** Import statement kind */
+type ImportKind = 'static' | 'require' | 'dynamic';
+
 /** Parsed import information */
 interface ImportInfo {
   /** The module specifier string (e.g., "./utils" or "lodash") */
@@ -98,6 +101,8 @@ interface ImportInfo {
   readonly isTypeOnly: boolean;
   /** Position of the import statement in the source file */
   readonly location: SourceLocation;
+  /** How this module is imported — static, require(), or dynamic import() */
+  readonly kind: ImportKind;
 }
 
 /** Parsed export information */
@@ -179,6 +184,7 @@ export type {
   ModuleGraph,
   ASTProvider,
   ImportInfo,
+  ImportKind,
   ExportInfo,
   ConfigFileProvider,
   RuleContext,

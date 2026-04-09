@@ -21,6 +21,7 @@ function makeConfig(ruleIds: string[]): ResolvedConfig {
     scopedRules: [],
     adapters: [],
     baseline: null,
+    reporters: [],
   };
 }
 

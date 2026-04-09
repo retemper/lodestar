@@ -8,13 +8,17 @@
 npx lodestar check [options]
 ```
 
-| 플래그           | 타입       | 기본값    | 설명                                                                                                       |
-| ---------------- | ---------- | --------- | ---------------------------------------------------------------------------------------------------------- |
-| `--format`       | `string`   | `console` | 출력 형식. 선택지: `console`, `json`                                                                       |
-| `--workspace`    | `boolean`  | 자동 감지 | 워크스페이스 모드 강제 활성화                                                                              |
-| `--no-workspace` | `boolean`  |           | 워크스페이스 모드 비활성화                                                                                 |
-| `--rule`         | `string[]` | 전체 규칙 | 특정 규칙만 실행. 정확한 일치(`naming-convention/file-naming`) 및 접두사 와일드카드(`architecture/*`) 지원 |
-| `--fix`          | `boolean`  | `false`   | 가능한 경우 위반 사항 자동 수정                                                                            |
+| 플래그           | 타입                | 기본값    | 설명                                                                                                                |
+| ---------------- | ------------------- | --------- | ------------------------------------------------------------------------------------------------------------------- |
+| `--format`       | `string`            | `console` | 출력 형식. 선택지: `console`, `json`, `sarif`, `junit`                                                              |
+| `--workspace`    | `boolean`           | 자동 감지 | 워크스페이스 모드 강제 활성화                                                                                       |
+| `--no-workspace` | `boolean`           |           | 워크스페이스 모드 비활성화                                                                                          |
+| `--rule`         | `string[]`          | 전체 규칙 | 특정 규칙만 실행. 정확한 일치(`naming-convention/file-naming`) 및 접두사 와일드카드(`architecture/*`) 지원          |
+| `--fix`          | `boolean`           | `false`   | 가능한 경우 위반 사항 자동 수정                                                                                     |
+| `--cache`        | `boolean`           | `true`    | 빠른 재실행을 위한 디스크 캐시 활성화                                                                               |
+| `--clear-cache`  | `boolean`           | `false`   | 실행 전 캐시 삭제                                                                                                   |
+| `--changed`      | `string \| boolean` |           | 주어진 git ref 이후 변경된 파일만 검사 (ref 생략 시 HEAD 기준). 간접 영향 범위(transitive impact scope)를 자동 계산 |
+| `--concurrency`  | `number`            | `4`       | 병렬로 검사할 패키지 수 (워크스페이스 모드 전용)                                                                    |
 
 `--workspace`를 생략하면 `pnpm-workspace.yaml` 또는 `package.json`의 workspaces 필드를 확인하여 워크스페이스 모드를 자동 감지합니다. 워크스페이스 모드에서는 발견된 각 패키지와 루트에 대해 규칙을 실행한 뒤 집계 요약을 출력합니다.
 
@@ -29,6 +33,34 @@ npx lodestar check --rule "architecture/*"
 
 # 여러 특정 규칙 실행
 npx lodestar check --rule architecture/layers --rule naming-convention/file-naming
+```
+
+### 증분 검사(Incremental Checking)
+
+`--changed` 플래그는 증분 모드를 활성화합니다. Lodestar는 변경 사항에 영향받는 파일(모듈 그래프를 통한 간접 의존자)을 계산하고 해당 파일만 검사합니다:
+
+```sh
+# HEAD 이후 변경된 파일 검사 (커밋되지 않은 변경 사항)
+npx lodestar check --changed
+
+# 특정 브랜치 또는 커밋 이후 변경된 파일 검사
+npx lodestar check --changed main
+npx lodestar check --changed abc1234
+```
+
+### 캐싱(Caching)
+
+Lodestar는 규칙 실행 결과를 디스크에 캐시합니다. 마지막 실행 이후 변경되지 않은 파일은 자동으로 건너뜁니다:
+
+```sh
+# 캐싱은 기본적으로 활성화됨
+npx lodestar check
+
+# 캐싱 비활성화
+npx lodestar check --no-cache
+
+# 캐시를 삭제하고 처음부터 다시 실행
+npx lodestar check --clear-cache
 ```
 
 **종료 코드:**
@@ -98,6 +130,8 @@ npx lodestar graph [options]
 | `--scope`  | `string`  | 전체 파일 | 이 경로 접두사와 일치하는 파일만 표시 (예: `src/domain`)                                |
 | `--format` | `string`  | `mermaid` | 출력 형식. 선택지: `mermaid`, `dot`                                                     |
 | `--layers` | `boolean` | `false`   | 파일 수준 대신 레이어 수준 아키텍처 그래프 표시. 설정에 `architecture/layers` 규칙 필요 |
+| `--serve`  | `boolean` | `false`   | 브라우저에서 인터랙티브 그래프 뷰어 시작                                                |
+| `--port`   | `number`  | `4040`    | 인터랙티브 그래프 서버 포트 (`--serve`와 함께 사용)                                     |
 
 **파일 수준 모드** (기본값)는 소스 파일 간의 모든 임포트 엣지를 출력합니다. `--scope`를 사용하여 특정 디렉토리로 출력을 제한할 수 있습니다:
 
@@ -112,6 +146,40 @@ npx lodestar graph --format dot | dot -Tsvg -o deps.svg
 npx lodestar graph --layers
 npx lodestar graph --layers --format dot
 ```
+
+**인터랙티브 모드** (`--serve`)는 시각적 그래프 탐색기를 제공하는 로컬 HTTP 서버를 시작합니다. 뷰어는 검색, 필터링, 레이어별 색상 구분, 노드 선택을 지원합니다:
+
+```sh
+npx lodestar graph --serve
+npx lodestar graph --serve --port 8080
+```
+
+---
+
+## `lodestar watch`
+
+Watch 모드로 규칙을 실행합니다 — 파일을 저장할 때마다 영향받는 파일을 다시 검사합니다.
+
+```sh
+npx lodestar watch [options]
+```
+
+| 플래그       | 타입       | 기본값    | 설명                                                                      |
+| ------------ | ---------- | --------- | ------------------------------------------------------------------------- |
+| `--format`   | `string`   | `console` | 출력 형식. 선택지: `console`, `json`                                      |
+| `--rule`     | `string[]` | 전체 규칙 | 특정 규칙만 실행. 정확한 일치 및 접두사 와일드카드(`architecture/*`) 지원 |
+| `--fix`      | `boolean`  | `false`   | 가능한 경우 위반 사항 자동 수정                                           |
+| `--cache`    | `boolean`  | `true`    | 빠른 재실행을 위한 디스크 캐시 활성화                                     |
+| `--debounce` | `number`   | `300`     | 디바운스 간격 (밀리초)                                                    |
+
+각 파일 변경 시, lodestar는 간접 영향 범위를 계산하고 영향받는 규칙만 다시 실행합니다. 각 주기 후 요약이 출력됩니다:
+
+```
+Watch: 1 changed → 3 in scope | 0 errors, 0 warnings (42ms)
+  Files: src/core/engine.ts
+```
+
+`Ctrl+C`로 종료합니다.
 
 ---
 

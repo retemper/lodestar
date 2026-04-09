@@ -10,6 +10,7 @@ function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
     rules: new Map(),
     scopedRules: [],
     baseline: null,
+    reporters: [],
     adapters: [],
     ...overrides,
   };

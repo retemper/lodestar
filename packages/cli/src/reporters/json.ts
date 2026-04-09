@@ -1,12 +1,17 @@
-import type { Reporter, Violation, RunSummary } from '@retemper/lodestar';
+import type {
+  WorkspaceReporter,
+  WorkspacePackageInfo,
+  Violation,
+  RunSummary,
+} from '@retemper/lodestar';
 
 /** Create a JSON reporter that outputs structured results to stdout */
-function createJsonReporter(): Reporter {
+function createJsonReporter(): WorkspaceReporter {
   const violations: Violation[] = [];
 
   return {
     name: 'json',
-    /** No-op -- JSON output is deferred to onComplete */
+    /** No-op — JSON output is deferred to onComplete */
     onStart() {},
     /** Collect each violation for later serialization */
     onViolation(violation: Violation) {
@@ -25,6 +30,10 @@ function createJsonReporter(): Reporter {
       };
       process.stdout.write(JSON.stringify(output, null, 2));
     },
+    /** No-op — package boundaries not relevant for JSON output */
+    onPackageStart(_pkg: WorkspacePackageInfo) {},
+    /** No-op */
+    onPackageComplete(_pkg: WorkspacePackageInfo, _summary: RunSummary) {},
   };
 }
 

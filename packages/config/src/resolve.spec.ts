@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import type { Plugin, PluginFactory } from '@retemper/lodestar-types';
-import { resolveConfig, resolvePluginEntry, normalizeRuleConfig } from './resolve';
+import type {
+  Plugin,
+  PluginFactory,
+  ReporterFactory,
+  WorkspaceReporter,
+} from '@retemper/lodestar-types';
+import {
+  resolveConfig,
+  resolvePluginEntry,
+  normalizeRuleConfig,
+  resolveReporterEntry,
+} from './resolve';
 
 describe('normalizeRuleConfig', () => {
   it('severity 문자열을 기본 options와 함께 정규화한다', () => {
@@ -46,6 +56,7 @@ describe('resolveConfig', () => {
       scopedRules: [],
       adapters: [],
       baseline: null,
+      reporters: [],
     });
   });
 
@@ -165,5 +176,60 @@ describe('resolvePluginEntry', () => {
     expect(result.name).toBe('string-plugin');
     expect(result.plugin.name).toBe('string-plugin');
     expect(result.options).toStrictEqual({});
+  });
+});
+
+describe('resolveReporterEntry', () => {
+  it('문자열 엔트리는 null을 반환한다', () => {
+    const result = resolveReporterEntry('console');
+    expect(result).toBeNull();
+  });
+
+  it('create 메서드가 있는 팩토리 객체를 해석한다', () => {
+    const mockReporter: WorkspaceReporter = {
+      name: 'mock',
+      onStart() {},
+      onViolation() {},
+      onComplete() {},
+    };
+    const factory: ReporterFactory = { name: 'mock', create: () => mockReporter };
+
+    const result = resolveReporterEntry(factory);
+    expect(result).toBe(mockReporter);
+  });
+
+  it('튜플 [factory, options] 형태를 해석한다', () => {
+    const mockReporter: WorkspaceReporter = {
+      name: 'mock-with-opts',
+      onStart() {},
+      onViolation() {},
+      onComplete() {},
+    };
+    const factory: ReporterFactory = { name: 'mock', create: () => mockReporter };
+
+    const result = resolveReporterEntry([factory, { output: 'test.sarif' }]);
+    expect(result).toBe(mockReporter);
+  });
+});
+
+describe('resolveConfig — reporters', () => {
+  it('설정 블록의 reporters를 해석하여 반환한다', () => {
+    const mockReporter: WorkspaceReporter = {
+      name: 'test-reporter',
+      onStart() {},
+      onViolation() {},
+      onComplete() {},
+    };
+    const factory: ReporterFactory = { name: 'mock', create: () => mockReporter };
+
+    const result = resolveConfig({ plugins: [], rules: {}, reporters: [factory] }, '/root');
+
+    expect(result.reporters).toStrictEqual([mockReporter]);
+  });
+
+  it('reporters가 없으면 빈 배열을 반환한다', () => {
+    const result = resolveConfig({ plugins: [], rules: {} }, '/root');
+
+    expect(result.reporters).toStrictEqual([]);
   });
 });

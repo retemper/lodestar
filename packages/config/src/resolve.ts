@@ -9,6 +9,8 @@ import type {
   PluginEntry,
   Plugin,
   ToolAdapter,
+  WorkspaceReporter,
+  ReporterEntry,
 } from '@retemper/lodestar-types';
 
 /**
@@ -24,6 +26,7 @@ function resolveConfig(written: WrittenConfig, rootDir: string): ResolvedConfig 
   const globalRules = new Map<string, ResolvedRuleConfig>();
   const scopedRules: ScopedRuleConfig[] = [];
   const adapterMap = new Map<string, ToolAdapter>();
+  const reporters: WorkspaceReporter[] = [];
 
   for (const block of blocks) {
     // Collect plugins (deduplicate by ID)
@@ -38,6 +41,12 @@ function resolveConfig(written: WrittenConfig, rootDir: string): ResolvedConfig 
     // Collect adapters (deduplicate by name, last wins)
     for (const adapter of block.adapters ?? []) {
       adapterMap.set(adapter.name, adapter);
+    }
+
+    // Collect reporters from config
+    for (const entry of block.reporters ?? []) {
+      const resolved = resolveReporterEntry(entry);
+      if (resolved) reporters.push(resolved);
     }
 
     // Collect rules — global or scoped
@@ -71,6 +80,7 @@ function resolveConfig(written: WrittenConfig, rootDir: string): ResolvedConfig 
     scopedRules,
     adapters: [...adapterMap.values()],
     baseline: null,
+    reporters,
   };
 }
 
@@ -125,4 +135,22 @@ function normalizeRuleConfig(
   };
 }
 
-export { resolveConfig, resolvePluginEntry, normalizeRuleConfig };
+/**
+ * Resolve a reporter entry into a WorkspaceReporter instance.
+ * String entries (built-in names) return null — CLI handles those by name.
+ * @param entry - reporter reference from config
+ */
+function resolveReporterEntry(entry: ReporterEntry): WorkspaceReporter | null {
+  if (typeof entry === 'string') {
+    return null;
+  }
+
+  if ('create' in entry) {
+    return entry.create();
+  }
+
+  const [factory, options] = entry;
+  return factory.create(options);
+}
+
+export { resolveConfig, resolvePluginEntry, normalizeRuleConfig, resolveReporterEntry };

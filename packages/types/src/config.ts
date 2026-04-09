@@ -1,5 +1,6 @@
 import type { Severity, Violation } from './rule';
 import type { Plugin, PluginFactory } from './plugin';
+import type { ReporterEntry, WorkspaceReporter } from './reporter';
 
 /** Adapter for external tools — linters, formatters, git hooks, etc. */
 interface ToolAdapter<TConfig = unknown> {
@@ -31,6 +32,8 @@ interface WrittenConfigBlock {
   readonly rules?: Readonly<Record<string, Severity | WrittenRuleConfig>>;
   /** External tool adapters */
   readonly adapters?: readonly ToolAdapter[];
+  /** Reporter configuration — built-in names or ReporterFactory instances */
+  readonly reporters?: readonly ReporterEntry[];
 }
 
 /**
@@ -79,6 +82,8 @@ interface ResolvedConfig {
   readonly adapters: readonly ToolAdapter[];
   /** Absolute path to the baseline snapshot file, or null */
   readonly baseline: string | null;
+  /** Resolved reporters from config (empty array means use CLI default) */
+  readonly reporters: readonly WorkspaceReporter[];
 }
 
 /** Resolved plugin after module loading */

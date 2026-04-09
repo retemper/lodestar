@@ -23,6 +23,7 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
+    "@retemper/lodestar-core": "workspace:*",
     "@retemper/lodestar-types": "workspace:*"
   },
   "devDependencies": {

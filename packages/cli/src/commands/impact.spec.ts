@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@retemper/lodestar', () => ({
   createProviders: vi.fn(),
+  createLogger: vi.fn(() => ({
+    debug: vi.fn((...args: unknown[]) => console.error(...args)),
+    error: vi.fn((...args: unknown[]) => console.error(...args)),
+    info: vi.fn((...args: unknown[]) => console.error(...args)),
+    warn: vi.fn((...args: unknown[]) => console.error(...args)),
+  })),
 }));
 
 import { collectTransitiveDependents, impactCommand } from './impact';

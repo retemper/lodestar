@@ -1,30 +1,25 @@
-import { dirname, join } from 'node:path';
 import type {
   DependencyGraphProvider,
   ModuleGraph,
   ModuleNode,
+  ModuleResolver,
   ASTProvider,
   FileSystemProvider,
 } from '@retemper/lodestar-types';
-
-/** Convert OS-specific path separators to forward slashes for consistent comparison */
-function toForwardSlash(p: string): string {
-  return p.replaceAll('\\', '/');
-}
-
-/** File extensions to try when resolving imports */
-const RESOLVE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx'];
+import { createDefaultResolverChain } from '../resolvers';
 
 /**
  * Create a dependency graph provider that builds the import graph lazily via AST.
  * @param rootDir - absolute path used as the project root
  * @param astProvider - AST provider for extracting import statements
  * @param fsProvider - file system provider for discovering source files
+ * @param customResolvers - additional resolvers inserted before built-in ones
  */
 function createGraphProvider(
   rootDir: string,
   astProvider?: ASTProvider,
   fsProvider?: FileSystemProvider,
+  customResolvers?: readonly ModuleResolver[],
 ): DependencyGraphProvider {
   const graphCache: { value: ModuleGraph | null } = { value: null };
 
@@ -42,6 +37,12 @@ function createGraphProvider(
     const files = [...allFiles, ...tsxFiles];
     const fileSet = new Set(files);
 
+    const { resolver, setup } = createDefaultResolverChain({
+      rootDir,
+      customResolvers,
+    });
+    await setup();
+
     const depsMap = new Map<string, string[]>();
     const dependentsMap = new Map<string, string[]>();
 
@@ -50,7 +51,11 @@ function createGraphProvider(
       const resolved: string[] = [];
 
       for (const imp of imports) {
-        const target = resolveImport(file, imp.source, fileSet);
+        const target = resolver.resolve({
+          importer: file,
+          source: imp.source,
+          knownFiles: fileSet,
+        });
         if (target) {
           resolved.push(target);
           const deps = dependentsMap.get(target) ?? [];
@@ -98,47 +103,6 @@ function createGraphProvider(
 }
 
 /**
- * Resolve a relative import source to an actual file path.
- * @param importer - relative path of the file containing the import
- * @param source - import specifier (e.g. './utils')
- * @param knownFiles - set of all known project file paths for existence checks
- */
-function resolveImport(importer: string, source: string, knownFiles: Set<string>): string | null {
-  if (!source.startsWith('.') && !source.startsWith('/')) return null;
-
-  const importerDir = dirname(importer);
-  const base = normalizePath(toForwardSlash(join(importerDir, source)));
-
-  if (knownFiles.has(base)) return base;
-
-  for (const ext of RESOLVE_EXTENSIONS) {
-    const candidate = `${base}${ext}`;
-    if (knownFiles.has(candidate)) return candidate;
-  }
-
-  for (const ext of RESOLVE_EXTENSIONS) {
-    const candidate = `${base}/index${ext}`;
-    if (knownFiles.has(candidate)) return candidate;
-  }
-
-  return null;
-}
-
-/** Normalize path segments (resolve . and ..) */
-function normalizePath(p: string): string {
-  const parts: string[] = [];
-  for (const segment of p.split('/')) {
-    if (segment === '.') continue;
-    if (segment === '..') {
-      parts.pop();
-      continue;
-    }
-    if (segment) parts.push(segment);
-  }
-  return parts.join('/');
-}
-
-/**
  * DFS cycle detection from an entry node.
  * @param nodes - the full module graph to traverse
  * @param entry - starting node id for cycle detection
@@ -147,6 +111,7 @@ function detectCycle(nodes: ReadonlyMap<string, ModuleNode>, entry: string): boo
   const visited = new Set<string>();
   const inStack = new Set<string>();
 
+  /** Depth-first search returning true if a cycle is found */
   function dfs(nodeId: string): boolean {
     if (inStack.has(nodeId)) return true;
     if (visited.has(nodeId)) return false;
