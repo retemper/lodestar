@@ -384,11 +384,25 @@ describe('createConsoleReporter', () => {
       expect(line).toContain('3 rules passed');
     });
   });
+
+  describe('logger 없이 생성하면 stderr logger를 사용한다', () => {
+    it('createStderrLogger가 생성되어 동작한다', () => {
+      vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+      const reporter = createConsoleReporter();
+      reporter.onComplete(makeSummary({ durationMs: 10 }));
+
+      expect(process.stderr.write).toHaveBeenCalled();
+      const output = (process.stderr.write as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(output).toContain('rules passed');
+
+      vi.mocked(process.stderr.write).mockRestore();
+    });
+  });
 });
 
 describe('createJsonReporter', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
     vi.restoreAllMocks();
     vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   });
@@ -432,5 +446,22 @@ describe('createJsonReporter', () => {
   it('onStart는 예외를 던지지 않는다', () => {
     const reporter = createJsonReporter();
     expect(() => reporter.onStart({ rootDir: '/root', ruleCount: 3 })).not.toThrow();
+  });
+
+  it('onPackageStart는 예외를 던지지 않는다', () => {
+    const reporter = createJsonReporter();
+    expect(() =>
+      reporter.onPackageStart!({ name: '@retemper/core', dir: '/root/packages/core' }),
+    ).not.toThrow();
+  });
+
+  it('onPackageComplete는 예외를 던지지 않는다', () => {
+    const reporter = createJsonReporter();
+    expect(() =>
+      reporter.onPackageComplete!(
+        { name: '@retemper/core', dir: '/root/packages/core' },
+        makeSummary(),
+      ),
+    ).not.toThrow();
   });
 });

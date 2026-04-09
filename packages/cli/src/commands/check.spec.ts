@@ -25,13 +25,16 @@ vi.mock('@retemper/lodestar', () => ({
   })),
   run: vi.fn(),
   runWorkspace: vi.fn(),
-  createCompositeReporter: vi.fn(),
+  createCompositeReporter: vi.fn((reporters: readonly unknown[]) => reporters[0]),
   createDiskCacheProvider: vi.fn(() => ({
     get: vi.fn().mockResolvedValue(null),
     set: vi.fn().mockResolvedValue(undefined),
     clear: vi.fn().mockResolvedValue(undefined),
   })),
   createLogger: vi.fn(() => createMockLogger()),
+  getChangedFiles: vi.fn(),
+  computeImpactScope: vi.fn(),
+  createProviders: vi.fn(),
 }));
 
 vi.mock('../reporters/console', () => ({
@@ -47,13 +50,67 @@ vi.mock('../reporters/console', () => ({
   })),
 }));
 
+vi.mock('../reporters/json', () => ({
+  createJsonReporter: vi.fn(() => ({
+    name: 'json',
+    onStart: vi.fn(),
+    onRuleStart: vi.fn(),
+    onRuleComplete: vi.fn(),
+    onViolation: vi.fn(),
+    onComplete: vi.fn(),
+    onPackageStart: vi.fn(),
+    onPackageComplete: vi.fn(),
+  })),
+}));
+
+vi.mock('@retemper/lodestar-reporter-sarif', () => ({
+  createSarifReporter: vi.fn(() => ({
+    name: 'sarif',
+    onStart: vi.fn(),
+    onRuleStart: vi.fn(),
+    onRuleComplete: vi.fn(),
+    onViolation: vi.fn(),
+    onComplete: vi.fn(),
+    onPackageStart: vi.fn(),
+    onPackageComplete: vi.fn(),
+  })),
+}));
+
+vi.mock('@retemper/lodestar-reporter-junit', () => ({
+  createJunitReporter: vi.fn(() => ({
+    name: 'junit',
+    onStart: vi.fn(),
+    onRuleStart: vi.fn(),
+    onRuleComplete: vi.fn(),
+    onViolation: vi.fn(),
+    onComplete: vi.fn(),
+    onPackageStart: vi.fn(),
+    onPackageComplete: vi.fn(),
+  })),
+}));
+
 import { checkCommand } from './check';
-import { discoverWorkspaces, loadConfigFile, run, runWorkspace } from '@retemper/lodestar';
+import {
+  createCompositeReporter,
+  createDiskCacheProvider,
+  createProviders,
+  computeImpactScope,
+  discoverWorkspaces,
+  getChangedFiles,
+  loadConfigFile,
+  run,
+  runWorkspace,
+} from '@retemper/lodestar';
+import { createSarifReporter } from '@retemper/lodestar-reporter-sarif';
+import { createJunitReporter } from '@retemper/lodestar-reporter-junit';
 
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 const mockDiscoverWorkspaces = vi.mocked(discoverWorkspaces);
 const mockRun = vi.mocked(run);
 const mockRunWorkspace = vi.mocked(runWorkspace);
+const mockGetChangedFiles = vi.mocked(getChangedFiles);
+const mockComputeImpactScope = vi.mocked(computeImpactScope);
+const mockCreateProviders = vi.mocked(createProviders);
 
 /** Create a minimal RunSummary for testing */
 function makeSummary(overrides: Partial<RunSummary> = {}): RunSummary {
@@ -382,6 +439,206 @@ describe('checkCommand', () => {
       });
 
       expect(mockRun).toHaveBeenCalledWith(expect.objectContaining({ fix: true }));
+    });
+  });
+
+  describe('--clearCache', () => {
+    it('캐시를 클리어하고 메시지를 출력한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        clearCache: true,
+      });
+
+      const cacheProvider = vi.mocked(createDiskCacheProvider).mock.results[0].value as {
+        clear: ReturnType<typeof vi.fn>;
+      };
+      expect(cacheProvider.clear).toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalledWith('Cache cleared.');
+    });
+
+    it('--cache=false이면 clearCache가 실행되지 않는다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        clearCache: true,
+        cache: false,
+      });
+
+      expect(vi.mocked(createDiskCacheProvider)).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('--changed 증분 분석', () => {
+    it('변경된 파일이 없으면 메시지를 출력하고 반환한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockGetChangedFiles.mockResolvedValue([]);
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        changed: true,
+      });
+
+      expect(console.error).toHaveBeenCalledWith('No changed files detected.');
+      expect(mockRun).not.toHaveBeenCalled();
+    });
+
+    it('변경된 파일이 있으면 영향 범위를 계산하고 run을 호출한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockGetChangedFiles.mockResolvedValue(['src/a.ts', 'src/b.ts']);
+      mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts', 'src/b.ts', 'src/c.ts']));
+      mockCreateProviders.mockReturnValue({
+        graph: {
+          getModuleGraph: vi.fn().mockResolvedValue({ nodes: new Map() }),
+        },
+      } as never);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        changed: true,
+      });
+
+      expect(mockRun).toHaveBeenCalledWith(
+        expect.objectContaining({
+          scope: expect.any(Set),
+        }),
+      );
+    });
+
+    it('--changed에 문자열을 전달하면 base로 사용한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockGetChangedFiles.mockResolvedValue(['src/a.ts']);
+      mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts']));
+      mockCreateProviders.mockReturnValue({
+        graph: {
+          getModuleGraph: vi.fn().mockResolvedValue({ nodes: new Map() }),
+        },
+      } as never);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        changed: 'main',
+      });
+
+      expect(mockGetChangedFiles).toHaveBeenCalledWith(expect.any(String), 'main');
+      expect(console.error).toHaveBeenCalledWith(expect.stringContaining('vs main'));
+    });
+
+    it('증분 분석에서 에러가 있으면 exitCode를 1로 설정한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockGetChangedFiles.mockResolvedValue(['src/a.ts']);
+      mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts']));
+      mockCreateProviders.mockReturnValue({
+        graph: {
+          getModuleGraph: vi.fn().mockResolvedValue({ nodes: new Map() }),
+        },
+      } as never);
+      mockRun.mockResolvedValue(makeSummary({ errorCount: 3 }));
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        changed: true,
+      });
+
+      expect(process.exitCode).toBe(1);
+    });
+
+    it('증분 분석에서 에러가 없으면 exitCode를 설정하지 않는다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockGetChangedFiles.mockResolvedValue(['src/a.ts']);
+      mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts']));
+      mockCreateProviders.mockReturnValue({
+        graph: {
+          getModuleGraph: vi.fn().mockResolvedValue({ nodes: new Map() }),
+        },
+      } as never);
+      mockRun.mockResolvedValue(makeSummary({ errorCount: 0 }));
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        changed: true,
+      });
+
+      expect(process.exitCode).toBeUndefined();
+    });
+  });
+
+  describe('reporter 선택', () => {
+    it('sarif format을 지정하면 SARIF reporter를 사용한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'sarif',
+      });
+
+      expect(createSarifReporter).toHaveBeenCalled();
+    });
+
+    it('junit format을 지정하면 JUnit reporter를 사용한다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'junit',
+      });
+
+      expect(createJunitReporter).toHaveBeenCalled();
+    });
+
+    it('config에 reporters가 있으면 compositeReporter를 생성한다', async () => {
+      const mockResolveConfig = vi.mocked((await import('@retemper/lodestar')).resolveConfig);
+      mockResolveConfig.mockReturnValueOnce({
+        rootDir: '/fake',
+        plugins: [],
+        rules: new Map(),
+        scopedRules: [],
+        baseline: null,
+        adapters: [],
+        reporters: [
+          { name: 'custom', onStart: vi.fn(), onComplete: vi.fn(), onViolation: vi.fn() },
+        ],
+      } as never);
+
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+      });
+
+      expect(createCompositeReporter).toHaveBeenCalled();
     });
   });
 });

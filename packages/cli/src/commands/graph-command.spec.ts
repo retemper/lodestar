@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { ModuleNode } from '@retemper/lodestar';
+import { createServer } from 'node:http';
+
+vi.mock('node:http', () => ({
+  createServer: vi.fn(),
+}));
 
 vi.mock('@retemper/lodestar', () => ({
   createProviders: vi.fn(),
@@ -11,6 +16,8 @@ vi.mock('@retemper/lodestar', () => ({
     warn: vi.fn((...args: unknown[]) => console.error(...args)),
   })),
 }));
+
+const mockCreateServer = vi.mocked(createServer);
 
 import { graphCommand } from './graph';
 import { createProviders, loadConfigFile } from '@retemper/lodestar';
@@ -236,6 +243,207 @@ describe('graphCommand', () => {
 
       const output = (process.stdout.write as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
       expect(output).toContain('graph TD');
+    });
+  });
+
+  describe('--serve 모드', () => {
+    it('HTTP 서버를 생성하고 시작한다', async () => {
+      const nodes = makeNodes({
+        'src/a.ts': ['src/b.ts'],
+        'src/b.ts': [],
+      });
+      mockCreateProviders.mockReturnValue({
+        graph: { getModuleGraph: vi.fn().mockResolvedValue({ nodes }) },
+      } as never);
+      mockLoadConfigFile.mockResolvedValue(null);
+
+      /** Mock server that invokes the listen callback immediately */
+      const mockServer = {
+        listen: vi.fn((_port: number, callback: () => void) => {
+          callback();
+        }),
+      };
+      mockCreateServer.mockReturnValue(mockServer as never);
+
+      await graphCommand({
+        _: ['graph'],
+        $0: 'lodestar',
+        format: 'mermaid',
+        serve: true,
+        port: 5050,
+      });
+
+      expect(mockCreateServer).toHaveBeenCalled();
+      expect(mockServer.listen).toHaveBeenCalledWith(5050, expect.any(Function));
+      expect(console.error).toHaveBeenCalledWith(expect.stringContaining('http://localhost:5050'));
+    });
+
+    it('포트가 지정되지 않으면 기본 포트 4040을 사용한다', async () => {
+      const nodes = makeNodes({ 'src/a.ts': [] });
+      mockCreateProviders.mockReturnValue({
+        graph: { getModuleGraph: vi.fn().mockResolvedValue({ nodes }) },
+      } as never);
+      mockLoadConfigFile.mockResolvedValue(null);
+
+      const mockServer = {
+        listen: vi.fn((_port: number, callback: () => void) => {
+          callback();
+        }),
+      };
+      mockCreateServer.mockReturnValue(mockServer as never);
+
+      await graphCommand({
+        _: ['graph'],
+        $0: 'lodestar',
+        format: 'mermaid',
+        serve: true,
+      });
+
+      expect(mockServer.listen).toHaveBeenCalledWith(4040, expect.any(Function));
+    });
+
+    it('/api/graph 엔드포인트가 JSON을 반환한다', async () => {
+      const nodes = makeNodes({
+        'src/a.ts': ['src/b.ts'],
+        'src/b.ts': [],
+      });
+      mockCreateProviders.mockReturnValue({
+        graph: { getModuleGraph: vi.fn().mockResolvedValue({ nodes }) },
+      } as never);
+      mockLoadConfigFile.mockResolvedValue(null);
+
+      /** Variable to capture the request handler */
+      type RequestHandler = (
+        req: { url: string },
+        res: { writeHead: ReturnType<typeof vi.fn>; end: ReturnType<typeof vi.fn> },
+      ) => void;
+      const capturedHandlers: RequestHandler[] = [];
+
+      mockCreateServer.mockImplementation(((handler: RequestHandler) => {
+        capturedHandlers.push(handler);
+        return {
+          listen: vi.fn((_port: number, callback: () => void) => {
+            callback();
+          }),
+        };
+      }) as never);
+
+      await graphCommand({
+        _: ['graph'],
+        $0: 'lodestar',
+        format: 'mermaid',
+        serve: true,
+      });
+
+      const handler = capturedHandlers[0];
+      const mockRes = {
+        writeHead: vi.fn(),
+        end: vi.fn(),
+      };
+
+      handler({ url: '/api/graph' }, mockRes);
+
+      expect(mockRes.writeHead).toHaveBeenCalledWith(200, { 'Content-Type': 'application/json' });
+      const jsonOutput = JSON.parse(mockRes.end.mock.calls[0][0] as string);
+      expect(jsonOutput).toHaveProperty('nodes');
+      expect(jsonOutput).toHaveProperty('edges');
+      expect(jsonOutput).toHaveProperty('layers');
+    });
+
+    it('기타 URL은 HTML 뷰어를 반환한다', async () => {
+      const nodes = makeNodes({ 'src/a.ts': [] });
+      mockCreateProviders.mockReturnValue({
+        graph: { getModuleGraph: vi.fn().mockResolvedValue({ nodes }) },
+      } as never);
+      mockLoadConfigFile.mockResolvedValue(null);
+
+      type RequestHandler = (
+        req: { url: string },
+        res: { writeHead: ReturnType<typeof vi.fn>; end: ReturnType<typeof vi.fn> },
+      ) => void;
+      const capturedHandlers: RequestHandler[] = [];
+
+      mockCreateServer.mockImplementation(((handler: RequestHandler) => {
+        capturedHandlers.push(handler);
+        return {
+          listen: vi.fn((_port: number, callback: () => void) => {
+            callback();
+          }),
+        };
+      }) as never);
+
+      await graphCommand({
+        _: ['graph'],
+        $0: 'lodestar',
+        format: 'mermaid',
+        serve: true,
+      });
+
+      const handler = capturedHandlers[0];
+      const mockRes = {
+        writeHead: vi.fn(),
+        end: vi.fn(),
+      };
+
+      handler({ url: '/' }, mockRes);
+
+      expect(mockRes.writeHead).toHaveBeenCalledWith(200, { 'Content-Type': 'text/html' });
+      const htmlOutput = mockRes.end.mock.calls[0][0] as string;
+      expect(htmlOutput).toContain('<!DOCTYPE html>');
+      expect(htmlOutput).toContain('Lodestar');
+    });
+
+    it('config에 layers가 있으면 레이어 정보를 API 응답에 포함한다', async () => {
+      const layerDefs = [
+        { name: 'domain', path: 'src/domain/**/*.ts' },
+        { name: 'app', path: 'src/app/**/*.ts', canImport: ['domain'] },
+      ];
+      mockLoadConfigFile.mockResolvedValue({
+        plugins: [],
+        rules: { 'architecture/layers': { options: { layers: layerDefs } } },
+      } as never);
+
+      const nodes = makeNodes({
+        'src/app/service.ts': ['src/domain/entity.ts'],
+        'src/domain/entity.ts': [],
+      });
+      mockCreateProviders.mockReturnValue({
+        graph: { getModuleGraph: vi.fn().mockResolvedValue({ nodes }) },
+      } as never);
+
+      type RequestHandler = (
+        req: { url: string },
+        res: { writeHead: ReturnType<typeof vi.fn>; end: ReturnType<typeof vi.fn> },
+      ) => void;
+      const capturedHandlers: RequestHandler[] = [];
+
+      mockCreateServer.mockImplementation(((handler: RequestHandler) => {
+        capturedHandlers.push(handler);
+        return {
+          listen: vi.fn((_port: number, callback: () => void) => {
+            callback();
+          }),
+        };
+      }) as never);
+
+      await graphCommand({
+        _: ['graph'],
+        $0: 'lodestar',
+        format: 'mermaid',
+        serve: true,
+      });
+
+      const handler = capturedHandlers[0];
+      const mockRes = {
+        writeHead: vi.fn(),
+        end: vi.fn(),
+      };
+
+      handler({ url: '/api/graph' }, mockRes);
+
+      const jsonOutput = JSON.parse(mockRes.end.mock.calls[0][0] as string);
+      expect(jsonOutput.layers).toHaveLength(2);
+      expect(jsonOutput.layers[0].name).toBe('domain');
     });
   });
 });
