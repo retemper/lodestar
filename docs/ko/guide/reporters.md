@@ -1,3 +1,7 @@
+---
+description: 'Lodestar 리포터 설정 — 콘솔, JSON, JUnit, SARIF 등 결과 출력 형식을 구성합니다.'
+---
+
 # 리포터(Reporters)
 
 리포터는 Lodestar가 결과를 표시하는 방식을 제어합니다. CLI에서 내장 형식을 선택하거나 설정 파일에서 리포터를 구성할 수 있습니다.

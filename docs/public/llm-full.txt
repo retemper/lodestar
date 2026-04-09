@@ -173,6 +173,28 @@ options: {
 }
 ```
 
+## Reporters
+
+Reporters control how results are displayed. Configure via CLI flags or config file.
+
+### Built-in Reporters
+- **console** (default) — human-readable terminal output
+- **json** — machine-readable JSON output
+
+### Reporter Plugins
+- **@retemper/lodestar-reporter-junit** — JUnit XML format for CI systems
+- **@retemper/lodestar-reporter-sarif** — SARIF format for GitHub Code Scanning
+
+```ts
+// lodestar.config.ts
+export default defineConfig({
+  reporters: [
+    'console',
+    ['@retemper/lodestar-reporter-junit', { outputFile: 'results.xml' }],
+  ],
+});
+```
+
 ## Adapters
 
 Adapters generate tool-specific config files from `lodestar.config.ts`.
@@ -191,10 +213,11 @@ Adapters generate tool-specific config files from `lodestar.config.ts`.
 ## CLI
 
 ```sh
-npx lodestar check [--workspace | --no-workspace]
+npx lodestar check [--workspace | --no-workspace] [--reporter console|json]
 npx lodestar init
 npx lodestar graph [--layers]
 npx lodestar impact <file>
+npx lodestar watch [--reporter console|json]
 ```
 
 Exit code 0 = no errors. Exit code 1 = errors found. Warnings don't fail.

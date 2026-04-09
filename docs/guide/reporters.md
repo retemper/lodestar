@@ -1,3 +1,7 @@
+---
+description: 'Configure Lodestar reporters to output results as console, JSON, JUnit, or SARIF formats.'
+---
+
 # Reporters
 
 Reporters control how Lodestar displays results. You can choose a built-in format via the CLI or configure reporters in the config file.
