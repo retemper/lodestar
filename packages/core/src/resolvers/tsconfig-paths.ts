@@ -133,7 +133,7 @@ function matchPattern(source: string, mapping: PathMapping): string | null {
 
 /** Strip single-line and multi-line comments from JSON (for tsconfig with comments) */
 function stripJsonComments(json: string): string {
-  return json.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  return json.replaceAll(/\/\/.*$/gm, '').replaceAll(/\/\*[\s\S]*?\*\//g, '');
 }
 
 /**

@@ -3,7 +3,6 @@ import type {
   Violation,
   RunSummary,
   Reporter,
-  WorkspaceReporter,
   RuleProviders,
   ResolvedRuleConfig,
 } from '@retemper/lodestar-types';
@@ -14,7 +13,7 @@ import { createGraphProvider } from './providers/graph';
 import { createASTProvider } from './providers/ast';
 import { createConfigFileProvider } from './providers/config-file';
 import { resolvePlugins } from './resolver';
-import { runRule, runRules } from './runner';
+import { runRules } from './runner';
 import { validateConfig } from './validate';
 import type { RuleResult } from './runner';
 import type { ResolvedRule } from './resolver';

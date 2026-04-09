@@ -399,7 +399,11 @@ const c = import('./dynamic');
 
   describe('disk cache', () => {
     /** Create a mock CacheProvider */
-    function createMockCache(): CacheProvider & { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn>; clear: ReturnType<typeof vi.fn> } {
+    function createMockCache(): CacheProvider & {
+      get: ReturnType<typeof vi.fn>;
+      set: ReturnType<typeof vi.fn>;
+      clear: ReturnType<typeof vi.fn>;
+    } {
       const store = new Map<string, unknown>();
       const get = vi.fn(async (namespace: string, key: string) => {
         return store.get(`${namespace}:${key}`) ?? null;
@@ -410,13 +414,15 @@ const c = import('./dynamic');
       const clear = vi.fn(async () => {
         store.clear();
       });
-      return { get, set, clear } as CacheProvider & { get: typeof get; set: typeof set; clear: typeof clear };
+      return { get, set, clear } as CacheProvider & {
+        get: typeof get;
+        set: typeof set;
+        clear: typeof clear;
+      };
     }
 
     /** Creates fixture with disk cache */
-    async function setupFixtureWithCache(
-      files: Record<string, string>,
-    ): Promise<{
+    async function setupFixtureWithCache(files: Record<string, string>): Promise<{
       rootDir: string;
       provider: ReturnType<typeof createASTProvider>;
       cache: CacheProvider;
@@ -497,7 +503,13 @@ const c = import('./dynamic');
       await writeFile(filePath, `import { z } from './z';`, 'utf-8');
 
       const cachedImports = [
-        { source: './z', specifiers: ['z'], isTypeOnly: false, location: { file: 'cached.ts' }, kind: 'static' },
+        {
+          source: './z',
+          specifiers: ['z'],
+          isTypeOnly: false,
+          location: { file: 'cached.ts' },
+          kind: 'static',
+        },
       ];
 
       const get = vi.fn(async () => cachedImports);

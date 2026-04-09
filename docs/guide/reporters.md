@@ -15,12 +15,12 @@ npx lodestar check --format junit     # JUnit XML for CI systems
 
 ## Built-in Reporters
 
-| Format    | Package                              | Output | Use Case                                   |
-| --------- | ------------------------------------ | ------ | ------------------------------------------ |
-| `console` | `@retemper/lodestar-cli`             | stderr | Local development, human-readable          |
-| `json`    | `@retemper/lodestar-cli`             | stdout | CI pipelines, programmatic consumption     |
-| `sarif`   | `@retemper/lodestar-reporter-sarif`  | stdout | GitHub Code Scanning, VS Code SARIF viewer |
-| `junit`   | `@retemper/lodestar-reporter-junit`  | stdout | Jenkins, GitLab CI, CircleCI test reports  |
+| Format    | Package                             | Output | Use Case                                   |
+| --------- | ----------------------------------- | ------ | ------------------------------------------ |
+| `console` | `@retemper/lodestar-cli`            | stderr | Local development, human-readable          |
+| `json`    | `@retemper/lodestar-cli`            | stdout | CI pipelines, programmatic consumption     |
+| `sarif`   | `@retemper/lodestar-reporter-sarif` | stdout | GitHub Code Scanning, VS Code SARIF viewer |
+| `junit`   | `@retemper/lodestar-reporter-junit` | stdout | Jenkins, GitLab CI, CircleCI test reports  |
 
 ## SARIF Reporter
 
@@ -51,8 +51,12 @@ import { defineConfig } from '@retemper/lodestar';
 import { sarifReporter } from '@retemper/lodestar-reporter-sarif';
 
 export default defineConfig({
-  plugins: [/* ... */],
-  rules: { /* ... */ },
+  plugins: [
+    /* ... */
+  ],
+  rules: {
+    /* ... */
+  },
   reporters: [sarifReporter({ output: 'reports/lodestar.sarif' })],
 });
 ```

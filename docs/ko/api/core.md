@@ -14,9 +14,9 @@ import { run, runWorkspace, createProviders } from '@retemper/lodestar-core';
 const summary = await run({
   config: resolvedConfig,
   reporter: myReporter, // 선택 사항
-  fix: true,            // 선택 사항 -- 위반 사항 자동 수정
+  fix: true, // 선택 사항 -- 위반 사항 자동 수정
   cache: cacheProvider, // 선택 사항 -- 디스크 캐시 프로바이더
-  scope: fileSet,       // 선택 사항 -- 검사할 파일을 제한하는 Set<string>
+  scope: fileSet, // 선택 사항 -- 검사할 파일을 제한하는 Set<string>
 });
 ```
 
@@ -43,9 +43,9 @@ const summary = await runWorkspace({
   rootDir: '/monorepo/root',
   rootConfig: writtenConfig,
   reporter: workspaceReporter, // 선택 사항
-  fix: true,                   // 선택 사항
-  cache: cacheProvider,        // 선택 사항
-  concurrency: 4,              // 선택 사항 -- 병렬 패키지 제한 (기본값: 4)
+  fix: true, // 선택 사항
+  cache: cacheProvider, // 선택 사항
+  concurrency: 4, // 선택 사항 -- 병렬 패키지 제한 (기본값: 4)
 });
 ```
 
@@ -68,14 +68,14 @@ const providers = createProviders('/project/root');
 import { createLogger, silentLogger } from '@retemper/lodestar-core';
 
 const logger = createLogger({ level: 'warn' }); // warn + error만 출력
-logger.info('건너뜀');  // 출력되지 않음
+logger.info('건너뜀'); // 출력되지 않음
 logger.error('출력됨'); // stderr로 출력됨
 ```
 
-| 옵션    | 타입       | 기본값   | 설명                                           |
-| ------- | ---------- | -------- | ---------------------------------------------- |
-| `level` | `LogLevel` | `'info'` | 출력할 최소 레벨 (`debug`, `info`, `warn`, `error`, `silent`) |
-| `write` | `(msg: string) => void` | `process.stderr.write` | 커스텀 출력 함수 |
+| 옵션    | 타입                    | 기본값                 | 설명                                                          |
+| ------- | ----------------------- | ---------------------- | ------------------------------------------------------------- |
+| `level` | `LogLevel`              | `'info'`               | 출력할 최소 레벨 (`debug`, `info`, `warn`, `error`, `silent`) |
+| `write` | `(msg: string) => void` | `process.stderr.write` | 커스텀 출력 함수                                              |
 
 `silentLogger`는 모든 메시지를 무시하는 no-op 로거입니다. 테스트에 유용합니다.
 

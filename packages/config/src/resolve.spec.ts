@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import type { Plugin, PluginFactory, ReporterFactory, WorkspaceReporter } from '@retemper/lodestar-types';
-import { resolveConfig, resolvePluginEntry, normalizeRuleConfig, resolveReporterEntry } from './resolve';
+import type {
+  Plugin,
+  PluginFactory,
+  ReporterFactory,
+  WorkspaceReporter,
+} from '@retemper/lodestar-types';
+import {
+  resolveConfig,
+  resolvePluginEntry,
+  normalizeRuleConfig,
+  resolveReporterEntry,
+} from './resolve';
 
 describe('normalizeRuleConfig', () => {
   it('severity 문자열을 기본 options와 함께 정규화한다', () => {
@@ -212,19 +222,13 @@ describe('resolveConfig — reporters', () => {
     };
     const factory: ReporterFactory = { name: 'mock', create: () => mockReporter };
 
-    const result = resolveConfig(
-      { plugins: [], rules: {}, reporters: [factory] },
-      '/root',
-    );
+    const result = resolveConfig({ plugins: [], rules: {}, reporters: [factory] }, '/root');
 
     expect(result.reporters).toStrictEqual([mockReporter]);
   });
 
   it('reporters가 없으면 빈 배열을 반환한다', () => {
-    const result = resolveConfig(
-      { plugins: [], rules: {} },
-      '/root',
-    );
+    const result = resolveConfig({ plugins: [], rules: {} }, '/root');
 
     expect(result.reporters).toStrictEqual([]);
   });

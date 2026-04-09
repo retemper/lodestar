@@ -8,17 +8,17 @@ Run all configured rules against the project.
 npx lodestar check [options]
 ```
 
-| Flag             | Type       | Default       | Description                                                                                                            |
-| ---------------- | ---------- | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `--format`       | `string`   | `console`     | Output format. Choices: `console`, `json`, `sarif`, `junit`                                                            |
-| `--workspace`    | `boolean`  | auto-detected | Force workspace mode on                                                                                                |
-| `--no-workspace` | `boolean`  |               | Disable workspace mode                                                                                                 |
-| `--rule`         | `string[]` | all rules     | Only run specific rules. Supports exact match (`naming-convention/file-naming`) and prefix wildcard (`architecture/*`) |
-| `--fix`          | `boolean`  | `false`       | Auto-fix violations where possible                                                                                     |
-| `--cache`        | `boolean`  | `true`        | Enable disk caching for faster re-runs                                                                                 |
-| `--clear-cache`  | `boolean`  | `false`       | Clear the cache before running                                                                                         |
-| `--changed`      | `string \| boolean` |        | Only check files changed since the given git ref (or HEAD if no ref given). Computes transitive impact scope           |
-| `--concurrency`  | `number`   | `4`           | Number of packages to check in parallel (workspace mode only)                                                          |
+| Flag             | Type                | Default       | Description                                                                                                            |
+| ---------------- | ------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `--format`       | `string`            | `console`     | Output format. Choices: `console`, `json`, `sarif`, `junit`                                                            |
+| `--workspace`    | `boolean`           | auto-detected | Force workspace mode on                                                                                                |
+| `--no-workspace` | `boolean`           |               | Disable workspace mode                                                                                                 |
+| `--rule`         | `string[]`          | all rules     | Only run specific rules. Supports exact match (`naming-convention/file-naming`) and prefix wildcard (`architecture/*`) |
+| `--fix`          | `boolean`           | `false`       | Auto-fix violations where possible                                                                                     |
+| `--cache`        | `boolean`           | `true`        | Enable disk caching for faster re-runs                                                                                 |
+| `--clear-cache`  | `boolean`           | `false`       | Clear the cache before running                                                                                         |
+| `--changed`      | `string \| boolean` |               | Only check files changed since the given git ref (or HEAD if no ref given). Computes transitive impact scope           |
+| `--concurrency`  | `number`            | `4`           | Number of packages to check in parallel (workspace mode only)                                                          |
 
 When `--workspace` is omitted, workspace mode is auto-detected by checking whether `pnpm-workspace.yaml` or `package.json` workspaces are present. When running in workspace mode, lodestar runs rules against each discovered package and the root, then prints an aggregated summary.
 
@@ -130,8 +130,8 @@ npx lodestar graph [options]
 | `--scope`  | `string`  | all files | Only show files matching this path prefix (e.g., `src/domain`)                                                  |
 | `--format` | `string`  | `mermaid` | Output format. Choices: `mermaid`, `dot`                                                                        |
 | `--layers` | `boolean` | `false`   | Show layer-level architecture graph instead of file-level. Requires an `architecture/layers` rule in the config |
-| `--serve`  | `boolean` | `false`   | Start interactive graph viewer in the browser                                                                           |
-| `--port`   | `number`  | `4040`    | Port for the interactive graph server (used with `--serve`)                                                             |
+| `--serve`  | `boolean` | `false`   | Start interactive graph viewer in the browser                                                                   |
+| `--port`   | `number`  | `4040`    | Port for the interactive graph server (used with `--serve`)                                                     |
 
 **File-level mode** (default) outputs every import edge between source files. Use `--scope` to limit the output to a specific directory:
 
@@ -164,13 +164,13 @@ Run rules in watch mode -- re-checks affected files on every save.
 npx lodestar watch [options]
 ```
 
-| Flag          | Type       | Default       | Description                                                                                                            |
-| ------------- | ---------- | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `--format`    | `string`   | `console`     | Output format. Choices: `console`, `json`                                                                              |
-| `--rule`      | `string[]` | all rules     | Only run specific rules. Supports exact match and prefix wildcard (`architecture/*`)                                   |
-| `--fix`       | `boolean`  | `false`       | Auto-fix violations where possible                                                                                     |
-| `--cache`     | `boolean`  | `true`        | Enable disk caching for faster re-runs                                                                                 |
-| `--debounce`  | `number`   | `300`         | Debounce interval in milliseconds                                                                                      |
+| Flag         | Type       | Default   | Description                                                                          |
+| ------------ | ---------- | --------- | ------------------------------------------------------------------------------------ |
+| `--format`   | `string`   | `console` | Output format. Choices: `console`, `json`                                            |
+| `--rule`     | `string[]` | all rules | Only run specific rules. Supports exact match and prefix wildcard (`architecture/*`) |
+| `--fix`      | `boolean`  | `false`   | Auto-fix violations where possible                                                   |
+| `--cache`    | `boolean`  | `true`    | Enable disk caching for faster re-runs                                               |
+| `--debounce` | `number`   | `300`     | Debounce interval in milliseconds                                                    |
 
 On each file change, lodestar computes the transitive impact scope and re-runs only the affected rules. A summary is printed after each cycle:
 

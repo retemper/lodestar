@@ -85,7 +85,7 @@ function collectTransitiveDependents(
 function printHumanOutput(
   targetFile: string,
   entries: readonly ImpactEntry[],
-  logger: import('@retemper/lodestar').Logger,
+  logger: Logger,
 ): void {
   logger.info(`Impact analysis for ${targetFile}\n`);
 

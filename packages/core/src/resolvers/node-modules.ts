@@ -5,7 +5,7 @@ import type { ModuleResolver, ResolveContext } from '@retemper/lodestar-types';
  * Only resolves packages that are actually imported — no full node_modules scan.
  * @param rootDir - absolute path to the project root
  */
-function createNodeModulesResolver(rootDir: string): ModuleResolver {
+function createNodeModulesResolver(_rootDir: string): ModuleResolver {
   const cache = new Map<string, string | null>();
 
   return {

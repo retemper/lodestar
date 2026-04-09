@@ -75,8 +75,8 @@ Lodestar uses a pluggable resolver chain to turn import specifiers into file pat
 
 ```ts
 interface ResolveContext {
-  readonly importer: string;   // file containing the import
-  readonly source: string;     // the import specifier
+  readonly importer: string; // file containing the import
+  readonly source: string; // the import specifier
   readonly knownFiles: ReadonlySet<string>;
 }
 
@@ -87,12 +87,12 @@ interface ModuleResolver {
 
 ### Built-in resolvers
 
-| Resolver | Factory | Description |
-| -------- | ------- | ----------- |
-| Relative | `createRelativeResolver()` | Resolves `./` and `../` imports against known project files |
+| Resolver       | Factory                                          | Description                                                    |
+| -------------- | ------------------------------------------------ | -------------------------------------------------------------- |
+| Relative       | `createRelativeResolver()`                       | Resolves `./` and `../` imports against known project files    |
 | tsconfig paths | `createTsconfigPathsResolver(rootDir, options?)` | Maps path aliases from `tsconfig.json` `compilerOptions.paths` |
-| node_modules | `createNodeModulesResolver(rootDir)` | Resolves bare specifiers (e.g., `lodash`) via `node_modules` |
-| Chain | `createResolverChain(resolvers)` | Tries each resolver in order, returns the first match |
+| node_modules   | `createNodeModulesResolver(rootDir)`             | Resolves bare specifiers (e.g., `lodash`) via `node_modules`   |
+| Chain          | `createResolverChain(resolvers)`                 | Tries each resolver in order, returns the first match          |
 
 ### `createDefaultResolverChain(options)`
 
@@ -103,16 +103,16 @@ import { createDefaultResolverChain } from '@retemper/lodestar-core';
 
 const { resolver, setup } = createDefaultResolverChain({
   rootDir: '/project',
-  nodeModules: true,           // include node_modules resolution
+  nodeModules: true, // include node_modules resolution
   tsconfigPath: 'tsconfig.json', // auto-detected if omitted
 });
 
 await setup(); // load tsconfig paths
 ```
 
-| Option | Type | Default | Description |
-| ------ | ---- | ------- | ----------- |
-| `rootDir` | `string` | **required** | Absolute path to project root |
-| `customResolvers` | `ModuleResolver[]` | `[]` | Additional resolvers (inserted first in chain) |
-| `tsconfigPath` | `string` | auto-detected | Path to tsconfig.json |
-| `nodeModules` | `boolean` | `false` | Include node_modules bare specifier resolution |
+| Option            | Type               | Default       | Description                                    |
+| ----------------- | ------------------ | ------------- | ---------------------------------------------- |
+| `rootDir`         | `string`           | **required**  | Absolute path to project root                  |
+| `customResolvers` | `ModuleResolver[]` | `[]`          | Additional resolvers (inserted first in chain) |
+| `tsconfigPath`    | `string`           | auto-detected | Path to tsconfig.json                          |
+| `nodeModules`     | `boolean`          | `false`       | Include node_modules bare specifier resolution |

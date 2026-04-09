@@ -188,11 +188,9 @@ describe('getChangedFiles', () => {
 
     const result = await getChangedFiles('/root', 'main');
 
-    expect(mockExecFile).toHaveBeenCalledWith(
-      'git',
-      ['diff', '--name-only', 'main...HEAD'],
-      { cwd: '/root' },
-    );
+    expect(mockExecFile).toHaveBeenCalledWith('git', ['diff', '--name-only', 'main...HEAD'], {
+      cwd: '/root',
+    });
     expect(result).toStrictEqual(['src/a.ts', 'src/b.ts']);
   });
 

@@ -76,7 +76,7 @@ function createWatcher(options: WatchOptions): WatcherHandle {
 
   const fsWatcher = watch(rootDir, { recursive: true }, (_event, filename) => {
     if (closed || !filename) return;
-    const normalized = filename.replace(/\\/g, '/');
+    const normalized = filename.replaceAll('\\', '/');
     if (shouldIgnore(normalized, ignorePatterns)) return;
 
     pendingFiles.add(normalized);
@@ -105,7 +105,7 @@ function createWatcher(options: WatchOptions): WatcherHandle {
 
       // Resolve changed file paths relative to rootDir (normalize to forward slashes for cross-platform)
       const resolvedChanges = changedFiles.map((f) =>
-        relative(rootDir, resolve(rootDir, f)).replace(/\\/g, '/'),
+        relative(rootDir, resolve(rootDir, f)).replaceAll('\\', '/'),
       );
       const scope = computeImpactScope(resolvedChanges, graph);
 

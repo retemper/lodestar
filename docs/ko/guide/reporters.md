@@ -15,12 +15,12 @@ npx lodestar check --format junit     # CI 시스템용 JUnit XML
 
 ## 내장 리포터(Built-in Reporters)
 
-| 형식      | 패키지                               | 출력   | 용도                                       |
-| --------- | ------------------------------------ | ------ | ------------------------------------------ |
-| `console` | `@retemper/lodestar-cli`             | stderr | 로컬 개발, 사람이 읽을 수 있는 형식        |
-| `json`    | `@retemper/lodestar-cli`             | stdout | CI 파이프라인, 프로그래밍 방식 소비        |
-| `sarif`   | `@retemper/lodestar-reporter-sarif`  | stdout | GitHub Code Scanning, VS Code SARIF 뷰어  |
-| `junit`   | `@retemper/lodestar-reporter-junit`  | stdout | Jenkins, GitLab CI, CircleCI 테스트 리포트 |
+| 형식      | 패키지                              | 출력   | 용도                                       |
+| --------- | ----------------------------------- | ------ | ------------------------------------------ |
+| `console` | `@retemper/lodestar-cli`            | stderr | 로컬 개발, 사람이 읽을 수 있는 형식        |
+| `json`    | `@retemper/lodestar-cli`            | stdout | CI 파이프라인, 프로그래밍 방식 소비        |
+| `sarif`   | `@retemper/lodestar-reporter-sarif` | stdout | GitHub Code Scanning, VS Code SARIF 뷰어   |
+| `junit`   | `@retemper/lodestar-reporter-junit` | stdout | Jenkins, GitLab CI, CircleCI 테스트 리포트 |
 
 ## SARIF 리포터
 
@@ -51,8 +51,12 @@ import { defineConfig } from '@retemper/lodestar';
 import { sarifReporter } from '@retemper/lodestar-reporter-sarif';
 
 export default defineConfig({
-  plugins: [/* ... */],
-  rules: { /* ... */ },
+  plugins: [
+    /* ... */
+  ],
+  rules: {
+    /* ... */
+  },
   reporters: [sarifReporter({ output: 'reports/lodestar.sarif' })],
 });
 ```

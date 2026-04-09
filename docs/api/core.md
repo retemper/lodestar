@@ -14,9 +14,9 @@ Run all rules against a single project.
 const summary = await run({
   config: resolvedConfig,
   reporter: myReporter, // optional
-  fix: true,            // optional -- auto-fix violations
+  fix: true, // optional -- auto-fix violations
   cache: cacheProvider, // optional -- disk cache provider
-  scope: fileSet,       // optional -- Set<string> to limit checked files
+  scope: fileSet, // optional -- Set<string> to limit checked files
 });
 ```
 
@@ -43,9 +43,9 @@ const summary = await runWorkspace({
   rootDir: '/monorepo/root',
   rootConfig: writtenConfig,
   reporter: workspaceReporter, // optional
-  fix: true,                   // optional
-  cache: cacheProvider,        // optional
-  concurrency: 4,              // optional -- parallel package limit (default: 4)
+  fix: true, // optional
+  cache: cacheProvider, // optional
+  concurrency: 4, // optional -- parallel package limit (default: 4)
 });
 ```
 
@@ -68,14 +68,14 @@ Create a structured logger with level filtering.
 import { createLogger, silentLogger } from '@retemper/lodestar-core';
 
 const logger = createLogger({ level: 'warn' }); // only warn + error
-logger.info('skipped');  // not printed
+logger.info('skipped'); // not printed
 logger.error('printed'); // printed to stderr
 ```
 
-| Option  | Type       | Default  | Description                                    |
-| ------- | ---------- | -------- | ---------------------------------------------- |
-| `level` | `LogLevel` | `'info'` | Minimum level to emit (`debug`, `info`, `warn`, `error`, `silent`) |
-| `write` | `(msg: string) => void` | `process.stderr.write` | Custom output function |
+| Option  | Type                    | Default                | Description                                                        |
+| ------- | ----------------------- | ---------------------- | ------------------------------------------------------------------ |
+| `level` | `LogLevel`              | `'info'`               | Minimum level to emit (`debug`, `info`, `warn`, `error`, `silent`) |
+| `write` | `(msg: string) => void` | `process.stderr.write` | Custom output function                                             |
 
 `silentLogger` is a no-op logger that discards all messages. Useful for testing.
 

@@ -15,7 +15,11 @@ export default defineConfig([
             { name: 'resolvers', path: 'src/resolvers/**/*.ts', canImport: ['utils'] },
             { name: 'providers', path: 'src/providers/**/*.ts', canImport: ['utils', 'resolvers'] },
             { name: 'eslint', path: 'src/eslint/**/*.ts' },
-            { name: 'engine', path: 'src/{engine,workspace-runner,watcher,composite-reporter,validate}.ts', canImport: ['providers', 'resolvers', 'eslint', 'utils'] },
+            {
+              name: 'engine',
+              path: 'src/{engine,workspace-runner,watcher,composite-reporter,validate}.ts',
+              canImport: ['providers', 'resolvers', 'eslint', 'utils'],
+            },
           ],
         },
       },

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { RuleProviders, ModuleGraph } from '@retemper/lodestar-types';
+import type { ModuleGraph, RuleProviders, RunSummary } from '@retemper/lodestar-types';
 
 // Mock fs.watch
 const mockWatcher = {
@@ -36,7 +36,6 @@ import { watch } from 'node:fs';
 import { run, createProviders } from './engine';
 import { computeImpactScope } from './incremental';
 import { createWatcher } from './watcher';
-import type { RunSummary } from '@retemper/lodestar-types';
 
 /** Creates a mock RunSummary */
 function createMockSummary(overrides: Partial<RunSummary> = {}): RunSummary {

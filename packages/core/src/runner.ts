@@ -88,9 +88,7 @@ async function runRules(
   providers: RuleProviders,
   rootDir: string,
 ): Promise<readonly RuleResult[]> {
-  return Promise.all(
-    rules.map(({ rule, config }) => runRule(rule, config, providers, rootDir)),
-  );
+  return Promise.all(rules.map(({ rule, config }) => runRule(rule, config, providers, rootDir)));
 }
 
 export { runRule, runRules };
