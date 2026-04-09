@@ -21,25 +21,18 @@ function execGit(
   allowNonZero = false,
 ): Promise<ExecGitResult> {
   return new Promise((resolve, reject) => {
-    execFile('git', args, { cwd, maxBuffer: 10 * 1024 * 1024 }, (error, stdout) => {
+    execFile('git', args, { cwd, maxBuffer: 10 * 1024 * 1024 }, (error, stdout, _stderr) => {
+      const out = stdout;
       if (!error) {
-        resolve({ stdout: stdout ?? '', exitCode: 0 });
+        resolve({ stdout: out, exitCode: 0 });
         return;
       }
 
-      // Extract the numeric exit code from the error object.
-      // ExecFileException has `code` (string | number | undefined) and may carry
-      // a numeric `status` property added by Node when the child exits non-zero.
-      const err = error as unknown as Record<string, unknown>;
-      const exitCode =
-        typeof err.status === 'number'
-          ? err.status
-          : typeof err.code === 'number'
-            ? err.code
-            : null;
-
-      if (exitCode !== null && allowNonZero) {
-        resolve({ stdout: stdout ?? '', exitCode });
+      // Node sets `code` to the numeric exit code on child process errors.
+      // For commands like `git merge-base --is-ancestor`, exit code 1 means "not ancestor" (not an error).
+      const exitCode = (error as unknown as Record<string, unknown>).code;
+      if (allowNonZero && typeof exitCode === 'number') {
+        resolve({ stdout: out, exitCode });
         return;
       }
 
@@ -154,4 +147,4 @@ function createGitProvider(rootDir: string): GitProvider {
   };
 }
 
-export { createGitProvider };
+export { createGitProvider, execGit };

@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { createGitProvider } from './git';
+import { createGitProvider, execGit } from './git';
 
 const execFileAsync = promisify(execFile);
 
@@ -250,6 +250,50 @@ describe('createGitProvider', () => {
       const result = await git.isAncestor(ancestor.trim());
 
       expect(result).toBe(true);
+    });
+  });
+
+  describe('execGit', () => {
+    it('성공한 git 명령의 stdout을 반환한다', async () => {
+      const rootDir = await setupGitRepo();
+      const result = await execGit(['rev-parse', '--git-dir'], rootDir);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toBeTruthy();
+    });
+
+    it('allowNonZero=false이면 non-zero exit code에서 reject한다', async () => {
+      const rootDir = await setupGitRepo();
+
+      await expect(
+        execGit(['merge-base', '--is-ancestor', 'HEAD', 'nonexistent-ref'], rootDir, false),
+      ).rejects.toThrow();
+    });
+
+    it('allowNonZero=true이면 non-zero exit code를 resolve한다', async () => {
+      const rootDir = await setupGitRepo();
+
+      // Create diverging branches so isAncestor returns exit code 1
+      await execFileAsync('git', ['checkout', '-b', 'test-a'], { cwd: rootDir });
+      await writeFile(join(rootDir, 'a.txt'), 'a', 'utf-8');
+      await execFileAsync('git', ['add', '.'], { cwd: rootDir });
+      await execFileAsync('git', ['commit', '-m', 'a'], { cwd: rootDir });
+      const { stdout: commitA } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
+        cwd: rootDir,
+      });
+
+      await execFileAsync('git', ['checkout', '-b', 'test-b', 'HEAD~1'], { cwd: rootDir });
+      await writeFile(join(rootDir, 'b.txt'), 'b', 'utf-8');
+      await execFileAsync('git', ['add', '.'], { cwd: rootDir });
+      await execFileAsync('git', ['commit', '-m', 'b'], { cwd: rootDir });
+
+      const result = await execGit(
+        ['merge-base', '--is-ancestor', commitA.trim(), 'HEAD'],
+        rootDir,
+        true,
+      );
+
+      expect(result.exitCode).toBe(1);
     });
   });
 
