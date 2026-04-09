@@ -60,8 +60,8 @@ Running `lodestar check --fix` applies the auto-fix for setup violations -- crea
 
 ## Available Adapters
 
-| Adapter                                      | Package                         | Managed File         | Description                          |
-| -------------------------------------------- | ------------------------------- | -------------------- | ------------------------------------ |
+| Adapter                                      | Package                                  | Managed File         | Description                          |
+| -------------------------------------------- | ---------------------------------------- | -------------------- | ------------------------------------ |
 | [adapter-eslint](/adapters/eslint)           | `@retemper/lodestar-adapter-eslint`      | `eslint.config.js`   | ESLint via Node API with bridge file |
 | [adapter-prettier](/adapters/prettier)       | `@retemper/lodestar-adapter-prettier`    | `.prettierrc`        | Prettier via CLI                     |
 | [adapter-biome](/adapters/biome)             | `@retemper/lodestar-adapter-biome`       | `biome.json`         | Biome via CLI with temp config       |

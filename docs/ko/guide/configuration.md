@@ -108,6 +108,22 @@ export default defineConfig([
 ]);
 ```
 
+### `reporters`
+
+추가 출력 형식을 위한 리포터(Reporter) 인스턴스 배열입니다. 자세한 내용은 [리포터 가이드](/ko/guide/reporters)를 참고하세요.
+
+```ts
+import { sarifReporter } from '@retemper/lodestar-reporter-sarif';
+import { junitReporter } from '@retemper/lodestar-reporter-junit';
+
+export default defineConfig({
+  reporters: [
+    sarifReporter({ output: 'reports/lodestar.sarif' }),
+    junitReporter({ output: 'reports/lodestar.xml' }),
+  ],
+});
+```
+
 ## 플랫 설정(Flat Config) — 배열 형식
 
 Lodestar는 플랫 설정 모델을 사용합니다. 단일 블록 또는 블록 배열을 전달할 수 있습니다. 배열 형식은 각 블록의 `files`와 `ignores`를 통해 파일 범위 지정이 가능합니다:

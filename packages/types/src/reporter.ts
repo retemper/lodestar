@@ -16,6 +16,30 @@ interface Reporter {
   onComplete(summary: RunSummary): void;
 }
 
+/** Extended reporter that understands workspace (monorepo) structure */
+interface WorkspaceReporter extends Reporter {
+  /** Called when starting a workspace package check */
+  onPackageStart?(pkg: WorkspacePackageInfo): void;
+  /** Called when a workspace package check completes */
+  onPackageComplete?(pkg: WorkspacePackageInfo, summary: RunSummary): void;
+}
+
+/** Minimal package info passed to workspace reporter hooks */
+interface WorkspacePackageInfo {
+  /** Package name (from package.json or directory basename) */
+  readonly name: string;
+  /** Absolute path to the package directory */
+  readonly dir: string;
+}
+
+/** Factory that creates a reporter instance */
+interface ReporterFactory {
+  /** Unique reporter identifier (e.g., "sarif", "junit") */
+  readonly name: string;
+  /** Create a WorkspaceReporter instance with optional configuration */
+  create(options?: Readonly<Record<string, unknown>>): WorkspaceReporter;
+}
+
 /** Summary of a single rule's execution */
 interface RuleResultSummary {
   /** Fully qualified rule identifier */
@@ -50,4 +74,18 @@ interface RunSummary {
   readonly durationMs: number;
 }
 
-export type { Reporter, RuleResultSummary, RunSummary };
+/** Reference to a reporter — built-in name, factory, or factory with options */
+type ReporterEntry =
+  | string
+  | ReporterFactory
+  | readonly [ReporterFactory, Readonly<Record<string, unknown>>];
+
+export type {
+  Reporter,
+  WorkspaceReporter,
+  WorkspacePackageInfo,
+  ReporterFactory,
+  ReporterEntry,
+  RuleResultSummary,
+  RunSummary,
+};

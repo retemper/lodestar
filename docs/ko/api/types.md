@@ -36,6 +36,15 @@ export type { ModuleGraph, ModuleNode, ImportInfo, ExportInfo };
 // 리포터
 export type { Reporter, RunSummary };
 
+// 로거
+export type { Logger, LogLevel };
+
+// 리졸버
+export type { Resolver };
+
+// 캐시
+export type { CacheProvider };
+
 // 헬퍼
 export { defineRule, definePlugin };
 ```

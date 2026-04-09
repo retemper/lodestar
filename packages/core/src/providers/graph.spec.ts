@@ -69,7 +69,13 @@ describe('createGraphProvider', () => {
     it('파일의 의존성 목록을 반환한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './b', specifiers: ['B'], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './b',
+            specifiers: ['B'],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
       });
       const fs = mockFSProvider(['src/a.ts', 'src/b.ts']);
@@ -95,7 +101,13 @@ describe('createGraphProvider', () => {
     it('파일을 import하는 파일 목록을 반환한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './b', specifiers: ['B'], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './b',
+            specifiers: ['B'],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
         'src/b.ts': [],
       });
@@ -124,10 +136,22 @@ describe('createGraphProvider', () => {
     it('순환 의존성이 있으면 true를 반환한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './b', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './b',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
         'src/b.ts': [
-          { source: './a', specifiers: [], isTypeOnly: false, location: { file: 'src/b.ts' } },
+          {
+            source: './a',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/b.ts' },
+          },
         ],
       });
       const fs = mockFSProvider(['src/a.ts', 'src/b.ts']);
@@ -141,7 +165,13 @@ describe('createGraphProvider', () => {
     it('순환 의존성이 없으면 false를 반환한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './b', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './b',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
         'src/b.ts': [],
       });
@@ -156,11 +186,39 @@ describe('createGraphProvider', () => {
     it('다이아몬드 의존성에서 이미 방문한 노드를 재탐색하지 않는다', async () => {
       const ast = mockASTProvider({
         'a.ts': [
-          { source: './b', specifiers: [], isTypeOnly: false, location: { file: 'a.ts' } },
-          { source: './c', specifiers: [], isTypeOnly: false, location: { file: 'a.ts' } },
+          {
+            source: './b',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'a.ts' },
+          },
+          {
+            source: './c',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'a.ts' },
+          },
         ],
-        'b.ts': [{ source: './d', specifiers: [], isTypeOnly: false, location: { file: 'b.ts' } }],
-        'c.ts': [{ source: './d', specifiers: [], isTypeOnly: false, location: { file: 'c.ts' } }],
+        'b.ts': [
+          {
+            source: './d',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'b.ts' },
+          },
+        ],
+        'c.ts': [
+          {
+            source: './d',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'c.ts' },
+          },
+        ],
         'd.ts': [],
       });
       const fs = mockFSProvider(['a.ts', 'b.ts', 'c.ts', 'd.ts']);
@@ -184,13 +242,31 @@ describe('createGraphProvider', () => {
     it('3개 파일의 간접 순환을 감지한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './b', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './b',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
         'src/b.ts': [
-          { source: './c', specifiers: [], isTypeOnly: false, location: { file: 'src/b.ts' } },
+          {
+            source: './c',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/b.ts' },
+          },
         ],
         'src/c.ts': [
-          { source: './a', specifiers: [], isTypeOnly: false, location: { file: 'src/c.ts' } },
+          {
+            source: './a',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/c.ts' },
+          },
         ],
       });
       const fs = mockFSProvider(['src/a.ts', 'src/b.ts', 'src/c.ts']);
@@ -206,7 +282,13 @@ describe('createGraphProvider', () => {
     it('모든 파일의 노드를 포함하는 그래프를 반환한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './b', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './b',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
         'src/b.ts': [],
       });
@@ -268,7 +350,13 @@ describe('createGraphProvider', () => {
     it('비상대 import는 무시한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: 'lodash', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: 'lodash',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
       });
       const fs = mockFSProvider(['src/a.ts']);
@@ -282,7 +370,13 @@ describe('createGraphProvider', () => {
     it('.tsx 확장자를 추론한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './App', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './App',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
       });
       const fs = mockFSProvider(['src/a.ts', 'src/App.tsx']);
@@ -296,7 +390,13 @@ describe('createGraphProvider', () => {
     it('.js 확장자를 추론한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './util', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './util',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
       });
       const fs = mockFSProvider(['src/a.ts', 'src/util.js']);
@@ -310,7 +410,13 @@ describe('createGraphProvider', () => {
     it('.jsx 확장자를 추론한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './Comp', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './Comp',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
       });
       const fs = mockFSProvider(['src/a.ts', 'src/Comp.jsx']);
@@ -324,7 +430,13 @@ describe('createGraphProvider', () => {
     it('index 파일을 추론한다', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
-          { source: './utils', specifiers: [], isTypeOnly: false, location: { file: 'src/a.ts' } },
+          {
+            source: './utils',
+            specifiers: [],
+            isTypeOnly: false,
+            kind: 'static',
+            location: { file: 'src/a.ts' },
+          },
         ],
       });
       const fs = mockFSProvider(['src/a.ts', 'src/utils/index.ts']);
@@ -342,6 +454,7 @@ describe('createGraphProvider', () => {
             source: './components',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'src/a.ts' },
           },
         ],
@@ -361,6 +474,7 @@ describe('createGraphProvider', () => {
             source: './nonexistent',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'src/a.ts' },
           },
         ],
@@ -380,6 +494,7 @@ describe('createGraphProvider', () => {
             source: './b.ts',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'src/a.ts' },
           },
         ],
@@ -399,6 +514,7 @@ describe('createGraphProvider', () => {
             source: '/lib/util',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'src/a.ts' },
           },
         ],
@@ -420,6 +536,7 @@ describe('createGraphProvider', () => {
             source: '../b',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'src/deep/a.ts' },
           },
         ],
@@ -439,6 +556,7 @@ describe('createGraphProvider', () => {
             source: '../b',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'a.ts' },
           },
         ],
@@ -459,6 +577,7 @@ describe('createGraphProvider', () => {
             source: '../../b',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'src/deep/nested/a.ts' },
           },
         ],
@@ -478,6 +597,7 @@ describe('createGraphProvider', () => {
             source: './/b',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'src/a.ts' },
           },
         ],
@@ -497,6 +617,7 @@ describe('createGraphProvider', () => {
             source: '././b',
             specifiers: [],
             isTypeOnly: false,
+            kind: 'static',
             location: { file: 'src/a.ts' },
           },
         ],

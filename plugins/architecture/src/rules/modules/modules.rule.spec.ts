@@ -24,7 +24,7 @@ async function checkModules(
 
 /** Creates an ImportInfo stub */
 function makeImport(source: string, file: string): ImportInfo {
-  return { source, specifiers: [], isTypeOnly: false, location: { file, line: 1 } };
+  return { source, specifiers: [], isTypeOnly: false, kind: 'static', location: { file, line: 1 } };
 }
 
 describe('architecture/modules', () => {

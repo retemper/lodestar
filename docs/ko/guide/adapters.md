@@ -60,8 +60,8 @@ export default defineConfig({
 
 ## 사용 가능한 어댑터
 
-| 어댑터                                          | 패키지                          | 관리 파일            | 설명                                 |
-| ----------------------------------------------- | ------------------------------- | -------------------- | ------------------------------------ |
+| 어댑터                                          | 패키지                                   | 관리 파일            | 설명                                 |
+| ----------------------------------------------- | ---------------------------------------- | -------------------- | ------------------------------------ |
 | [adapter-eslint](/ko/adapters/eslint)           | `@retemper/lodestar-adapter-eslint`      | `eslint.config.js`   | Node API를 통한 ESLint와 브릿지 파일 |
 | [adapter-prettier](/ko/adapters/prettier)       | `@retemper/lodestar-adapter-prettier`    | `.prettierrc`        | CLI를 통한 Prettier                  |
 | [adapter-biome](/ko/adapters/biome)             | `@retemper/lodestar-adapter-biome`       | `biome.json`         | 임시 설정을 사용하는 CLI 기반 Biome  |

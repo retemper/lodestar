@@ -20,8 +20,8 @@ const summary = await run({ config });
 
 ## Exports
 
-| Export            | From               | Description             |
-| ----------------- | ------------------ | ----------------------- |
+| Export            | From                        | Description             |
+| ----------------- | --------------------------- | ----------------------- |
 | `defineConfig`    | `@retemper/lodestar-types`  | Config 타입 추론 헬퍼   |
 | `definePlugin`    | `@retemper/lodestar-types`  | 플러그인 정의           |
 | `defineRule`      | `@retemper/lodestar-types`  | 규칙 정의               |

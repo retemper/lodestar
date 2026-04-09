@@ -15,6 +15,7 @@ export type {
   ModuleGraph,
   ASTProvider,
   ImportInfo,
+  ImportKind,
   ExportInfo,
   ConfigFileProvider,
   RuleContext,
@@ -36,4 +37,16 @@ export type {
   ResolvedRuleConfig,
 } from './config';
 
-export type { Reporter, RuleResultSummary, RunSummary } from './reporter';
+export type { LogLevel, Logger } from './logger';
+
+export type { ModuleResolver, ResolveContext } from './resolver';
+
+export type {
+  Reporter,
+  WorkspaceReporter,
+  WorkspacePackageInfo,
+  ReporterFactory,
+  ReporterEntry,
+  RuleResultSummary,
+  RunSummary,
+} from './reporter';

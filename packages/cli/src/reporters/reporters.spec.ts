@@ -1,7 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Violation, RunSummary, RuleResultSummary } from '@retemper/lodestar';
+import type { Logger, Violation, RunSummary, RuleResultSummary } from '@retemper/lodestar';
 import { createConsoleReporter } from './console';
 import { createJsonReporter } from './json';
+
+/** Create a logger that delegates to console.error so spies can capture output */
+function createSpyLogger(): Logger {
+  return {
+    debug: (...args: unknown[]) => console.error(...args),
+    error: (...args: unknown[]) => console.error(...args),
+    info: (...args: unknown[]) => console.error(...args),
+    warn: (...args: unknown[]) => console.error(...args),
+  };
+}
 
 /** Create a minimal RunSummary for testing */
 function makeSummary(overrides: Partial<RunSummary> = {}): RunSummary {
@@ -24,13 +34,13 @@ describe('createConsoleReporter', () => {
   });
 
   it('has name "console"', () => {
-    const reporter = createConsoleReporter();
+    const reporter = createConsoleReporter({ logger: createSpyLogger() });
     expect(reporter.name).toBe('console');
   });
 
   describe('onRuleComplete', () => {
     it('shows checkmark for passing rules', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
         violations: [],
@@ -45,7 +55,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('shows cross for failing rules with violations inline', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'fs-layout/directory-exists',
         violations: [
@@ -69,7 +79,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('shows warning indicator for warn-only results', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
         violations: [
@@ -93,7 +103,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('위반에 location이 없으면 위치 정보를 출력하지 않는다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'fs-layout/directory-exists',
         violations: [
@@ -117,7 +127,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('위반에 location은 있지만 line이 없으면 파일 경로만 출력한다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
         violations: [
@@ -142,7 +152,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('위반에 location과 line이 모두 있으면 파일 경로와 줄 번호를 출력한다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
         violations: [
@@ -166,7 +176,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('meta가 있으면 출력에 포함한다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
         violations: [],
@@ -181,7 +191,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('docsUrl이 있으면 경고에도 표시한다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
         violations: [
@@ -204,7 +214,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('docsUrl이 있으면 에러에도 표시한다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'test/rule',
         violations: [
@@ -227,7 +237,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('shows error message when rule threw', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'broken/rule',
         violations: [],
@@ -245,7 +255,7 @@ describe('createConsoleReporter', () => {
 
   describe('onComplete', () => {
     it('prints summary totals', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       reporter.onComplete(makeSummary({ errorCount: 3, warnCount: 2, durationMs: 150.5 }));
 
       const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
@@ -258,7 +268,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('prints zero counts', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       reporter.onComplete(makeSummary({ durationMs: 0 }));
 
       const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map(
@@ -270,7 +280,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('ruleResults가 있으면 위반 없는 규칙 수를 계산한다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       reporter.onComplete(
         makeSummary({
           totalRules: 3,
@@ -299,7 +309,7 @@ describe('createConsoleReporter', () => {
 
   describe('onPackageStart', () => {
     it('prints package name', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       reporter.onPackageStart!({ name: '@retemper/lodestar-core', dir: '/root/packages/core' });
 
       const output = (console.error as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
@@ -309,24 +319,24 @@ describe('createConsoleReporter', () => {
 
   describe('no-op 메서드', () => {
     it('onStart는 예외를 던지지 않는다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       expect(() => reporter.onStart({ rootDir: '/root', ruleCount: 5 })).not.toThrow();
     });
 
     it('onRuleStart는 예외를 던지지 않는다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       expect(() => reporter.onRuleStart!('test/rule')).not.toThrow();
     });
 
     it('onPackageComplete는 예외를 던지지 않는다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       expect(() =>
         reporter.onPackageComplete!(undefined as never, undefined as never),
       ).not.toThrow();
     });
 
     it('onViolation은 예외를 던지지 않는다', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       expect(() =>
         reporter.onViolation({ ruleId: 'test', message: 'msg', severity: 'error' }),
       ).not.toThrow();
@@ -335,7 +345,7 @@ describe('createConsoleReporter', () => {
 
   describe('onComplete 폴백 분기', () => {
     it('ruleResults가 없으면 totalRules 기반으로 passed를 계산한다 (에러 있음)', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const summary = {
         totalFiles: 0,
         totalRules: 5,
@@ -355,7 +365,7 @@ describe('createConsoleReporter', () => {
     });
 
     it('ruleResults가 없으면 totalRules 기반으로 passed를 계산한다 (에러 없음)', () => {
-      const reporter = createConsoleReporter();
+      const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const summary = {
         totalFiles: 0,
         totalRules: 3,
@@ -374,11 +384,25 @@ describe('createConsoleReporter', () => {
       expect(line).toContain('3 rules passed');
     });
   });
+
+  describe('logger 없이 생성하면 stderr logger를 사용한다', () => {
+    it('createStderrLogger가 생성되어 동작한다', () => {
+      vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+      const reporter = createConsoleReporter();
+      reporter.onComplete(makeSummary({ durationMs: 10 }));
+
+      expect(process.stderr.write).toHaveBeenCalled();
+      const output = (process.stderr.write as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(output).toContain('rules passed');
+
+      vi.mocked(process.stderr.write).mockRestore();
+    });
+  });
 });
 
 describe('createJsonReporter', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
     vi.restoreAllMocks();
     vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   });
@@ -422,5 +446,22 @@ describe('createJsonReporter', () => {
   it('onStart는 예외를 던지지 않는다', () => {
     const reporter = createJsonReporter();
     expect(() => reporter.onStart({ rootDir: '/root', ruleCount: 3 })).not.toThrow();
+  });
+
+  it('onPackageStart는 예외를 던지지 않는다', () => {
+    const reporter = createJsonReporter();
+    expect(() =>
+      reporter.onPackageStart!({ name: '@retemper/core', dir: '/root/packages/core' }),
+    ).not.toThrow();
+  });
+
+  it('onPackageComplete는 예외를 던지지 않는다', () => {
+    const reporter = createJsonReporter();
+    expect(() =>
+      reporter.onPackageComplete!(
+        { name: '@retemper/core', dir: '/root/packages/core' },
+        makeSummary(),
+      ),
+    ).not.toThrow();
   });
 });

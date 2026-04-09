@@ -1,5 +1,5 @@
 import { defineRule } from '@retemper/lodestar-types';
-import { resolveImport } from '../../shared/resolve-import';
+import { createRelativeResolver } from '@retemper/lodestar-core';
 
 /** A named layer with a file pattern and allowed import targets */
 interface LayerDefinition {
@@ -63,6 +63,8 @@ const layers = defineRule<{
       allowedLayers.set(layer.name, new Set(layer.canImport ?? []));
     }
 
+    const resolver = createRelativeResolver();
+
     for (const [file, sourceLayer] of fileToLayer) {
       const imports = await ctx.providers.ast.getImports(file);
       const allowed = allowedLayers.get(sourceLayer.name) ?? new Set<string>();
@@ -70,7 +72,7 @@ const layers = defineRule<{
       for (const imp of imports) {
         if (allowTypeOnly && imp.isTypeOnly) continue;
 
-        const resolved = resolveImport(file, imp.source, knownFiles);
+        const resolved = resolver.resolve({ importer: file, source: imp.source, knownFiles });
         if (!resolved) continue;
 
         const targetLayer = fileToLayer.get(resolved);

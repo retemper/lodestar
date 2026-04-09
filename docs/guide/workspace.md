@@ -66,3 +66,20 @@ Lodestar reads workspace patterns from:
 - `package.json` (`workspaces` field)
 
 Only packages that have their own `lodestar.config.ts` / `.mjs` / `.js` are checked in workspace mode. Packages without a config are skipped.
+
+## Parallel Execution
+
+In workspace mode, packages are checked in parallel. The default concurrency is 4 packages at a time:
+
+```sh
+# Default: 4 packages in parallel
+npx lodestar check
+
+# Increase parallelism
+npx lodestar check --concurrency 8
+
+# Sequential execution
+npx lodestar check --concurrency 1
+```
+
+Reporter output preserves package order regardless of which package finishes first. Results are buffered and flushed sequentially so that the output is deterministic and easy to read.

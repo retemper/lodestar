@@ -3,9 +3,8 @@ import { mkdtemp, mkdir, writeFile, rm, symlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { runWorkspace } from './workspace-runner';
-import type { WrittenConfig, RunSummary } from '@retemper/lodestar-types';
+import type { WrittenConfig, RunSummary, WorkspaceReporter } from '@retemper/lodestar-types';
 import type { WorkspacePackage } from '@retemper/lodestar-config';
-import type { WorkspaceReporter } from './workspace-runner';
 
 /** Result of creating a test fixture directory */
 interface FixtureResult {
@@ -179,7 +178,11 @@ describe('runWorkspace() integration test', () => {
     });
 
     await linkPlugin(rootDir, '@retemper/lodestar-plugin-architecture');
-    await linkPluginToPackage(rootDir, 'packages/with-config', '@retemper/lodestar-plugin-architecture');
+    await linkPluginToPackage(
+      rootDir,
+      'packages/with-config',
+      '@retemper/lodestar-plugin-architecture',
+    );
 
     const rootConfig = makeLayersConfig();
     const result = await runWorkspace({ rootDir, rootConfig });
