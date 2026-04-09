@@ -10,6 +10,22 @@ describe('structure/co-change-required', () => {
     });
   });
 
+  describe('git provider가 없는 경우', () => {
+    it('위반 없이 종료한다', async () => {
+      const providers = createMockProviders();
+      const providersWithoutGit = { ...providers, git: undefined };
+      const { ctx, violations } = createTestContext(
+        { watch: ['src/**/*.ts'], require: ['tests/**'] },
+        providersWithoutGit,
+        'structure/co-change-required',
+      );
+
+      await coChangeRequired.check(ctx);
+
+      expect(violations).toHaveLength(0);
+    });
+  });
+
   describe('변경 파일이 없는 경우', () => {
     it('위반이 없다', async () => {
       const providers = createMockProviders({
@@ -143,6 +159,22 @@ describe('structure/co-change-required', () => {
 
       expect(diffFiles).toHaveBeenCalledWith('origin/main');
       expect(violations).toHaveLength(1);
+    });
+
+    it('diffFiles가 실패하면 빈 배열로 fallback한다', async () => {
+      const providers = createMockProviders({
+        stagedFiles: vi.fn().mockResolvedValue([]),
+        diffFiles: vi.fn().mockRejectedValue(new Error('git not available')),
+      });
+      const { ctx, violations } = createTestContext(
+        { watch: ['src/**/*.ts'], require: ['tests/**'] },
+        providers,
+        'structure/co-change-required',
+      );
+
+      await coChangeRequired.check(ctx);
+
+      expect(violations).toHaveLength(0);
     });
   });
 });

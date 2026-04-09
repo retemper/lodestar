@@ -40,6 +40,11 @@ const coChangeRequired = defineRule<{
     const { git } = ctx.providers;
     const { watch, require: requirePatterns, exclude, message } = ctx.options;
 
+    if (!git) {
+      ctx.meta('git provider not available');
+      return;
+    }
+
     // Get changed files from staged (commit hook) or diff (CI/manual)
     const staged = await git.stagedFiles();
     const changed = staged.length > 0

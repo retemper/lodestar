@@ -169,7 +169,7 @@ interface RuleProviders {
   /** Project configuration file access */
   readonly config: ConfigFileProvider;
   /** Git operations — available when the project is inside a git repository */
-  readonly git: GitProvider;
+  readonly git?: GitProvider;
 }
 
 /** Rule definition — the unit of architectural enforcement */
