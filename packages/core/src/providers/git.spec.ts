@@ -201,6 +201,58 @@ describe('createGitProvider', () => {
     });
   });
 
+  describe('diffContent without options', () => {
+    it('옵션 없이 호출하면 working tree diff를 반환한다', async () => {
+      const rootDir = await setupGitRepo();
+
+      // Modify file without staging
+      await writeFile(join(rootDir, 'README.md'), '# Working tree change', 'utf-8');
+
+      const git = createGitProvider(rootDir);
+      const diff = await git.diffContent('README.md');
+
+      expect(diff).toContain('Working tree change');
+    });
+  });
+
+  describe('diffFiles without head', () => {
+    it('head를 생략하면 HEAD를 기본값으로 사용한다', async () => {
+      const rootDir = await setupGitRepo();
+
+      const { stdout: base } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
+        cwd: rootDir,
+      });
+
+      await writeFile(join(rootDir, 'new.ts'), 'export {}', 'utf-8');
+      await execFileAsync('git', ['add', '.'], { cwd: rootDir });
+      await execFileAsync('git', ['commit', '-m', 'add new'], { cwd: rootDir });
+
+      const git = createGitProvider(rootDir);
+      const files = await git.diffFiles(base.trim());
+
+      expect(files).toContain('new.ts');
+    });
+  });
+
+  describe('isAncestor without descendant', () => {
+    it('descendant를 생략하면 HEAD를 기본값으로 사용한다', async () => {
+      const rootDir = await setupGitRepo();
+
+      const { stdout: ancestor } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
+        cwd: rootDir,
+      });
+
+      await writeFile(join(rootDir, 'file.txt'), 'content', 'utf-8');
+      await execFileAsync('git', ['add', '.'], { cwd: rootDir });
+      await execFileAsync('git', ['commit', '-m', 'child'], { cwd: rootDir });
+
+      const git = createGitProvider(rootDir);
+      const result = await git.isAncestor(ancestor.trim());
+
+      expect(result).toBe(true);
+    });
+  });
+
   describe('git이 없는 환경', () => {
     it('git 저장소가 아닌 디렉토리에서 에러를 던진다', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-git-test-nogit-'));
@@ -208,6 +260,16 @@ describe('createGitProvider', () => {
       const git = createGitProvider(rootDir);
 
       await expect(git.currentBranch()).rejects.toThrow('Git is not available');
+    });
+
+    it('한 번 실패한 후 다시 호출해도 에러를 던진다', async () => {
+      const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-git-test-nogit2-'));
+      dirs.push(rootDir);
+      const git = createGitProvider(rootDir);
+
+      await expect(git.currentBranch()).rejects.toThrow('Git is not available');
+      // Second call should also throw (cached failure)
+      await expect(git.stagedFiles()).rejects.toThrow('Git is not available');
     });
   });
 });
