@@ -1,3 +1,7 @@
+---
+description: 'API reference for lodestar.config.ts — defineConfig options, rule configuration, and type definitions.'
+---
+
 # Config File Reference
 
 ## `defineConfig(config)`

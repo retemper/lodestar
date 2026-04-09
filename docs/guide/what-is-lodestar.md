@@ -1,3 +1,7 @@
+---
+description: 'Learn what Lodestar is — a declarative architecture enforcement framework for TypeScript/JavaScript projects.'
+---
+
 # What is Lodestar?
 
 Lodestar enforces **intra-package architecture rules** that ESLint can't — layer dependencies, module boundaries, circular imports. Define your architecture in `lodestar.config.ts`, enforce it in CI.

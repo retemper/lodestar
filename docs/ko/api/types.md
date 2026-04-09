@@ -1,3 +1,7 @@
+---
+description: '@retemper/lodestar-types API 레퍼런스 — 공유 TypeScript 타입 정의와 인터페이스.'
+---
+
 # @retemper/lodestar-types
 
 모든 Lodestar 패키지에서 공유되는 런타임 비용 없는 타입 정의입니다.

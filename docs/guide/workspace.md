@@ -1,3 +1,7 @@
+---
+description: 'Run Lodestar across monorepo packages with automatic workspace discovery and per-package configs.'
+---
+
 # Workspace Mode
 
 Lodestar supports monorepo workspace mode. Each package can have its own independent `lodestar.config.ts`.

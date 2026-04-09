@@ -1,3 +1,7 @@
+---
+description: 'plugin-architecture reference — layers, modules, no-circular, and no-circular-packages rules.'
+---
+
 # plugin-architecture
 
 The core plugin. Enforces intra-package architecture rules — layer dependencies, module boundaries, and circular import detection.

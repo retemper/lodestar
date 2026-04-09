@@ -1,3 +1,7 @@
+---
+description: 'adapter-stylelint — generate Stylelint config from lodestar.config.ts.'
+---
+
 # adapter-stylelint
 
 Runs Stylelint via the CLI and parses JSON output for CSS lint violations. Also generates a `.stylelintrc.json` config file.

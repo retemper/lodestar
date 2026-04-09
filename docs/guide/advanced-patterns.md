@@ -1,3 +1,7 @@
+---
+description: 'Advanced Lodestar patterns — conditional rules, shared configs, dynamic options, and multi-layer setups.'
+---
+
 # Advanced Patterns
 
 Patterns for teams with more complex architectures, multi-package setups, or sophisticated enforcement needs.

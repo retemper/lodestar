@@ -1,3 +1,7 @@
+---
+description: 'adapter-commitlint — generate commitlint config from lodestar.config.ts.'
+---
+
 # adapter-commitlint
 
 Generates a `.commitlintrc.json` config file for commit message linting. This is a setup-only adapter: commitlint is invoked by husky, not by lodestar directly.

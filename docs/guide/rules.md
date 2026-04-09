@@ -1,3 +1,7 @@
+---
+description: 'Understand how Lodestar rules work — severity levels, options, providers, and how to configure them.'
+---
+
 # Rules
 
 A rule is the smallest unit of enforcement. Each rule declares what data sources it needs and runs a check against the project.

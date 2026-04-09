@@ -1,3 +1,7 @@
+---
+description: 'API reference for @retemper/lodestar-types — shared TypeScript type definitions and interfaces.'
+---
+
 # @retemper/lodestar-types
 
 Zero-runtime type definitions shared across all Lodestar packages.

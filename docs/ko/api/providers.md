@@ -1,3 +1,7 @@
+---
+description: 'Lodestar 프로바이더 API 레퍼런스 — FileSystem, DependencyGraph, AST, ConfigFile.'
+---
+
 # 프로바이더(Providers)
 
 프로바이더(Provider)는 규칙(Rule)에게 프로젝트 데이터에 대한 읽기 전용 접근을 제공합니다. `needs` 배열을 통해 규칙이 필요한 프로바이더를 선언합니다.

@@ -1,3 +1,7 @@
+---
+description: 'adapter-prettier — lodestar.config.ts에서 .prettierrc와 .prettierignore를 생성.'
+---
+
 # adapter-prettier
 
 Prettier를 CLI(`prettier --check` / `prettier --write`)로 실행하고, `.prettierrc` 파일을 생성합니다.

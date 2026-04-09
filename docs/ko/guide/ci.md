@@ -1,3 +1,7 @@
+---
+description: 'CI/CD에 Lodestar 통합하기 — GitHub Actions, GitLab CI 등 파이프라인 설정 가이드.'
+---
+
 # CI/CD 연동
 
 Lodestar는 단일 CLI 명령으로 실행되므로 어떤 CI 파이프라인에도 쉽게 통합할 수 있습니다.

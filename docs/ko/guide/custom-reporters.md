@@ -1,3 +1,7 @@
+---
+description: '커스텀 Lodestar Reporter 만들기 — 검사 결과를 JSON, HTML 등 원하는 형식으로 출력.'
+---
+
 # 커스텀 Reporter
 
 Reporter는 lodestar가 결과를 표시하는 방식을 제어합니다. Lodestar는 두 가지 내장 reporter(`console`과 `json`)를 제공하며, 직접 작성할 수도 있습니다.

@@ -1,3 +1,7 @@
+---
+description: 'Install Lodestar and create your first lodestar.config.ts to enforce architecture rules in minutes.'
+---
+
 # Getting Started
 
 ## Installation

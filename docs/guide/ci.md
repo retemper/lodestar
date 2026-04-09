@@ -1,3 +1,7 @@
+---
+description: 'Integrate Lodestar into CI/CD pipelines — GitHub Actions, GitLab CI, and other CI systems.'
+---
+
 # CI/CD Integration
 
 Lodestar runs as a single CLI command, making it easy to integrate into any CI pipeline.

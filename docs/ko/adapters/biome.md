@@ -1,3 +1,7 @@
+---
+description: 'adapter-biome — lodestar.config.ts에서 biome.json 설정을 생성.'
+---
+
 # adapter-biome
 
 Biome을 CLI로 실행하고, `biome.json` 설정 파일을 생성합니다.

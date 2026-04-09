@@ -1,3 +1,7 @@
+---
+description: '@retemper/lodestar-config API 레퍼런스 — 프로그래밍 방식의 설정 로딩과 해석 유틸리티.'
+---
+
 # @retemper/lodestar-config
 
 설정 로딩, 정규화 및 병합을 담당합니다.

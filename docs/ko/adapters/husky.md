@@ -1,3 +1,7 @@
+---
+description: 'adapter-husky — lodestar.config.ts에서 Git hooks 설정을 생성.'
+---
+
 # adapter-husky
 
 Husky를 통해 Git 훅(Hook)을 관리합니다. 다른 어댑터와 달리 `check`이나 `fix` 메서드는 없고, `verifySetup`과 `setup`만 제공합니다.

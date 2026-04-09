@@ -1,3 +1,7 @@
+---
+description: 'API reference for @retemper/lodestar-core — the engine that runs rules and produces results.'
+---
+
 # @retemper/lodestar-core
 
 Rule engine, runner, plugin resolver, and providers.

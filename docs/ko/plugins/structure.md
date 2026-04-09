@@ -1,3 +1,7 @@
+---
+description: 'plugin-structure 레퍼런스 — directory-exists, no-forbidden-path, paired-files 규칙.'
+---
+
 # plugin-structure
 
 파일 시스템 구조 규칙을 강제합니다 -- 디렉토리 존재 여부, 금지 경로, 페어 파일(Paired File) 검증.

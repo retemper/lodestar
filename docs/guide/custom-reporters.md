@@ -1,3 +1,7 @@
+---
+description: 'Create custom Lodestar reporters to format check results as JSON, HTML, or any output format.'
+---
+
 # Custom Reporters
 
 Reporters control how lodestar displays results. Lodestar ships with two built-in reporters (`console` and `json`) and lets you write your own.

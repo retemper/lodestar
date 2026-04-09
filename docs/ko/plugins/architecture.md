@@ -1,3 +1,7 @@
+---
+description: 'plugin-architecture 레퍼런스 — layers, modules, no-circular, no-circular-packages 규칙.'
+---
+
 # plugin-architecture
 
 핵심 플러그인(Plugin)입니다. 패키지 내부의 아키텍처 규칙 -- 레이어 의존성, 모듈 경계, 순환 임포트 감지를 강제합니다.

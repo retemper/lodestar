@@ -1,3 +1,7 @@
+---
+description: 'adapter-husky — generate Git hooks configuration from lodestar.config.ts.'
+---
+
 # adapter-husky
 
 Manages git hooks via Husky. Unlike other adapters, husky has no `check` or `fix` methods -- it only provides `verifySetup` and `setup`.

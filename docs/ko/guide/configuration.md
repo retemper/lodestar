@@ -1,3 +1,7 @@
+---
+description: 'lodestar.config.ts 완벽 가이드 — 플러그인, 규칙, include/exclude, 베이스라인 설정.'
+---
+
 # 설정(Configuration)
 
 Lodestar는 프로젝트 루트의 `lodestar.config.ts` 파일로 설정합니다.

@@ -1,3 +1,7 @@
+---
+description: 'adapter-prettier — generate .prettierrc and .prettierignore from lodestar.config.ts.'
+---
+
 # adapter-prettier
 
 Runs Prettier via the CLI (`prettier --check` / `prettier --write`) and generates a `.prettierrc` file.

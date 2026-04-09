@@ -1,3 +1,7 @@
+---
+description: 'lodestar.config.ts API 레퍼런스 — defineConfig 옵션, 규칙 설정, 타입 정의.'
+---
+
 # 설정 파일 레퍼런스
 
 ## `defineConfig(config)`

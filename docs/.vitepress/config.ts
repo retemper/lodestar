@@ -1,39 +1,81 @@
-import { defineConfig } from 'vitepress';
+import { defineConfig, type HeadConfig, type TransformContext } from 'vitepress';
 
-const sharedHead = [
-  ['meta', { property: 'og:type', content: 'website' }],
-  ['meta', { property: 'og:url', content: 'https://retemper.github.io/lodestar/' }],
-  ['meta', { name: 'twitter:card', content: 'summary' }],
-  ['link', { rel: 'canonical', href: 'https://retemper.github.io/lodestar/' }],
-  ['link', { rel: 'author', type: 'text/plain', href: '/lodestar/llm.txt' }],
-] as const;
+const HOSTNAME = 'https://retemper.github.io/lodestar';
+
+/** Generates per-page head tags for canonical, OG, hreflang, and JSON-LD. */
+function buildDynamicHead(context: TransformContext): HeadConfig[] {
+  const { pageData } = context;
+  const relativePath = pageData.relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '');
+  const pageUrl = `${HOSTNAME}/${relativePath}`;
+  const title = pageData.title || 'Lodestar';
+  const description =
+    pageData.description ||
+    'One config to govern your project — architecture rules, tool configs, and setup verification.';
+  const isKo = relativePath.startsWith('ko/');
+  const counterpart = isKo ? relativePath.replace(/^ko\//, '') : `ko/${relativePath}`;
+  const counterpartUrl = `${HOSTNAME}/${counterpart}`;
+
+  const heads: HeadConfig[] = [
+    ['link', { rel: 'canonical', href: pageUrl }],
+    ['meta', { property: 'og:url', content: pageUrl }],
+    ['meta', { property: 'og:title', content: title }],
+    ['meta', { property: 'og:description', content: description }],
+    ['meta', { name: 'twitter:title', content: title }],
+    ['meta', { name: 'twitter:description', content: description }],
+    [
+      'link',
+      {
+        rel: 'alternate',
+        hreflang: isKo ? 'en' : 'ko',
+        href: counterpartUrl,
+      },
+    ],
+    [
+      'link',
+      {
+        rel: 'alternate',
+        hreflang: isKo ? 'ko' : 'en',
+        href: pageUrl,
+      },
+    ],
+    ['link', { rel: 'alternate', hreflang: 'x-default', href: `${HOSTNAME}/${isKo ? counterpart : relativePath}` }],
+  ];
+
+  return heads;
+}
 
 export default defineConfig({
   title: 'Lodestar',
   base: '/lodestar/',
   cleanUrls: true,
   sitemap: {
-    hostname: 'https://retemper.github.io/lodestar',
+    hostname: HOSTNAME,
+  },
+  transformHead(context) {
+    return buildDynamicHead(context);
   },
   head: [
-    ...sharedHead,
-    ['meta', { property: 'og:title', content: 'Lodestar' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:image', content: `${HOSTNAME}/og-image.png` }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: `${HOSTNAME}/og-image.png` }],
+    ['link', { rel: 'author', type: 'text/plain', href: '/lodestar/llm.txt' }],
     [
-      'meta',
-      {
-        property: 'og:description',
-        content:
-          'One config to govern your project — architecture rules, tool configs, and setup verification.',
-      },
-    ],
-    ['meta', { name: 'twitter:title', content: 'Lodestar' }],
-    [
-      'meta',
-      {
-        name: 'twitter:description',
-        content:
-          'One config to govern your project — architecture rules, tool configs, and setup verification.',
-      },
+      'script',
+      { type: 'application/ld+json' },
+      JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareSourceCode',
+        name: 'Lodestar',
+        description:
+          'Declarative project governance framework — architecture rules, tool configs, and setup verification for TypeScript/JavaScript.',
+        url: HOSTNAME,
+        codeRepository: 'https://github.com/retemper/lodestar',
+        programmingLanguage: 'TypeScript',
+        license: 'https://opensource.org/licenses/MIT',
+        runtimePlatform: 'Node.js',
+        applicationCategory: 'DeveloperApplication',
+      }),
     ],
   ],
   locales: {

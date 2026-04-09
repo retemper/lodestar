@@ -1,3 +1,7 @@
+---
+description: 'Overview of Lodestar adapters — generate ESLint, Prettier, Biome, and other tool configs from one source.'
+---
+
 # Adapters
 
 Adapters are integrations with external tools -- linters, formatters, and git hooks -- declared in `lodestar.config.ts`. They let you centralize tool configuration in a single source of truth while generating the native config files that each tool and IDE expects.

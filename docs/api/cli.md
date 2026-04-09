@@ -1,3 +1,7 @@
+---
+description: 'Lodestar CLI reference — check, init, graph, and impact commands with all available flags.'
+---
+
 # CLI Reference
 
 ## `lodestar check`

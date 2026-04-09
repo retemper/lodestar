@@ -1,3 +1,7 @@
+---
+description: 'API reference for defineRule — create typed rules with providers, schemas, and check functions.'
+---
+
 # defineRule
 
 Create a typed rule definition.
