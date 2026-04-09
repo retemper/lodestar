@@ -1,3 +1,7 @@
+---
+description: '모노레포에서 Lodestar 실행하기 — 자동 워크스페이스 감지와 패키지별 독립 설정.'
+---
+
 # 워크스페이스 모드(Workspace Mode)
 
 Lodestar는 모노레포 워크스페이스 모드를 지원합니다. 각 패키지는 독립적인 자체 `lodestar.config.ts`를 가질 수 있습니다.

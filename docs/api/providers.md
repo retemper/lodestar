@@ -1,3 +1,7 @@
+---
+description: 'API reference for Lodestar providers — FileSystem, DependencyGraph, AST, and ConfigFile data sources.'
+---
+
 # Providers
 
 Providers give rules read-only access to project data. Declare which providers a rule needs via the `needs` array.

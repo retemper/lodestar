@@ -1,3 +1,7 @@
+---
+description: '@retemper/lodestar-core API 레퍼런스 — 규칙을 실행하고 결과를 생성하는 엔진.'
+---
+
 # @retemper/lodestar-core
 
 규칙 엔진(Rule Engine), 러너(Runner), 플러그인 리졸버(Plugin Resolver) 및 프로바이더(Provider)를 담당합니다.

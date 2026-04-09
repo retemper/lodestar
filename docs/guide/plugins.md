@@ -1,3 +1,7 @@
+---
+description: 'Learn how Lodestar plugins bundle related rules and how to register them in your configuration.'
+---
+
 # Plugins
 
 A plugin is a named collection of rules. Lodestar ships one official plugin and supports custom third-party plugins.

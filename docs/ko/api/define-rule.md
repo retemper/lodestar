@@ -1,3 +1,7 @@
+---
+description: 'defineRule API 레퍼런스 — 프로바이더, 스키마, 체크 함수로 타입 안전한 규칙 작성.'
+---
+
 # defineRule
 
 타입이 지정된 규칙(Rule) 정의를 생성합니다.

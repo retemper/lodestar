@@ -1,3 +1,7 @@
+---
+description: 'Lodestar CLI 레퍼런스 — check, init, graph, impact 명령어와 플래그 설명.'
+---
+
 # CLI 레퍼런스
 
 ## `lodestar check`

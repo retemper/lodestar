@@ -1,3 +1,7 @@
+---
+description: 'API reference for @retemper/lodestar-test-utils — test helpers for rule and plugin authors.'
+---
+
 # test-utils
 
 Testing utilities for Lodestar rules. Provides mock providers and a test context that collects violations, so you can unit test rules without touching the file system or real dependency graphs.

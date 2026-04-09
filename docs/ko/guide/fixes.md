@@ -1,3 +1,7 @@
+---
+description: 'Lodestar 규칙에 자동 수정 기능 추가하기 — lodestar check --fix로 위반 자동 해결.'
+---
+
 # 자동 수정
 
 Lodestar는 셋업 위반과 코드 위반 모두에 대한 자동 수정을 지원합니다. `lodestar check --fix`를 실행하여 사용 가능한 모든 수정을 적용하세요.

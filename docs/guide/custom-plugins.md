@@ -1,3 +1,7 @@
+---
+description: 'Bundle custom rules into reusable Lodestar plugins and share them as npm packages.'
+---
+
 # Custom Plugins
 
 A plugin bundles multiple rules into a single installable package.

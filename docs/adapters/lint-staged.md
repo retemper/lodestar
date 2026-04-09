@@ -1,3 +1,7 @@
+---
+description: 'adapter-lint-staged — generate lint-staged config from lodestar.config.ts.'
+---
+
 # adapter-lint-staged
 
 Generates a `.lintstagedrc.json` config file that maps glob patterns to commands. This is a setup-only adapter: lint-staged is invoked by husky, not by lodestar directly.

@@ -1,3 +1,7 @@
+---
+description: 'adapter-eslint — generate ESLint flat config from lodestar.config.ts with centralized rule management.'
+---
+
 # adapter-eslint
 
 Runs ESLint via the Node API and generates an `eslint.config.js` bridge file for IDE integration.

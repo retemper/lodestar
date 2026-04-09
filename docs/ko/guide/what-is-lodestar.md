@@ -1,3 +1,7 @@
+---
+description: 'Lodestar란 무엇인가 — TypeScript/JavaScript 프로젝트를 위한 선언적 아키텍처 규칙 프레임워크.'
+---
+
 # Lodestar란?
 
 Lodestar는 ESLint가 할 수 없는 **패키지 내부 아키텍처 규칙**을 강제합니다 -- 레이어 의존성, 모듈 경계, 순환 참조. `lodestar.config.ts`에 아키텍처를 정의하고 CI에서 강제하세요.

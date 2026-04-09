@@ -1,3 +1,7 @@
+---
+description: 'adapter-eslint — lodestar.config.ts에서 ESLint flat config를 생성하여 규칙을 중앙 관리.'
+---
+
 # adapter-eslint
 
 ESLint를 Node API로 실행하고, IDE 연동을 위한 `eslint.config.js` 브릿지(Bridge) 파일을 생성합니다.

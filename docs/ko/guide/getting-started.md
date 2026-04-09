@@ -1,3 +1,7 @@
+---
+description: 'Lodestar 설치부터 첫 lodestar.config.ts 설정까지 빠르게 시작하는 가이드.'
+---
+
 # 시작하기
 
 ## 설치

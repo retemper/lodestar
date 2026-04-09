@@ -1,3 +1,7 @@
+---
+description: 'definePlugin API 레퍼런스 — 규칙을 플러그인으로 묶어 메타데이터와 함께 내보내기.'
+---
+
 # definePlugin
 
 여러 규칙(Rule)을 묶는 플러그인(Plugin)을 생성합니다.

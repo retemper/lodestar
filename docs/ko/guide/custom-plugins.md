@@ -1,3 +1,7 @@
+---
+description: '커스텀 규칙을 재사용 가능한 Lodestar 플러그인으로 묶어 npm 패키지로 배포하기.'
+---
+
 # 커스텀 플러그인(Custom Plugins)
 
 플러그인(Plugin)은 여러 규칙(Rule)을 하나의 설치 가능한 패키지로 묶은 것입니다.

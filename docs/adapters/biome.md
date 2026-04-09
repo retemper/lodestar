@@ -1,3 +1,7 @@
+---
+description: 'adapter-biome — generate biome.json configuration from lodestar.config.ts.'
+---
+
 # adapter-biome
 
 Runs Biome via the CLI and generates a `biome.json` config file.

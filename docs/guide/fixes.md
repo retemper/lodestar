@@ -1,3 +1,7 @@
+---
+description: 'Enable auto-fix in Lodestar rules to automatically resolve violations with lodestar check --fix.'
+---
+
 # Auto-fix
 
 Lodestar supports automatic fixes for both setup violations and code violations. Run `lodestar check --fix` to apply all available fixes.

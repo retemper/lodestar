@@ -1,3 +1,7 @@
+---
+description: 'API reference for definePlugin — bundle rules into plugins with metadata and named exports.'
+---
+
 # definePlugin
 
 Create a plugin that bundles multiple rules.

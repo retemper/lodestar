@@ -1,3 +1,7 @@
+---
+description: 'Adopt Lodestar incrementally in an existing project using baselines to suppress legacy violations.'
+---
+
 # Adopting Lodestar in an Existing Project
 
 A step-by-step guide to introducing Lodestar into a project that already has code, dependencies, and existing tooling.

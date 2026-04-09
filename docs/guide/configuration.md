@@ -1,3 +1,7 @@
+---
+description: 'Complete guide to lodestar.config.ts — plugins, rules, include/exclude patterns, and baseline support.'
+---
+
 # Configuration
 
 Lodestar is configured via a `lodestar.config.ts` file in your project root.

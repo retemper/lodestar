@@ -1,3 +1,7 @@
+---
+description: 'plugin-structure reference — directory-exists, no-forbidden-path, and paired-files rules.'
+---
+
 # plugin-structure
 
 Enforces file system structure rules -- directory existence, forbidden paths, and paired file validation.

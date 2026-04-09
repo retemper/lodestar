@@ -1,3 +1,7 @@
+---
+description: 'adapter-commitlint — lodestar.config.ts에서 commitlint 설정을 생성.'
+---
+
 # adapter-commitlint
 
 커밋 메시지 린팅(Linting)을 위한 `.commitlintrc.json` 설정 파일을 생성합니다. 이 어댑터는 설정 전용(Setup-only) 어댑터로, commitlint는 husky에 의해 호출되며 lodestar가 직접 실행하지 않습니다.

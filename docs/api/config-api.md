@@ -1,3 +1,7 @@
+---
+description: 'API reference for @retemper/lodestar-config — programmatic config loading and resolution utilities.'
+---
+
 # @retemper/lodestar-config
 
 Config loading, normalization, and merging.

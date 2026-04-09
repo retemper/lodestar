@@ -1,3 +1,7 @@
+---
+description: 'adapter-knip — lodestar.config.ts에서 Knip 미사용 코드 감지 설정을 생성.'
+---
+
 # adapter-knip
 
 Knip을 CLI로 실행하고 JSON 출력을 파싱하여 사용되지 않는 파일, 의존성, 내보내기(Export)를 탐지합니다. `knip.json` 설정 파일도 생성합니다.

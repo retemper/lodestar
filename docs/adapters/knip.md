@@ -1,3 +1,7 @@
+---
+description: 'adapter-knip — generate Knip unused code detection config from lodestar.config.ts.'
+---
+
 # adapter-knip
 
 Runs Knip via the CLI and parses JSON output to find unused files, dependencies, and exports. Also generates a `knip.json` config file.

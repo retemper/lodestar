@@ -38,19 +38,19 @@ export { myPlugin };  // named export, NOT default
 
 ```ts
 import { defineConfig } from '@retemper/lodestar';
-import { pluginFs } from '@retemper/lodestar-plugin-fs-layout';
+import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
-  plugins: [pluginFs],                    // direct imports (preferred)
+  plugins: [pluginArchitecture],            // direct imports (preferred)
   rules: {
-    'fs-layout/directory-exists': {
-      severity: 'error',                  // 'error' | 'warn' | 'off'
-      options: { required: ['src'] },
+    'architecture/layers': {
+      severity: 'error',                    // 'error' | 'warn' | 'off'
+      options: { layers: [{ name: 'domain', path: 'src/domain/**' }] },
     },
   },
-  include: ['src/**/*.ts'],               // optional, default: ['**/*']
-  exclude: ['node_modules/**'],           // optional
-  baseline: '.lodestar-baseline.json',    // suppress existing violations
+  include: ['src/**/*.ts'],                 // optional, default: ['**/*']
+  exclude: ['node_modules/**'],             // optional
+  baseline: '.lodestar-baseline.json',      // suppress existing violations
 });
 ```
 
@@ -95,116 +95,129 @@ ctx.providers.config.getCustomConfig<T>(filename, dir?): Promise<T>
 
 ## Plugin Reference
 
-### @retemper/lodestar-plugin-fs-layout
+### @retemper/lodestar-plugin-architecture
 
-**fs-layout/directory-exists**
+Architecture as Code — layers, module boundaries, and circular dependency detection.
+
+**architecture/layers**
+Enforces dependency direction between architectural layers.
 ```ts
-options: { required: string[] }  // supports glob patterns: 'src/rules/*/index.ts'
+options: {
+  layers: [{
+    name: string,             // human-readable layer name
+    path: string,             // glob pattern matching files in this layer
+    canImport?: string[],     // layer names this layer may import from
+  }],
+  allowTypeOnly?: boolean,    // permit type-only cross-layer imports (default: false)
+}
 ```
 
-**fs-layout/no-forbidden-path**
+**architecture/modules**
+Forbids importing internal files of a module — requires barrel (index) imports.
 ```ts
-options: { patterns: string[] }  // glob patterns for forbidden files
+options: {
+  modules: string[],          // module root directories enforcing barrel-only imports
+  allow?: string[],           // deep import paths permitted as exceptions
+  include?: string[],         // glob for files to check
+  exclude?: string[],         // glob for files to skip
+}
 ```
 
-**fs-layout/paired-files**
+**architecture/no-circular**
+Detects circular dependency chains between files.
+```ts
+options: {
+  entries?: string[],         // glob for entry points (default: all)
+  ignore?: string[],          // glob for files to skip
+  maxDepth?: number,          // max cycle chain length
+}
+```
+
+**architecture/no-circular-packages**
+Detects circular dependencies between workspace packages via package.json.
+```ts
+options: {
+  scope?: string,             // e.g. '@retemper' — auto-detected if omitted
+}
+```
+
+### @retemper/lodestar-plugin-structure
+
+File system structure enforcement — directory existence, forbidden paths, and paired file validation.
+
+**structure/directory-exists**
+Verifies that required directories or files exist. Supports auto-fix.
+```ts
+options: {
+  required: string[],         // glob patterns for paths that must exist
+}
+```
+
+**structure/no-forbidden-path**
+Verifies that forbidden paths do not exist.
+```ts
+options: {
+  patterns: string[],         // glob patterns for paths that must NOT exist
+}
+```
+
+**structure/paired-files**
+Verifies that source files have required companion files. Supports auto-fix.
 ```ts
 options: {
   pairs: [{
-    source: string,                      // glob for source files
-    required: string | string[],         // template(s): '{dir}/{name}.spec.ts'
-    message?: string,
-  }]
+    source: string,           // glob pattern matching source files
+    required: string,         // template: '{dir}/{name}.spec.ts'
+    message?: string,         // custom error message
+  }],
 }
 ```
 
-### @retemper/lodestar-plugin-naming-convention
+## Reporters
 
-**naming-convention/file-naming**
-```ts
-options: {
-  scopes: [{
-    include: string,                     // glob pattern
-    convention?: 'kebab-case' | 'camelCase' | 'PascalCase' | 'snake_case',
-    regex?: string,                      // overrides convention
-    message?: string,
-    exclude?: string[],
-  }]
-}
-```
+Reporters control how results are displayed. Configure via CLI flags or config file.
 
-### @retemper/lodestar-plugin-import-boundary
+### Built-in Reporters
+- **console** (default) — human-readable terminal output
+- **json** — machine-readable JSON output
 
-**import-boundary/no-deep-import**
-```ts
-options: {
-  modules: string[],     // dirs requiring barrel imports
-  allow?: string[],      // permitted deep import paths
-  include?: string[],
-  exclude?: string[],
-}
-```
-
-**import-boundary/manifest-imports**
-```ts
-options: {
-  manifestFile?: string,  // default: 'module.json'
-  include?: string[],     // default: ['**/*.ts']
-  exclude?: string[],
-}
-```
-
+### Reporter Plugins
+- **@retemper/lodestar-reporter-junit** — JUnit XML format for CI systems
+- **@retemper/lodestar-reporter-sarif** — SARIF format for GitHub Code Scanning
 
 ```ts
-options: {
-  allow: string[]  // e.g. ['@retemper/lodestar-types', '@retemper/lodestar-config']
-}
-```
-### @retemper/lodestar-plugin-dependency-graph
-
-**dependency-graph/no-circular**
-```ts
-options: {
-  entries?: string[],   // glob for entry points (default: all)
-  ignore?: string[],    // glob for files to skip
-  maxDepth?: number,    // max cycle chain length
-}
+// lodestar.config.ts
+export default defineConfig({
+  reporters: [
+    'console',
+    ['@retemper/lodestar-reporter-junit', { outputFile: 'results.xml' }],
+  ],
+});
 ```
 
-**dependency-graph/no-circular-packages**
-```ts
-options: {
-  scope?: string  // e.g. '@retemper' — auto-detected if omitted
-}
-```
-Detects cycles between workspace packages via package.json dependencies.
+## Adapters
 
-### @retemper/lodestar-plugin-source-content
+Adapters generate tool-specific config files from `lodestar.config.ts`.
 
-**source-content/no-restricted-text**
-```ts
-options: {
-  include: string[],
-  exclude?: string[],
-  presets?: ('no-korean' | 'no-japanese' | 'no-chinese' | 'ascii-only' | 'no-todo')[],
-  patterns?: [{ regex: string, flags?: string, message: string }],
-}
-```
-
-**source-content/barrel-only**
-```ts
-options: {
-  include: string[],   // glob for barrel files
-  exclude?: string[],
-}
-```
-Ensures files contain only re-exports (all exports have a `source` field in AST).
+| Adapter | Tool | Package |
+|---------|------|---------|
+| adapter-eslint | ESLint | @retemper/lodestar-adapter-eslint |
+| adapter-prettier | Prettier | @retemper/lodestar-adapter-prettier |
+| adapter-biome | Biome | @retemper/lodestar-adapter-biome |
+| adapter-husky | Husky | @retemper/lodestar-adapter-husky |
+| adapter-lint-staged | lint-staged | @retemper/lodestar-adapter-lint-staged |
+| adapter-commitlint | Commitlint | @retemper/lodestar-adapter-commitlint |
+| adapter-knip | Knip | @retemper/lodestar-adapter-knip |
+| adapter-stylelint | Stylelint | @retemper/lodestar-adapter-stylelint |
 
 ## CLI
 
 ```sh
-npx lodestar check [--workspace | --no-workspace]
+npx lodestar check [--workspace | --no-workspace] [--reporter console|json]
 npx lodestar init
+npx lodestar graph [--layers]
+npx lodestar impact <file>
+npx lodestar watch [--reporter console|json]
 ```
 
 Exit code 0 = no errors. Exit code 1 = errors found. Warnings don't fail.
@@ -213,11 +226,8 @@ Exit code 0 = no errors. Exit code 1 = errors found. Warnings don't fail.
 
 Auto-detected when pnpm-workspace.yaml exists. Root config runs globally, per-package `lodestar.config.ts` files run independently (no implicit inheritance). Packages without their own config are skipped.
 
-## Native Acceleration
+## Links
 
-```sh
-pnpm add -D @retemper/lodestar-accel-rust   # napi-rs, ~10-15x
-pnpm add -D @retemper/lodestar-accel-go     # WASM, ~3-5x
-```
-
-Auto-detected, no config needed. Falls back to TypeScript (SWC) implementation.
+- Docs: https://retemper.github.io/lodestar/
+- GitHub: https://github.com/retemper/lodestar
+- Compact reference: /llm.txt

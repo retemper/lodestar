@@ -1,3 +1,7 @@
+---
+description: 'Common Lodestar issues and solutions — config errors, rule conflicts, performance tips, and debugging.'
+---
+
 # Troubleshooting
 
 Common issues and how to resolve them.

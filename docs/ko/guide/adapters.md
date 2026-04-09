@@ -1,3 +1,7 @@
+---
+description: 'Lodestar 어댑터 개요 — ESLint, Prettier, Biome 등 도구 설정을 하나로 통합.'
+---
+
 # 어댑터(Adapters)
 
 어댑터(Adapter)는 외부 도구 -- 린터, 포매터, Git 훅 -- 를 `lodestar.config.ts`에서 선언적으로 통합합니다. 도구 설정을 단일 소스(Single Source of Truth)에서 중앙 관리하면서, 각 도구와 IDE가 기대하는 네이티브 설정 파일을 자동 생성합니다.

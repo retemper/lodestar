@@ -1,6 +1,6 @@
 # Lodestar — Declare your architecture. Enforce it.
 
-Intra-package architecture rules that ESLint can't do — layer dependencies, module boundaries, circular imports. Define your architecture in `lodestar.config.ts`, enforce it in CI, visualize it as a diagram.
+Intra-package architecture enforcement for TypeScript/JavaScript — layer dependencies, module boundaries, circular imports. Plus file structure validation and tool config generation. Define rules in `lodestar.config.ts`, enforce in CI, visualize as diagrams.
 
 ## The Problem
 
@@ -10,6 +10,7 @@ Every project has unwritten architecture rules — "domain shouldn't import infr
 
 ```ts
 // lodestar.config.ts
+import { defineConfig } from '@retemper/lodestar';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 
 export default defineConfig({
@@ -36,6 +37,7 @@ export default defineConfig({
 - `lodestar graph` — visualize file-level dependency graph
 - `lodestar impact <file>` — show files affected by a change
 - `lodestar init` — create config file
+- `lodestar watch` — re-check on file changes (incremental)
 
 ## Rules (plugin-architecture)
 
@@ -43,6 +45,20 @@ export default defineConfig({
 - `architecture/modules` — module boundary encapsulation (barrel imports)
 - `architecture/no-circular` — circular dependency detection
 - `architecture/no-circular-packages` — circular package dependency detection
+
+## Rules (plugin-structure)
+
+- `structure/directory-exists` — required directories/files must exist (auto-fix)
+- `structure/no-forbidden-path` — forbidden paths must not exist
+- `structure/paired-files` — source files must have companion files (auto-fix)
+
+## Reporters
+
+Built-in: console (default), JSON. Plugins: @retemper/lodestar-reporter-junit, @retemper/lodestar-reporter-sarif.
+
+## Adapters
+
+Generate tool configs from lodestar.config.ts: ESLint, Prettier, Biome, Husky, lint-staged, Commitlint, Knip, Stylelint.
 
 ## Links
 

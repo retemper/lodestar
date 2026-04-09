@@ -1,3 +1,7 @@
+---
+description: 'TypeScript로 커스텀 Lodestar 규칙 작성하기 — AST, 의존성 그래프, 파일시스템 프로바이더 활용.'
+---
+
 # 커스텀 규칙(Custom Rules)
 
 `defineRule`을 사용하여 TypeScript로 직접 규칙을 작성할 수 있습니다.

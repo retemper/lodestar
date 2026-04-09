@@ -1,3 +1,7 @@
+---
+description: 'Write custom Lodestar rules in TypeScript with access to AST, dependency graph, and file system providers.'
+---
+
 # Custom Rules
 
 Write your own rules in TypeScript using `defineRule`.
