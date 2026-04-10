@@ -1,4 +1,4 @@
-import { describe, it, expect, afterAll } from 'vitest';
+import { describe, it, expect, afterAll, beforeAll } from 'vitest';
 import { mkdtemp, writeFile, rm, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -34,12 +34,17 @@ afterAll(async () => {
   }
 });
 
+// Shared repo setup for tests that only need a basic git repo.
+// Reduces Windows CI time by avoiding repeated git init + commit.
+let sharedRepo: string;
+beforeAll(async () => {
+  sharedRepo = await setupGitRepo();
+}, 30_000);
+
 describe('createGitProvider', () => {
   describe('currentBranch', () => {
     it('현재 브랜치 이름을 반환한다', async () => {
-      const rootDir = await setupGitRepo();
-      const git = createGitProvider(rootDir);
-
+      const git = createGitProvider(sharedRepo);
       const branch = await git.currentBranch();
 
       // git init creates 'main' or 'master' depending on git config
@@ -61,13 +66,12 @@ describe('createGitProvider', () => {
       const branch = await git.currentBranch();
 
       expect(branch).toBeNull();
-    });
+    }, 30_000);
   });
 
   describe('stagedFiles', () => {
     it('GIT_INDEX_FILE이 없으면 빈 배열을 반환한다', async () => {
-      const rootDir = await setupGitRepo();
-      const git = createGitProvider(rootDir);
+      const git = createGitProvider(sharedRepo);
 
       // Ensure GIT_INDEX_FILE is not set
       delete process.env.GIT_INDEX_FILE;
@@ -100,7 +104,7 @@ describe('createGitProvider', () => {
           process.env.GIT_INDEX_FILE = originalEnv;
         }
       }
-    });
+    }, 30_000);
   });
 
   describe('diffFiles', () => {
@@ -122,7 +126,24 @@ describe('createGitProvider', () => {
       const files = await git.diffFiles(base.trim(), 'HEAD');
 
       expect(files).toContain('src/app.ts');
-    });
+    }, 30_000);
+
+    it('head를 생략하면 HEAD를 기본값으로 사용한다', async () => {
+      const rootDir = await setupGitRepo();
+
+      const { stdout: base } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
+        cwd: rootDir,
+      });
+
+      await writeFile(join(rootDir, 'new.ts'), 'export {}', 'utf-8');
+      await execFileAsync('git', ['add', '.'], { cwd: rootDir });
+      await execFileAsync('git', ['commit', '-m', 'add new'], { cwd: rootDir });
+
+      const git = createGitProvider(rootDir);
+      const files = await git.diffFiles(base.trim());
+
+      expect(files).toContain('new.ts');
+    }, 30_000);
   });
 
   describe('diffContent', () => {
@@ -138,7 +159,7 @@ describe('createGitProvider', () => {
 
       expect(diff).toContain('Updated');
       expect(diff).toContain('diff --git');
-    });
+    }, 30_000);
 
     it('base ref 기준 diff를 반환한다', async () => {
       const rootDir = await setupGitRepo();
@@ -155,7 +176,19 @@ describe('createGitProvider', () => {
       const diff = await git.diffContent('README.md', { base: base.trim() });
 
       expect(diff).toContain('Changed');
-    });
+    }, 30_000);
+
+    it('옵션 없이 호출하면 working tree diff를 반환한다', async () => {
+      const rootDir = await setupGitRepo();
+
+      // Modify file without staging
+      await writeFile(join(rootDir, 'README.md'), '# Working tree change', 'utf-8');
+
+      const git = createGitProvider(rootDir);
+      const diff = await git.diffContent('README.md');
+
+      expect(diff).toContain('Working tree change');
+    }, 30_000);
   });
 
   describe('isAncestor', () => {
@@ -175,7 +208,7 @@ describe('createGitProvider', () => {
       const result = await git.isAncestor(ancestor.trim(), 'HEAD');
 
       expect(result).toBe(true);
-    });
+    }, 30_000);
 
     it('ancestor가 아니면 false를 반환한다', async () => {
       const rootDir = await setupGitRepo();
@@ -198,43 +231,8 @@ describe('createGitProvider', () => {
       const result = await git.isAncestor(commitA.trim(), 'HEAD');
 
       expect(result).toBe(false);
-    });
-  });
+    }, 30_000);
 
-  describe('diffContent without options', () => {
-    it('옵션 없이 호출하면 working tree diff를 반환한다', async () => {
-      const rootDir = await setupGitRepo();
-
-      // Modify file without staging
-      await writeFile(join(rootDir, 'README.md'), '# Working tree change', 'utf-8');
-
-      const git = createGitProvider(rootDir);
-      const diff = await git.diffContent('README.md');
-
-      expect(diff).toContain('Working tree change');
-    });
-  });
-
-  describe('diffFiles without head', () => {
-    it('head를 생략하면 HEAD를 기본값으로 사용한다', async () => {
-      const rootDir = await setupGitRepo();
-
-      const { stdout: base } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
-        cwd: rootDir,
-      });
-
-      await writeFile(join(rootDir, 'new.ts'), 'export {}', 'utf-8');
-      await execFileAsync('git', ['add', '.'], { cwd: rootDir });
-      await execFileAsync('git', ['commit', '-m', 'add new'], { cwd: rootDir });
-
-      const git = createGitProvider(rootDir);
-      const files = await git.diffFiles(base.trim());
-
-      expect(files).toContain('new.ts');
-    });
-  });
-
-  describe('isAncestor without descendant', () => {
     it('descendant를 생략하면 HEAD를 기본값으로 사용한다', async () => {
       const rootDir = await setupGitRepo();
 
@@ -250,23 +248,20 @@ describe('createGitProvider', () => {
       const result = await git.isAncestor(ancestor.trim());
 
       expect(result).toBe(true);
-    });
+    }, 30_000);
   });
 
   describe('execGit', () => {
     it('성공한 git 명령의 stdout을 반환한다', async () => {
-      const rootDir = await setupGitRepo();
-      const result = await execGit(['rev-parse', '--git-dir'], rootDir);
+      const result = await execGit(['rev-parse', '--git-dir'], sharedRepo);
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toBeTruthy();
     });
 
     it('allowNonZero=false이면 non-zero exit code에서 reject한다', async () => {
-      const rootDir = await setupGitRepo();
-
       await expect(
-        execGit(['merge-base', '--is-ancestor', 'HEAD', 'nonexistent-ref'], rootDir, false),
+        execGit(['merge-base', '--is-ancestor', 'HEAD', 'nonexistent-ref'], sharedRepo, false),
       ).rejects.toThrow();
     });
 
@@ -294,7 +289,7 @@ describe('createGitProvider', () => {
       );
 
       expect(result.exitCode).toBe(1);
-    });
+    }, 30_000);
   });
 
   describe('git이 없는 환경', () => {
