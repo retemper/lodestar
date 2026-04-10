@@ -1,4 +1,4 @@
-import type { WrittenConfig, WrittenConfigBlock } from '@retemper/lodestar';
+import type { WrittenConfig, WrittenConfigBlock, ToolAdapter } from '@retemper/lodestar';
 
 /** Check if a rule ID matches any filter pattern (exact or prefix/*) */
 function matchesRuleFilter(ruleId: string, patterns: readonly string[]): boolean {
@@ -29,7 +29,7 @@ function filterAdapters(config: WrittenConfig, adapterNames: readonly string[]):
   const blocks = Array.isArray(config) ? [...config] : [config];
   return blocks.map((block) => {
     if (!block.adapters) return block;
-    const filtered = block.adapters.filter((a) => adapterNames.includes(a.name));
+    const filtered = block.adapters.filter((a: ToolAdapter) => adapterNames.includes(a.name));
     return { ...block, adapters: filtered };
   });
 }

@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { WrittenConfig } from '@retemper/lodestar';
-import type { ToolAdapter } from '@retemper/lodestar-types';
+import type { WrittenConfig, ToolAdapter } from '@retemper/lodestar';
 import { filterRules, filterAdapters, matchesRuleFilter } from './filter';
 
 describe('matchesRuleFilter', () => {
