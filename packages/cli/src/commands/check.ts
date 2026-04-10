@@ -1,11 +1,6 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import type {
-  Logger,
-  WrittenConfig,
-  WrittenConfigBlock,
-  WorkspaceReporter,
-} from '@retemper/lodestar';
+import type { Logger, WorkspaceReporter } from '@retemper/lodestar';
 import {
   loadConfigFile,
   discoverWorkspaces,
@@ -23,6 +18,7 @@ import { createConsoleReporter } from '../reporters/console';
 import { createJsonReporter } from '../reporters/json';
 import { createSarifReporter } from '@retemper/lodestar-reporter-sarif';
 import { createJunitReporter } from '@retemper/lodestar-reporter-junit';
+import { filterRules, filterAdapters } from '../filter';
 
 /** Options for the check command */
 interface CheckOptions {
@@ -30,6 +26,7 @@ interface CheckOptions {
   readonly format: string;
   readonly workspace?: boolean;
   readonly rule?: readonly string[];
+  readonly adapter?: readonly string[];
   readonly fix?: boolean;
   readonly cache?: boolean;
   readonly clearCache?: boolean;
@@ -56,7 +53,8 @@ async function checkCommand(args: ArgumentsCamelCase<CheckOptions>): Promise<voi
     return;
   }
 
-  const effectiveConfig = args.rule ? filterRules(writtenConfig, args.rule) : writtenConfig;
+  let effectiveConfig = args.rule ? filterRules(writtenConfig, args.rule) : writtenConfig;
+  effectiveConfig = args.adapter ? filterAdapters(effectiveConfig, args.adapter) : effectiveConfig;
   const resolved = resolveConfig(effectiveConfig, rootDir);
 
   const reporter = buildReporter(args.format, resolved.reporters, logger);
@@ -146,30 +144,6 @@ function buildReporter(
   }
 
   return createCompositeReporter([cliReporter, ...configReporters]);
-}
-
-/** Filter config blocks to only include specified rules */
-function filterRules(config: WrittenConfig, ruleIds: readonly string[]): WrittenConfig {
-  const blocks = Array.isArray(config) ? [...config] : [config];
-  return blocks.map((block) => {
-    if (!block.rules) return block;
-    const filtered: Record<string, unknown> = {};
-    for (const [id, value] of Object.entries(block.rules)) {
-      if (matchesRuleFilter(id, ruleIds)) {
-        filtered[id] = value;
-      }
-    }
-    return { ...block, rules: filtered as WrittenConfigBlock['rules'] };
-  });
-}
-
-/** Check if a rule ID matches any filter pattern (exact or prefix/*) */
-function matchesRuleFilter(ruleId: string, patterns: readonly string[]): boolean {
-  for (const pattern of patterns) {
-    if (pattern === ruleId) return true;
-    if (pattern.endsWith('/*') && ruleId.startsWith(pattern.slice(0, -1))) return true;
-  }
-  return false;
 }
 
 /** Determine if workspace mode should be used */

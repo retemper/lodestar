@@ -585,6 +585,68 @@ describe('checkCommand', () => {
     });
   });
 
+  describe('--adapter 필터', () => {
+    it('--adapter 필터가 주어지면 매칭되는 adapter만 전달한다', async () => {
+      const configWithAdapters: WrittenConfig = {
+        plugins: [],
+        adapters: [
+          { name: 'eslint', config: {} },
+          { name: 'prettier', config: {} },
+          { name: 'husky', config: {} },
+        ],
+      };
+      mockLoadConfigFile.mockResolvedValue(configWithAdapters);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        adapter: ['prettier'],
+      });
+
+      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<
+        typeof vi.fn
+      >;
+      const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
+      const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
+      expect(blocks[0].adapters).toHaveLength(1);
+      expect(blocks[0].adapters![0].name).toBe('prettier');
+    });
+
+    it('--adapter와 --rule을 함께 사용할 수 있다', async () => {
+      const config: WrittenConfig = {
+        plugins: [],
+        rules: { 'test/one': 'error', 'test/two': 'warn' },
+        adapters: [
+          { name: 'eslint', config: {} },
+          { name: 'prettier', config: {} },
+        ],
+      };
+      mockLoadConfigFile.mockResolvedValue(config);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        rule: ['test/one'],
+        adapter: ['prettier'],
+      });
+
+      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<
+        typeof vi.fn
+      >;
+      const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
+      const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
+      expect(blocks[0].rules).toStrictEqual({ 'test/one': 'error' });
+      expect(blocks[0].adapters).toHaveLength(1);
+      expect(blocks[0].adapters![0].name).toBe('prettier');
+    });
+  });
+
   describe('reporter 선택', () => {
     it('sarif format을 지정하면 SARIF reporter를 사용한다', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);

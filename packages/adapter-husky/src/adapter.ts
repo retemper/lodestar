@@ -11,10 +11,14 @@ function indent(text: string): string {
     .join('\n');
 }
 
-/** Git hook definition — maps hook name to commands */
+/** Git hook definition — declarative or command-based */
 interface HookDefinition {
-  /** Commands to run in this hook, each as a separate line */
-  readonly commands: readonly string[];
+  /** Raw commands to run in this hook */
+  readonly commands?: readonly string[];
+  /** Adapter names — generates `npx lodestar check --adapter <name>` */
+  readonly adapters?: readonly string[];
+  /** Rule patterns — generates `npx lodestar check --rule <pattern>` */
+  readonly rules?: readonly string[];
 }
 
 /** Husky-specific adapter configuration */
@@ -25,16 +29,36 @@ interface HuskyAdapterConfig {
 
 /** Normalize hook config — accept array shorthand or full definition */
 function normalizeHook(hook: HookDefinition | readonly string[]): HookDefinition {
-  if ('commands' in hook) return hook;
-  return { commands: hook };
+  if (Array.isArray(hook)) return { commands: hook as readonly string[] };
+  return hook as HookDefinition;
+}
+
+/** Build a lodestar check command from adapter/rule references */
+function buildLodestarCommand(hook: HookDefinition): string | null {
+  const args: string[] = [];
+  for (const adapter of hook.adapters ?? []) {
+    args.push(`--adapter ${adapter}`);
+  }
+  for (const rule of hook.rules ?? []) {
+    args.push(`--rule "${rule}"`);
+  }
+  if (args.length === 0) return null;
+  return `npx lodestar check --workspace false ${args.join(' ')}`;
 }
 
 /** Build the content of a git hook script */
 function buildHookScript(hook: HookDefinition): string {
   const lines = ['#!/usr/bin/env sh', ''];
-  for (const command of hook.commands) {
+
+  const lodestarCmd = buildLodestarCommand(hook);
+  if (lodestarCmd) {
+    lines.push(lodestarCmd);
+  }
+
+  for (const command of hook.commands ?? []) {
     lines.push(command);
   }
+
   lines.push('');
   return lines.join('\n');
 }
@@ -116,5 +140,5 @@ function huskyAdapter(config: HuskyAdapterConfig): ToolAdapter<HuskyAdapterConfi
   };
 }
 
-export { huskyAdapter, buildHookScript, normalizeHook };
+export { huskyAdapter, buildHookScript, buildLodestarCommand, normalizeHook };
 export type { HuskyAdapterConfig, HookDefinition };

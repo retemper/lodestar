@@ -65,15 +65,20 @@ const adapters: WrittenConfigBlock = {
     }),
     huskyAdapter({
       hooks: {
-        'pre-commit': ['npx prettier --check .'],
-        'pre-push': [
-          'pnpm turbo build',
-          'pnpm turbo lint',
-          'pnpm format:check',
-          'pnpm turbo type-check',
-          'pnpm turbo lodestar',
-          'pnpm turbo test -- --coverage',
-        ],
+        'pre-commit': {
+          adapters: ['prettier'],
+          rules: ['structure/*', 'architecture/*'],
+        },
+        'pre-push': {
+          commands: [
+            'pnpm turbo build',
+            'pnpm turbo lint',
+            'pnpm format:check',
+            'pnpm turbo type-check',
+            'pnpm turbo lodestar',
+            'pnpm turbo test -- --coverage',
+          ],
+        },
       },
     }),
   ],
