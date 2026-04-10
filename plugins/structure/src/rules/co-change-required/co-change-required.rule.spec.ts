@@ -64,9 +64,7 @@ describe('structure/co-change-required', () => {
   describe('watch 대상이 변경되고 require도 변경된 경우', () => {
     it('위반이 없다', async () => {
       const providers = createMockProviders({
-        stagedFiles: vi
-          .fn()
-          .mockResolvedValue(['src/app.ts', 'tests/app.spec.ts']),
+        stagedFiles: vi.fn().mockResolvedValue(['src/app.ts', 'tests/app.spec.ts']),
       });
       const { ctx, violations } = createTestContext(
         { watch: ['src/**/*.ts'], require: ['tests/**'] },

@@ -19,8 +19,7 @@ export default defineConfig([
         options: {
           watch: ['packages/types/src/**/*.ts'],
           require: ['packages/test-utils/src/**/*.ts'],
-          message:
-            'types 패키지가 변경되었지만 test-utils가 함께 업데이트되지 않았습니다.',
+          message: 'types 패키지가 변경되었지만 test-utils가 함께 업데이트되지 않았습니다.',
         },
       },
     },

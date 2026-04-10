@@ -75,8 +75,7 @@ function createMockProviders(overrides: MockProviderOverrides = {}): RuleProvide
     git: {
       stagedFiles: (overrides.stagedFiles ??
         (() => Promise.resolve([]))) as GitProvider['stagedFiles'],
-      diffFiles: (overrides.diffFiles ??
-        (() => Promise.resolve([]))) as GitProvider['diffFiles'],
+      diffFiles: (overrides.diffFiles ?? (() => Promise.resolve([]))) as GitProvider['diffFiles'],
       diffContent: (overrides.diffContent ??
         (() => Promise.resolve(''))) as GitProvider['diffContent'],
       currentBranch: (overrides.currentBranch ??

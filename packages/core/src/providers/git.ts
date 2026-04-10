@@ -15,11 +15,7 @@ interface ExecGitResult {
  * Set allowNonZero to true to resolve with the exit code instead (for commands
  * like `git merge-base --is-ancestor` that use exit code 1 for "not ancestor").
  */
-function execGit(
-  args: string[],
-  cwd: string,
-  allowNonZero = false,
-): Promise<ExecGitResult> {
+function execGit(args: string[], cwd: string, allowNonZero = false): Promise<ExecGitResult> {
   return new Promise((resolve, reject) => {
     execFile('git', args, { cwd, maxBuffer: 10 * 1024 * 1024 }, (error, stdout, _stderr) => {
       const out = stdout;
@@ -99,10 +95,7 @@ function createGitProvider(rootDir: string): GitProvider {
     async diffFiles(base: string, head?: string): Promise<readonly string[]> {
       await ensureGit();
       const ref = head ? `${base}...${head}` : `${base}...HEAD`;
-      const { stdout } = await execGit(
-        ['diff', '--name-only', '--diff-filter=ACMR', ref],
-        rootDir,
-      );
+      const { stdout } = await execGit(['diff', '--name-only', '--diff-filter=ACMR', ref], rootDir);
       return parseLines(stdout);
     },
 
@@ -126,10 +119,7 @@ function createGitProvider(rootDir: string): GitProvider {
 
     async currentBranch(): Promise<string | null> {
       await ensureGit();
-      const { stdout } = await execGit(
-        ['rev-parse', '--abbrev-ref', 'HEAD'],
-        rootDir,
-      );
+      const { stdout } = await execGit(['rev-parse', '--abbrev-ref', 'HEAD'], rootDir);
       const branch = stdout.trim();
       // Detached HEAD returns literal "HEAD"
       return branch === 'HEAD' ? null : branch;

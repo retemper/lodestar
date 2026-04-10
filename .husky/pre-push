@@ -1,15 +1,8 @@
 #!/usr/bin/env sh
 
 pnpm turbo build
-
-# lint job
 pnpm turbo lint
 pnpm format:check
 pnpm turbo type-check
-
-# lodestar job
-pnpm install --frozen-lockfile
 pnpm turbo lodestar
-
-# test job
 pnpm turbo test -- --coverage

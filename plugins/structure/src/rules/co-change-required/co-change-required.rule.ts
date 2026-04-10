@@ -47,9 +47,10 @@ const coChangeRequired = defineRule<{
 
     // Get changed files from staged (commit hook) or diff (CI/manual)
     const staged = await git.stagedFiles();
-    const changed = staged.length > 0
-      ? [...staged]
-      : await git.diffFiles('origin/main').catch(() => [] as string[]);
+    const changed =
+      staged.length > 0
+        ? [...staged]
+        : await git.diffFiles('origin/main').catch(() => [] as string[]);
 
     if (changed.length === 0) {
       ctx.meta('no changes detected');
@@ -59,9 +60,7 @@ const coChangeRequired = defineRule<{
     const { minimatch } = await import('minimatch');
 
     const watchedChanged = changed.filter(
-      (f) =>
-        watch.some((p) => minimatch(f, p)) &&
-        !(exclude ?? []).some((p) => minimatch(f, p)),
+      (f) => watch.some((p) => minimatch(f, p)) && !(exclude ?? []).some((p) => minimatch(f, p)),
     );
 
     if (watchedChanged.length === 0) {
@@ -69,9 +68,7 @@ const coChangeRequired = defineRule<{
       return;
     }
 
-    const requiredChanged = changed.some((f) =>
-      requirePatterns.some((p) => minimatch(f, p)),
-    );
+    const requiredChanged = changed.some((f) => requirePatterns.some((p) => minimatch(f, p)));
 
     if (!requiredChanged) {
       ctx.report({

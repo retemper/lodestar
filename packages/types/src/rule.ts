@@ -134,10 +134,7 @@ interface GitProvider {
   /** List files changed between two refs (defaults head to 'HEAD') */
   diffFiles(base: string, head?: string): Promise<readonly string[]>;
   /** Get the unified diff content for a single file */
-  diffContent(
-    file: string,
-    options?: { staged?: boolean; base?: string },
-  ): Promise<string>;
+  diffContent(file: string, options?: { staged?: boolean; base?: string }): Promise<string>;
   /** Get the current branch name, or null if in detached HEAD */
   currentBranch(): Promise<string | null>;
   /** Check whether ancestor is an ancestor of descendant (defaults to 'HEAD') */

@@ -73,10 +73,7 @@ import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
 import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
 
 export default defineConfig({
-  adapters: [
-    eslintAdapter({ presets: ['strict'] }),
-    prettierAdapter({ singleQuote: true }),
-  ],
+  adapters: [eslintAdapter({ presets: ['strict'] }), prettierAdapter({ singleQuote: true })],
   // ...rules
 });
 ```
@@ -132,7 +129,9 @@ export default defineConfig([
     rules: {
       'architecture/layers': {
         severity: 'error', // enforced only in new code
-        options: { /* ... */ },
+        options: {
+          /* ... */
+        },
       },
     },
   },
@@ -145,11 +144,11 @@ This lets you enforce rules on new code while giving legacy code time to comply.
 
 When adopting adapters, your existing tool configs become managed by lodestar. Here's how the transition works:
 
-| Before                         | After                                               |
-| ------------------------------ | --------------------------------------------------- |
-| Hand-written `eslint.config.js`| Bridge file delegating to `lodestar.config.ts`      |
-| Hand-written `.prettierrc`     | Generated `.prettierrc` from adapter options         |
-| Hand-written `biome.json`      | Generated `biome.json` from adapter options          |
+| Before                          | After                                          |
+| ------------------------------- | ---------------------------------------------- |
+| Hand-written `eslint.config.js` | Bridge file delegating to `lodestar.config.ts` |
+| Hand-written `.prettierrc`      | Generated `.prettierrc` from adapter options   |
+| Hand-written `biome.json`       | Generated `biome.json` from adapter options    |
 
 **To migrate:**
 

@@ -24,16 +24,16 @@ Adapters with bulk fix capabilities run last. For example, the ESLint adapter ru
 
 ## Which Adapters Support Fix?
 
-| Adapter    | Setup Fix | Check Fix | Bulk Fix |
-| ---------- | --------- | --------- | -------- |
-| ESLint     | Yes       | --        | Yes      |
-| Prettier   | Yes       | --        | Yes      |
-| Biome      | Yes       | --        | --       |
-| Stylelint  | Yes       | --        | Yes      |
-| Husky      | Yes       | --        | --       |
-| Lint-Staged| Yes       | --        | --       |
-| Commitlint | Yes       | --        | --       |
-| Knip       | Yes       | --        | --       |
+| Adapter     | Setup Fix | Check Fix | Bulk Fix |
+| ----------- | --------- | --------- | -------- |
+| ESLint      | Yes       | --        | Yes      |
+| Prettier    | Yes       | --        | Yes      |
+| Biome       | Yes       | --        | --       |
+| Stylelint   | Yes       | --        | Yes      |
+| Husky       | Yes       | --        | --       |
+| Lint-Staged | Yes       | --        | --       |
+| Commitlint  | Yes       | --        | --       |
+| Knip        | Yes       | --        | --       |
 
 **Setup Fix** generates managed config files. **Bulk Fix** runs the tool's native fix command.
 
