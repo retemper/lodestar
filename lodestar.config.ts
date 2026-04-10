@@ -27,6 +27,12 @@ export default defineConfig([
     plugins: [pluginArchitecture, pluginStructure],
     rules: {
       'architecture/no-circular-packages': 'error',
+      'architecture/modules': {
+        severity: 'error',
+        options: {
+          modules: ['packages/core/src/providers', 'packages/core/src/resolvers'],
+        },
+      },
       'structure/no-forbidden-path': {
         severity: 'error',
         options: { patterns: ['**/*.log', '**/.env', '**/.env.*'] },
