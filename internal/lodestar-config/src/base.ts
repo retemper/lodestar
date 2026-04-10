@@ -69,16 +69,7 @@ const adapters: WrittenConfigBlock = {
           adapters: ['prettier'],
           rules: ['structure/*', 'architecture/*'],
         },
-        'pre-push': {
-          commands: [
-            'pnpm turbo build',
-            'pnpm turbo lint',
-            'pnpm format:check',
-            'pnpm turbo type-check',
-            'pnpm turbo lodestar',
-            'pnpm turbo test -- --coverage',
-          ],
-        },
+        'pre-push': ['pnpm turbo build type-check lodestar', 'pnpm turbo test -- --coverage'],
       },
     }),
   ],

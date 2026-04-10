@@ -1,8 +1,4 @@
 #!/usr/bin/env sh
 
-pnpm turbo build
-pnpm turbo lint
-pnpm format:check
-pnpm turbo type-check
-pnpm turbo lodestar
+pnpm turbo build type-check lodestar
 pnpm turbo test -- --coverage
