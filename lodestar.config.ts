@@ -1,14 +1,17 @@
 import { defineConfig } from '@retemper/lodestar';
-import { adapters, base } from '@repo/lodestar-config';
+import { base, eslintConfig, prettierConfig } from '@repo/lodestar-config';
+import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
+import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
+import { huskyAdapter } from '@retemper/lodestar-adapter-husky';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 import { pluginStructure } from '@retemper/lodestar-plugin-structure';
-import { huskyAdapter } from '@retemper/lodestar-adapter-husky';
 
 export default defineConfig([
   ...base,
-  adapters,
   {
     adapters: [
+      eslintAdapter({ ...eslintConfig }),
+      prettierAdapter({ ...prettierConfig }),
       huskyAdapter({
         hooks: {
           'pre-commit': {
