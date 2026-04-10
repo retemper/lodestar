@@ -2,10 +2,24 @@ import { defineConfig } from '@retemper/lodestar';
 import { adapters, base } from '@repo/lodestar-config';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 import { pluginStructure } from '@retemper/lodestar-plugin-structure';
+import { huskyAdapter } from '@retemper/lodestar-adapter-husky';
 
 export default defineConfig([
   ...base,
   adapters,
+  {
+    adapters: [
+      huskyAdapter({
+        hooks: {
+          'pre-commit': {
+            adapters: ['prettier'],
+            rules: ['structure/*', 'architecture/*'],
+          },
+          'pre-push': ['pnpm turbo build type-check lodestar', 'pnpm turbo test -- --coverage'],
+        },
+      }),
+    ],
+  },
   {
     plugins: [pluginArchitecture, pluginStructure],
     rules: {

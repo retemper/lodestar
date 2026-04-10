@@ -3,7 +3,6 @@ import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
 import { pluginConventions } from '@repo/plugin-conventions';
 import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
 import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
-import { huskyAdapter } from '@retemper/lodestar-adapter-husky';
 import importX from 'eslint-plugin-import-x';
 import unicorn from 'eslint-plugin-unicorn';
 
@@ -62,15 +61,6 @@ const adapters: WrittenConfigBlock = {
       semi: true,
       tabWidth: 2,
       printWidth: 100,
-    }),
-    huskyAdapter({
-      hooks: {
-        'pre-commit': {
-          adapters: ['prettier'],
-          rules: ['structure/*', 'architecture/*'],
-        },
-        'pre-push': ['pnpm turbo build type-check lodestar', 'pnpm turbo test -- --coverage'],
-      },
     }),
   ],
 };
