@@ -37,6 +37,13 @@ export default defineConfig([
         severity: 'error',
         options: { patterns: ['**/*.log', '**/.env', '**/.env.*'] },
       },
+      'structure/no-loose-files': {
+        severity: 'warn',
+        options: {
+          dirs: ['packages/core/src'],
+          allow: ['index.ts'],
+        },
+      },
       'structure/co-change-required': {
         severity: 'warn',
         options: {
