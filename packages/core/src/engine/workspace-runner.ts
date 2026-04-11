@@ -2,7 +2,7 @@ import type { WrittenConfig, WorkspaceReporter, RunSummary } from '@retemper/lod
 import type { WorkspacePackage } from '@retemper/lodestar-config';
 import { discoverWorkspaces, loadConfigFile, resolveConfig } from '@retemper/lodestar-config';
 import { run } from './engine';
-import type { CacheProvider } from './cache';
+import type { CacheProvider } from '../utils/cache';
 
 /** Default number of packages to run concurrently */
 const DEFAULT_CONCURRENCY = 4;

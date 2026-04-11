@@ -19,11 +19,11 @@ vi.mock('./engine', () => ({
   createProviders: vi.fn(),
 }));
 
-vi.mock('./incremental', () => ({
+vi.mock('../utils/incremental', () => ({
   computeImpactScope: vi.fn(),
 }));
 
-vi.mock('./logger', () => ({
+vi.mock('../utils/logger', () => ({
   silentLogger: {
     debug: vi.fn(),
     error: vi.fn(),
@@ -34,7 +34,7 @@ vi.mock('./logger', () => ({
 
 import { watch } from 'node:fs';
 import { run, createProviders } from './engine';
-import { computeImpactScope } from './incremental';
+import { computeImpactScope } from '../utils/incremental';
 import { createWatcher } from './watcher';
 
 /** Creates a mock RunSummary */

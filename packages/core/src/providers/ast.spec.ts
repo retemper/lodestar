@@ -3,7 +3,7 @@ import { mkdtemp, writeFile, rm, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createASTProvider } from './ast';
-import type { CacheProvider } from '../cache';
+import type { CacheProvider } from '../utils/cache';
 
 /** Temporary directory paths for testing */
 const dirs: string[] = [];
