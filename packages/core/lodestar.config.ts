@@ -1,12 +1,20 @@
 import { defineConfig } from '@retemper/lodestar';
 import { base } from '@repo/lodestar-config';
 import { pluginArchitecture } from '@retemper/lodestar-plugin-architecture';
+import { pluginStructure } from '@retemper/lodestar-plugin-structure';
 
 export default defineConfig([
   ...base,
   {
-    plugins: [pluginArchitecture],
+    plugins: [pluginArchitecture, pluginStructure],
     rules: {
+      'structure/no-loose-files': {
+        severity: 'warn',
+        options: {
+          dirs: ['src'],
+          allow: ['index.ts'],
+        },
+      },
       'architecture/layers': {
         severity: 'error',
         options: {
