@@ -43,7 +43,7 @@ function buildLodestarCommand(hook: HookDefinition): string | null {
     args.push(`--rule "${rule}"`);
   }
   if (args.length === 0) return null;
-  return `npx lodestar check --workspace false ${args.join(' ')}`;
+  return `npx lodestar check ${args.join(' ')}`;
 }
 
 /** Build the content of a git hook script */

@@ -47,25 +47,25 @@ describe('buildHookScript', () => {
 describe('buildLodestarCommand', () => {
   it('단일 adapter로 명령어를 생성한다', () => {
     expect(buildLodestarCommand({ adapters: ['prettier'] })).toBe(
-      'npx lodestar check --workspace false --adapter prettier',
+      'npx lodestar check --adapter prettier',
     );
   });
 
   it('복수 adapter로 명령어를 생성한다', () => {
     expect(buildLodestarCommand({ adapters: ['prettier', 'eslint'] })).toBe(
-      'npx lodestar check --workspace false --adapter prettier --adapter eslint',
+      'npx lodestar check --adapter prettier --adapter eslint',
     );
   });
 
   it('rule 패턴으로 명령어를 생성한다', () => {
     expect(buildLodestarCommand({ rules: ['structure/*'] })).toBe(
-      'npx lodestar check --workspace false --rule "structure/*"',
+      'npx lodestar check --rule "structure/*"',
     );
   });
 
   it('adapter와 rule을 조합한다', () => {
     expect(buildLodestarCommand({ adapters: ['prettier'], rules: ['structure/*'] })).toBe(
-      'npx lodestar check --workspace false --adapter prettier --rule "structure/*"',
+      'npx lodestar check --adapter prettier --rule "structure/*"',
     );
   });
 
@@ -78,7 +78,7 @@ describe('buildLodestarCommand', () => {
 describe('buildHookScript (declarative)', () => {
   it('adapter 선언으로 lodestar 명령어를 생성한다', () => {
     const script = buildHookScript({ adapters: ['prettier'] });
-    expect(script).toContain('npx lodestar check --workspace false --adapter prettier');
+    expect(script).toContain('npx lodestar check --adapter prettier');
     expect(script).toContain('#!/usr/bin/env sh');
   });
 
@@ -215,7 +215,7 @@ describe('huskyAdapter verifySetup()', () => {
     await adapter.setup!(rootDir);
 
     const preCommit = await readFile(join(rootDir, '.husky/pre-commit'), 'utf-8');
-    expect(preCommit).toContain('npx lodestar check --workspace false --adapter prettier');
+    expect(preCommit).toContain('npx lodestar check --adapter prettier');
 
     const prePush = await readFile(join(rootDir, '.husky/pre-push'), 'utf-8');
     expect(prePush).toContain('pnpm turbo build');

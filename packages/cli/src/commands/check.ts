@@ -1,6 +1,6 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import type { Logger, WorkspaceReporter } from '@retemper/lodestar';
+import type { Logger, WorkspaceReporter, WrittenConfig } from '@retemper/lodestar';
 import {
   loadConfigFile,
   discoverWorkspaces,
@@ -91,6 +91,7 @@ async function checkCommand(args: ArgumentsCamelCase<CheckOptions>): Promise<voi
   }
 
   if (useWorkspace) {
+    const configTransform = buildConfigTransform(args);
     const result = await runWorkspace({
       rootDir,
       rootConfig: effectiveConfig,
@@ -98,6 +99,7 @@ async function checkCommand(args: ArgumentsCamelCase<CheckOptions>): Promise<voi
       fix: args.fix,
       cache: cacheProvider,
       concurrency: args.concurrency,
+      configTransform,
     });
     const packageCount = result.packages.length + 1;
     logger.info(
@@ -155,6 +157,18 @@ async function shouldUseWorkspaceMode(
   if (explicitFlag === false) return false;
   const packages = await discoverWorkspaces(rootDir);
   return packages.length > 0;
+}
+
+/** Build a config transform that applies --rule and --adapter filters to sub-package configs */
+function buildConfigTransform(
+  args: ArgumentsCamelCase<CheckOptions>,
+): ((config: WrittenConfig) => WrittenConfig) | undefined {
+  if (!args.rule && !args.adapter) return undefined;
+  return (config: WrittenConfig) => {
+    let result = args.rule ? filterRules(config, args.rule) : config;
+    result = args.adapter ? filterAdapters(result, args.adapter) : result;
+    return result;
+  };
 }
 
 export { checkCommand };
