@@ -2,9 +2,9 @@ import { watch } from 'node:fs';
 import { resolve, relative } from 'node:path';
 import type { Logger, ResolvedConfig, Reporter } from '@retemper/lodestar-types';
 import { createProviders, run } from './engine';
-import { computeImpactScope } from './incremental';
-import type { CacheProvider } from './cache';
-import { silentLogger } from './logger';
+import { computeImpactScope } from '../utils/incremental';
+import type { CacheProvider } from '../utils/cache';
+import { silentLogger } from '../utils/logger';
 
 /** Directories and patterns to ignore during file watching */
 const DEFAULT_IGNORE_PATTERNS = [

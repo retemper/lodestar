@@ -6,12 +6,13 @@ import type {
   RuleProviders,
   ResolvedRuleConfig,
 } from '@retemper/lodestar-types';
-import type { CacheProvider } from './cache';
-import { createScopedFsProvider } from './incremental';
-import { createFileSystemProvider } from './providers/fs';
-import { createGraphProvider } from './providers/graph';
-import { createASTProvider } from './providers/ast';
-import { createConfigFileProvider } from './providers/config-file';
+import type { CacheProvider } from '../utils/cache';
+import { createScopedFsProvider } from '../utils/incremental';
+import { createFileSystemProvider } from '../providers/fs';
+import { createGraphProvider } from '../providers/graph';
+import { createASTProvider } from '../providers/ast';
+import { createConfigFileProvider } from '../providers/config-file';
+import { createGitProvider } from '../providers/git';
 import { resolvePlugins } from './resolver';
 import { runRules } from './runner';
 import { validateConfig } from './validate';
@@ -46,6 +47,7 @@ function createProviders(rootDir: string, cache?: CacheProvider): RuleProviders 
     graph: createGraphProvider(rootDir, astProvider, fsProvider),
     ast: astProvider,
     config: createConfigFileProvider(rootDir),
+    git: createGitProvider(rootDir),
   };
 }
 

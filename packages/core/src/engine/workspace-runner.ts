@@ -2,7 +2,7 @@ import type { WrittenConfig, WorkspaceReporter, RunSummary } from '@retemper/lod
 import type { WorkspacePackage } from '@retemper/lodestar-config';
 import { discoverWorkspaces, loadConfigFile, resolveConfig } from '@retemper/lodestar-config';
 import { run } from './engine';
-import type { CacheProvider } from './cache';
+import type { CacheProvider } from '../utils/cache';
 
 /** Default number of packages to run concurrently */
 const DEFAULT_CONCURRENCY = 4;
@@ -21,6 +21,8 @@ interface WorkspaceRunOptions {
   readonly cache?: CacheProvider;
   /** Max packages to run in parallel (default: 4, use 1 for sequential) */
   readonly concurrency?: number;
+  /** Optional transform applied to each sub-package config before execution */
+  readonly configTransform?: (config: WrittenConfig) => WrittenConfig;
 }
 
 /** Summary for the entire workspace run */
@@ -51,7 +53,7 @@ interface PackageSummary {
  * 2. For each package with its own config, run with concurrency control
  */
 async function runWorkspace(options: WorkspaceRunOptions): Promise<WorkspaceSummary> {
-  const { rootDir, rootConfig, reporter, fix, cache } = options;
+  const { rootDir, rootConfig, reporter, fix, cache, configTransform } = options;
   const concurrency = Math.max(1, options.concurrency ?? DEFAULT_CONCURRENCY);
   const startTime = performance.now();
 
@@ -71,7 +73,7 @@ async function runWorkspace(options: WorkspaceRunOptions): Promise<WorkspaceSumm
   // Run packages with concurrency control
   const packageSummaries = await runPackagesParallel(
     packagesWithConfig,
-    { reporter, fix, cache },
+    { reporter, fix, cache, configTransform },
     concurrency,
   );
 
@@ -104,10 +106,15 @@ async function filterPackagesWithConfig(
 /** Run packages in parallel with a concurrency limit, emitting reporter events in order */
 async function runPackagesParallel(
   packagesWithConfig: readonly { pkg: WorkspacePackage; config: WrittenConfig }[],
-  context: { reporter?: WorkspaceReporter; fix?: boolean; cache?: CacheProvider },
+  context: {
+    reporter?: WorkspaceReporter;
+    fix?: boolean;
+    cache?: CacheProvider;
+    configTransform?: (config: WrittenConfig) => WrittenConfig;
+  },
   concurrency: number,
 ): Promise<readonly PackageSummary[]> {
-  const { reporter, fix, cache } = context;
+  const { reporter, fix, cache, configTransform } = context;
 
   if (packagesWithConfig.length === 0) return [];
 
@@ -119,7 +126,8 @@ async function runPackagesParallel(
   const state = { nextToEmit: 0 };
 
   const executePackage = async (index: number): Promise<void> => {
-    const { pkg, config } = packagesWithConfig[index];
+    const { pkg, config: rawConfig } = packagesWithConfig[index];
+    const config = configTransform ? configTransform(rawConfig) : rawConfig;
     const resolved = resolveConfig(config, pkg.dir);
     const summary = await run({ config: resolved, fix, cache });
     results[index] = { package: pkg, summary };

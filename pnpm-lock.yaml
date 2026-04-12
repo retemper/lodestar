@@ -506,6 +506,9 @@ importers:
       '@retemper/lodestar-types':
         specifier: workspace:*
         version: link:../../packages/types
+      minimatch:
+        specifier: ^10.2.5
+        version: 10.2.5
     devDependencies:
       '@retemper/lodestar-test-utils':
         specifier: workspace:*

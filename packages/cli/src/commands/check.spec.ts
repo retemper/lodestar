@@ -585,6 +585,121 @@ describe('checkCommand', () => {
     });
   });
 
+  describe('--adapter 필터', () => {
+    it('--adapter 필터가 주어지면 매칭되는 adapter만 전달한다', async () => {
+      const configWithAdapters: WrittenConfig = {
+        plugins: [],
+        adapters: [
+          { name: 'eslint', config: {} },
+          { name: 'prettier', config: {} },
+          { name: 'husky', config: {} },
+        ],
+      };
+      mockLoadConfigFile.mockResolvedValue(configWithAdapters);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        adapter: ['prettier'],
+      });
+
+      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<
+        typeof vi.fn
+      >;
+      const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
+      const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
+      expect(blocks[0].adapters).toHaveLength(1);
+      expect(blocks[0].adapters![0].name).toBe('prettier');
+    });
+
+    it('--adapter와 --rule을 함께 사용할 수 있다', async () => {
+      const config: WrittenConfig = {
+        plugins: [],
+        rules: { 'test/one': 'error', 'test/two': 'warn' },
+        adapters: [
+          { name: 'eslint', config: {} },
+          { name: 'prettier', config: {} },
+        ],
+      };
+      mockLoadConfigFile.mockResolvedValue(config);
+      mockDiscoverWorkspaces.mockResolvedValue([]);
+      mockRun.mockResolvedValue(makeSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        rule: ['test/one'],
+        adapter: ['prettier'],
+      });
+
+      const resolveConfig = (await import('@retemper/lodestar')).resolveConfig as ReturnType<
+        typeof vi.fn
+      >;
+      const passedConfig = resolveConfig.mock.calls[0][0] as WrittenConfig;
+      const blocks = Array.isArray(passedConfig) ? passedConfig : [passedConfig];
+      expect(blocks[0].rules).toStrictEqual({ 'test/one': 'error' });
+      expect(blocks[0].adapters).toHaveLength(1);
+      expect(blocks[0].adapters![0].name).toBe('prettier');
+    });
+  });
+
+  describe('workspace configTransform', () => {
+    it('--adapter와 --rule이 있으면 configTransform을 runWorkspace에 전달한다', async () => {
+      const configWithAdapters: WrittenConfig = {
+        plugins: [],
+        adapters: [
+          { name: 'eslint', config: {} },
+          { name: 'prettier', config: {} },
+        ],
+        rules: { 'structure/no-loose-files': 'error', 'conventions/no-korean-comments': 'error' },
+      };
+      mockLoadConfigFile.mockResolvedValue(configWithAdapters);
+      mockDiscoverWorkspaces.mockResolvedValue([
+        { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
+      ]);
+      mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+        adapter: ['prettier'],
+        rule: ['structure/*'],
+      });
+
+      const callArgs = mockRunWorkspace.mock.calls[0][0];
+      expect(callArgs.configTransform).toBeDefined();
+
+      // Verify the transform filters correctly
+      const transformed = callArgs.configTransform!(configWithAdapters);
+      const blocks = Array.isArray(transformed) ? transformed : [transformed];
+      expect(blocks[0].adapters).toHaveLength(1);
+      expect(blocks[0].adapters![0].name).toBe('prettier');
+      expect(blocks[0].rules).toStrictEqual({ 'structure/no-loose-files': 'error' });
+    });
+
+    it('--adapter도 --rule도 없으면 configTransform을 전달하지 않는다', async () => {
+      mockLoadConfigFile.mockResolvedValue(stubConfig);
+      mockDiscoverWorkspaces.mockResolvedValue([
+        { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
+      ]);
+      mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary());
+
+      await checkCommand({
+        _: ['check'],
+        $0: 'lodestar',
+        format: 'console',
+      });
+
+      const callArgs = mockRunWorkspace.mock.calls[0][0];
+      expect(callArgs.configTransform).toBeUndefined();
+    });
+  });
+
   describe('reporter 선택', () => {
     it('sarif format을 지정하면 SARIF reporter를 사용한다', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);

@@ -62,11 +62,7 @@ export default defineConfig({
     'architecture/modules': {
       severity: 'error',
       options: {
-        modules: [
-          'src/features/auth',
-          'src/features/billing',
-          'src/features/dashboard',
-        ],
+        modules: ['src/features/auth', 'src/features/billing', 'src/features/dashboard'],
       },
     },
     'architecture/layers': {
@@ -92,6 +88,7 @@ export default defineConfig({
 ```
 
 이렇게 하면:
+
 - 피처끼리 직접 import할 수 없음 (모듈 캡슐화)
 - 피처는 `shared`에서만 import 가능
 - `app` 레이어만 피처를 조합할 수 있음
@@ -243,6 +240,7 @@ export default defineConfig({
 ```
 
 이 단일 설정이 다음을 통제합니다:
+
 - 아키텍처 규칙 (레이어, 순환 의존성, 모듈 캡슐화)
 - 린팅(ESLint)과 포맷팅(Prettier)
 - Git 훅(Husky)과 스테이지된 파일 검사(lint-staged)

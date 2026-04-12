@@ -73,10 +73,7 @@ import { eslintAdapter } from '@retemper/lodestar-adapter-eslint';
 import { prettierAdapter } from '@retemper/lodestar-adapter-prettier';
 
 export default defineConfig({
-  adapters: [
-    eslintAdapter({ presets: ['strict'] }),
-    prettierAdapter({ singleQuote: true }),
-  ],
+  adapters: [eslintAdapter({ presets: ['strict'] }), prettierAdapter({ singleQuote: true })],
   // ...rules
 });
 ```
@@ -132,7 +129,9 @@ export default defineConfig([
     rules: {
       'architecture/layers': {
         severity: 'error', // 새 코드에만 적용
-        options: { /* ... */ },
+        options: {
+          /* ... */
+        },
       },
     },
   },
@@ -145,11 +144,11 @@ export default defineConfig([
 
 어댑터를 도입하면 기존 도구 설정이 lodestar에 의해 관리됩니다. 전환 방식은 다음과 같습니다:
 
-| 이전                             | 이후                                                |
-| -------------------------------- | --------------------------------------------------- |
-| 직접 작성한 `eslint.config.js`    | `lodestar.config.ts`에 위임하는 브릿지 파일          |
-| 직접 작성한 `.prettierrc`         | 어댑터 옵션에서 생성된 `.prettierrc`                 |
-| 직접 작성한 `biome.json`          | 어댑터 옵션에서 생성된 `biome.json`                  |
+| 이전                           | 이후                                        |
+| ------------------------------ | ------------------------------------------- |
+| 직접 작성한 `eslint.config.js` | `lodestar.config.ts`에 위임하는 브릿지 파일 |
+| 직접 작성한 `.prettierrc`      | 어댑터 옵션에서 생성된 `.prettierrc`        |
+| 직접 작성한 `biome.json`       | 어댑터 옵션에서 생성된 `biome.json`         |
 
 **마이그레이션 방법:**
 

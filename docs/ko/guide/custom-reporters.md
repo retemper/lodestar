@@ -8,10 +8,10 @@ Reporter는 lodestar가 결과를 표시하는 방식을 제어합니다. Lodest
 
 ## 내장 Reporter
 
-| Reporter  | 플래그                | 출력   | 용도                                  |
-| --------- | --------------------- | ------ | ------------------------------------- |
-| `console` | (기본값)              | stderr | 사람이 읽기 쉬운 터미널 출력          |
-| `json`    | `--format json`       | stdout | CI 파이프라인용 기계 판독 출력        |
+| Reporter  | 플래그          | 출력   | 용도                           |
+| --------- | --------------- | ------ | ------------------------------ |
+| `console` | (기본값)        | stderr | 사람이 읽기 쉬운 터미널 출력   |
+| `json`    | `--format json` | stdout | CI 파이프라인용 기계 판독 출력 |
 
 ## Reporter 인터페이스
 
@@ -41,7 +41,7 @@ interface RuleResultSummary {
   readonly ruleId: string;
   readonly violations: readonly Violation[];
   readonly durationMs: number;
-  readonly meta?: string;      // 예: "14 files", "0 cycles"
+  readonly meta?: string; // 예: "14 files", "0 cycles"
   readonly docsUrl?: string;
   readonly error?: Error;
 }
@@ -121,12 +121,18 @@ function createJUnitReporter(): Reporter {
 
       for (const result of results) {
         if (result.violations.length === 0) {
-          lines.push(`    <testcase name="${result.ruleId}" time="${(result.durationMs / 1000).toFixed(3)}" />`);
+          lines.push(
+            `    <testcase name="${result.ruleId}" time="${(result.durationMs / 1000).toFixed(3)}" />`,
+          );
         } else {
-          lines.push(`    <testcase name="${result.ruleId}" time="${(result.durationMs / 1000).toFixed(3)}">`);
+          lines.push(
+            `    <testcase name="${result.ruleId}" time="${(result.durationMs / 1000).toFixed(3)}">`,
+          );
           for (const v of result.violations) {
             const loc = v.location ? `${v.location.file}:${v.location.line ?? 0}` : '';
-            lines.push(`      <failure message="${escapeXml(v.message)}" type="${v.severity}">${escapeXml(loc)}</failure>`);
+            lines.push(
+              `      <failure message="${escapeXml(v.message)}" type="${v.severity}">${escapeXml(loc)}</failure>`,
+            );
           }
           lines.push('    </testcase>');
         }
@@ -139,7 +145,11 @@ function createJUnitReporter(): Reporter {
 }
 
 function escapeXml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 ```
 

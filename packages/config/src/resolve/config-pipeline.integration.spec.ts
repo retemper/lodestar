@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { loadConfigFile } from './load';
+import { loadConfigFile } from '../load';
 import { resolveConfig } from './resolve';
 
 /** Result of creating a test fixture directory */
