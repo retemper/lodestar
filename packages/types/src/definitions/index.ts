@@ -1,7 +1,7 @@
-export { defineConfig } from './definitions';
-export { definePlugin, defineRule } from './definitions';
+export { defineConfig } from './config';
+export { definePlugin, defineRule } from './plugin';
 
-export type { JSONSchema7 } from './definitions';
+export type { JSONSchema7 } from './json-schema';
 
 export type {
   ProviderKey,
@@ -22,9 +22,9 @@ export type {
   RuleContext,
   RuleProviders,
   RuleDefinition,
-} from './definitions';
+} from './rule';
 
-export type { Plugin, PluginFactory } from './definitions';
+export type { Plugin, PluginFactory } from './plugin';
 
 export type {
   ToolAdapter,
@@ -36,11 +36,11 @@ export type {
   ResolvedConfig,
   ResolvedPlugin,
   ResolvedRuleConfig,
-} from './definitions';
+} from './config';
 
-export type { LogLevel, Logger } from './definitions';
+export type { LogLevel, Logger } from './logger';
 
-export type { ModuleResolver, ResolveContext } from './definitions';
+export type { ModuleResolver, ResolveContext } from './resolver';
 
 export type {
   Reporter,
@@ -50,4 +50,4 @@ export type {
   ReporterEntry,
   RuleResultSummary,
   RunSummary,
-} from './definitions';
+} from './reporter';

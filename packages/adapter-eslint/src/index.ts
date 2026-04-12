@@ -1,3 +1,2 @@
-export { eslintAdapter, buildFlatConfig } from './adapter';
-export { fromLodestar } from './from-lodestar';
+export { eslintAdapter, buildFlatConfig, fromLodestar } from './adapter';
 export type { EslintAdapterConfig } from './adapter';
