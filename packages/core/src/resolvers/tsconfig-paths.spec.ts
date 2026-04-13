@@ -47,6 +47,25 @@ describe('stripJsonComments', () => {
     const input = '{"a": "foo\\"bar//baz"}';
     expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 'foo"bar//baz' });
   });
+
+  it('handles empty string', () => {
+    expect(stripJsonComments('')).toBe('');
+  });
+
+  it('preserves block comment syntax inside strings', () => {
+    const input = '{"a": "/* not a comment */"}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: '/* not a comment */' });
+  });
+
+  it('handles trailing single-line comment without newline', () => {
+    const input = '{"a": 1} // trailing';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 1 });
+  });
+
+  it('preserves escaped backslash before quote in strings', () => {
+    const input = '{"a": "end\\\\"}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 'end\\' });
+  });
 });
 
 describe('compileMappings', () => {
