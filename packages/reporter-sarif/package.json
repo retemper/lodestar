@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-reporter-sarif",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "SARIF reporter for Lodestar — output violations in Static Analysis Results Interchange Format",
   "license": "MIT",

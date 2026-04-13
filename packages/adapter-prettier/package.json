@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-adapter-prettier",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "Prettier adapter for Lodestar — run format checks via lodestar check",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-adapter-husky",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "Husky adapter for Lodestar — configure git hooks from lodestar.config.ts",
   "license": "MIT",

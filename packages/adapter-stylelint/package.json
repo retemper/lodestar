@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-adapter-stylelint",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "Stylelint adapter for Lodestar — run CSS lint checks via lodestar check",
   "license": "MIT",

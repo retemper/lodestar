@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-reporter-junit",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "JUnit XML reporter for Lodestar — output violations as JUnit test results for CI integration",
   "license": "MIT",

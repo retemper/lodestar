@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-adapter-knip",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "Knip adapter for Lodestar — find unused exports, dependencies, and files via lodestar check",
   "license": "MIT",
