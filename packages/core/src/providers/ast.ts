@@ -6,6 +6,8 @@ import type { ASTProvider, ImportInfo, ExportInfo } from '@retemper/lodestar-typ
 import type { CacheProvider } from '../utils/cache';
 import { contentHash } from '../utils/cache';
 
+const PARSEABLE_EXTENSIONS = /\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$/;
+
 /**
  * Create an AST provider backed by SWC for TypeScript source analysis.
  * Supports optional disk cache for persisting import/export info across runs.
@@ -45,10 +47,15 @@ function createASTProvider(rootDir: string, diskCache?: CacheProvider): ASTProvi
 
   return {
     async getSourceFile(path: string): Promise<unknown> {
+      if (!PARSEABLE_EXTENSIONS.test(path)) {
+        return { type: 'Module', body: [] };
+      }
       return parse(path);
     },
 
     async getImports(path: string): Promise<readonly ImportInfo[]> {
+      if (!PARSEABLE_EXTENSIONS.test(path)) return [];
+
       const memoryCached = importCache.get(path);
       if (memoryCached) return memoryCached;
 
@@ -76,6 +83,8 @@ function createASTProvider(rootDir: string, diskCache?: CacheProvider): ASTProvi
     },
 
     async getExports(path: string): Promise<readonly ExportInfo[]> {
+      if (!PARSEABLE_EXTENSIONS.test(path)) return [];
+
       const memoryCached = exportCache.get(path);
       if (memoryCached) return memoryCached;
 
