@@ -112,18 +112,42 @@ jobs:
 
       - run: pnpm turbo test -- --coverage
 
+  changeset:
+    # Only check on PRs — pushes to main don't need changesets
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check for changesets
+        run: pnpm changeset status --since=origin/main
+
   # Gate job for branch protection
   ci-passed:
     if: always()
-    needs: [lint, lodestar, test]
+    needs: [lint, lodestar, test, changeset]
     runs-on: ubuntu-latest
     steps:
       - name: Check results
         run: |
           if [[ "${{ needs.lint.result }}" != "success" && "${{ needs.lint.result }}" != "skipped" ]] || \
              [[ "${{ needs.lodestar.result }}" != "success" && "${{ needs.lodestar.result }}" != "skipped" ]] || \
-             [[ "${{ needs.test.result }}" != "success" && "${{ needs.test.result }}" != "skipped" ]]; then
-            echo "CI failed (lint=${{ needs.lint.result }}, lodestar=${{ needs.lodestar.result }}, test=${{ needs.test.result }})"
+             [[ "${{ needs.test.result }}" != "success" && "${{ needs.test.result }}" != "skipped" ]] || \
+             [[ "${{ needs.changeset.result }}" != "success" && "${{ needs.changeset.result }}" != "skipped" ]]; then
+            echo "CI failed (lint=${{ needs.lint.result }}, lodestar=${{ needs.lodestar.result }}, test=${{ needs.test.result }}, changeset=${{ needs.changeset.result }})"
             exit 1
           fi
           echo "CI passed"
