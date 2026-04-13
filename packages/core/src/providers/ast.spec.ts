@@ -397,6 +397,54 @@ const c = import('./dynamic');
     });
   });
 
+  describe('non-parseable files', () => {
+    it('returns empty module for .graphql files', async () => {
+      const { provider } = await setupFixture({
+        'schema.graphql': 'type Query { hello: String }',
+      });
+
+      const result = await provider.getSourceFile('schema.graphql');
+
+      expect(result).toHaveProperty('type', 'Module');
+      expect(result).toHaveProperty('body', []);
+    });
+
+    it('returns empty imports for .svg files', async () => {
+      const { provider } = await setupFixture({
+        'icon.svg': '<svg></svg>',
+      });
+
+      const imports = await provider.getImports('icon.svg');
+
+      expect(imports).toStrictEqual([]);
+    });
+
+    it('returns empty exports for .json files', async () => {
+      const { provider } = await setupFixture({
+        'data.json': '{"key": "value"}',
+      });
+
+      const exports = await provider.getExports('data.json');
+
+      expect(exports).toStrictEqual([]);
+    });
+
+    it('parses .mts and .cjs files normally', async () => {
+      const { provider } = await setupFixture({
+        'mod.mts': `import { foo } from './foo';`,
+        'legacy.cjs': `const bar = require('./bar');`,
+      });
+
+      const mtsImports = await provider.getImports('mod.mts');
+      expect(mtsImports).toHaveLength(1);
+      expect(mtsImports[0].source).toBe('./foo');
+
+      const cjsImports = await provider.getImports('legacy.cjs');
+      expect(cjsImports).toHaveLength(1);
+      expect(cjsImports[0].source).toBe('./bar');
+    });
+  });
+
   describe('disk cache', () => {
     /** Create a mock CacheProvider */
     function createMockCache(): CacheProvider & {
@@ -440,6 +488,30 @@ const c = import('./dynamic');
       const cache = createMockCache();
       return { rootDir, provider: createASTProvider(rootDir, cache), cache };
     }
+
+    it('returns empty imports for non-parseable files even with disk cache', async () => {
+      const { provider, cache } = await setupFixtureWithCache({
+        'schema.graphql': 'type Query { hello: String }',
+      });
+
+      const imports = await provider.getImports('schema.graphql');
+
+      expect(imports).toStrictEqual([]);
+      expect(cache.get).not.toHaveBeenCalled();
+      expect(cache.set).not.toHaveBeenCalled();
+    });
+
+    it('returns empty exports for non-parseable files even with disk cache', async () => {
+      const { provider, cache } = await setupFixtureWithCache({
+        'icon.svg': '<svg></svg>',
+      });
+
+      const exports = await provider.getExports('icon.svg');
+
+      expect(exports).toStrictEqual([]);
+      expect(cache.get).not.toHaveBeenCalled();
+      expect(cache.set).not.toHaveBeenCalled();
+    });
 
     it('parses and stores in cache on getImports disk cache miss', async () => {
       const { provider, cache } = await setupFixtureWithCache({
