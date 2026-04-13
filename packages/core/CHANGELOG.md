@@ -1,5 +1,11 @@
 # @retemper/lodestar-core
 
+## 0.0.3
+
+### Patch Changes
+
+- [#23](https://github.com/retemper/lodestar/pull/23) [`d216f16`](https://github.com/retemper/lodestar/commit/d216f1686e2e676b406de64a7d20f91a28027526) Thanks [@devKangMinHyeok](https://github.com/devKangMinHyeok)! - Skip non-parseable files (e.g. .graphql, .svg, .json) in AST provider to prevent SWC parse errors
+
 ## 0.0.2
 
 ### Patch Changes
