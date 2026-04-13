@@ -66,6 +66,16 @@ describe('stripJsonComments', () => {
     const input = '{"a": "end\\\\"}';
     expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 'end\\' });
   });
+
+  it('handles unterminated string gracefully', () => {
+    const input = '{"a": "unterminated';
+    expect(stripJsonComments(input)).toBe('{"a": "unterminated');
+  });
+
+  it('handles unterminated string ending with backslash', () => {
+    const input = '{"a": "end\\';
+    expect(stripJsonComments(input)).toBe('{"a": "end\\');
+  });
 });
 
 describe('compileMappings', () => {
