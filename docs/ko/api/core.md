@@ -240,6 +240,6 @@ function createMyReporter(): Reporter {
 | `createJsonReporter()`    | stdout | 모든 위반 사항을 수집하고 완료 시 단일 JSON 객체를 출력합니다. CI 파이프라인 및 프로그래밍 방식 소비에 유용합니다.                                  |
 
 ```ts
-import { createConsoleReporter } from '@retemper/lodestar-cli';
-import { createJsonReporter } from '@retemper/lodestar-cli';
+import { createConsoleReporter } from '@retemper/lodestar';
+import { createJsonReporter } from '@retemper/lodestar';
 ```
