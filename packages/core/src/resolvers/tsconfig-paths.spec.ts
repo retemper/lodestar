@@ -27,6 +27,55 @@ describe('stripJsonComments', () => {
     const input = '{"a": 1}';
     expect(stripJsonComments(input)).toBe(input);
   });
+
+  it('preserves URLs inside string literals', () => {
+    const input = '{\n  "$schema": "https://json.schemastore.org/tsconfig"\n}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({
+      $schema: 'https://json.schemastore.org/tsconfig',
+    });
+  });
+
+  it('handles mixed: URLs in strings and real comments', () => {
+    const input = '{\n  "$schema": "https://example.com/schema", // a comment\n  "a": 1\n}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({
+      $schema: 'https://example.com/schema',
+      a: 1,
+    });
+  });
+
+  it('preserves escaped quotes inside strings', () => {
+    const input = '{"a": "foo\\"bar//baz"}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 'foo"bar//baz' });
+  });
+
+  it('handles empty string', () => {
+    expect(stripJsonComments('')).toBe('');
+  });
+
+  it('preserves block comment syntax inside strings', () => {
+    const input = '{"a": "/* not a comment */"}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: '/* not a comment */' });
+  });
+
+  it('handles trailing single-line comment without newline', () => {
+    const input = '{"a": 1} // trailing';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 1 });
+  });
+
+  it('preserves escaped backslash before quote in strings', () => {
+    const input = '{"a": "end\\\\"}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 'end\\' });
+  });
+
+  it('handles unterminated string gracefully', () => {
+    const input = '{"a": "unterminated';
+    expect(stripJsonComments(input)).toBe('{"a": "unterminated');
+  });
+
+  it('handles unterminated string ending with backslash', () => {
+    const input = '{"a": "end\\';
+    expect(stripJsonComments(input)).toBe('{"a": "end\\');
+  });
 });
 
 describe('compileMappings', () => {

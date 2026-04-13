@@ -54,6 +54,22 @@ describe('createFileSystemProvider', () => {
 
       expect(result).toStrictEqual([]);
     });
+
+    it('excludes directories from glob results', async () => {
+      const rootDir = await setupFixture({
+        'src/components/Button.ts': '',
+        'src/components/Modal.ts': '',
+      });
+      // 'src/components' is a directory that could match 'src/**'
+      const provider = createFileSystemProvider(rootDir);
+
+      const result = await provider.glob('src/**');
+
+      for (const entry of result) {
+        expect(entry).toMatch(/\.ts$/);
+      }
+      expect(result).not.toContain('src/components');
+    });
   });
 
   describe('readFile', () => {
