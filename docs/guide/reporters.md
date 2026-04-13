@@ -21,8 +21,8 @@ npx lodestar check --format junit     # JUnit XML for CI systems
 
 | Format    | Package                             | Output | Use Case                                   |
 | --------- | ----------------------------------- | ------ | ------------------------------------------ |
-| `console` | `@retemper/lodestar-cli`            | stderr | Local development, human-readable          |
-| `json`    | `@retemper/lodestar-cli`            | stdout | CI pipelines, programmatic consumption     |
+| `console` | `@retemper/lodestar` (via cli)      | stderr | Local development, human-readable          |
+| `json`    | `@retemper/lodestar` (via cli)      | stdout | CI pipelines, programmatic consumption     |
 | `sarif`   | `@retemper/lodestar-reporter-sarif` | stdout | GitHub Code Scanning, VS Code SARIF viewer |
 | `junit`   | `@retemper/lodestar-reporter-junit` | stdout | Jenkins, GitLab CI, CircleCI test reports  |
 
