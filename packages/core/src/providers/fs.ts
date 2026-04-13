@@ -1,4 +1,4 @@
-import { readFile, access } from 'node:fs/promises';
+import { readFile, access, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import type { FileSystemProvider } from '@retemper/lodestar-types';
 
@@ -12,7 +12,10 @@ function createFileSystemProvider(rootDir: string): FileSystemProvider {
       const { glob } = await import('node:fs/promises');
       const matches: string[] = [];
       for await (const entry of glob(pattern, { cwd: rootDir })) {
-        matches.push(relative(rootDir, join(rootDir, entry)).replaceAll('\\', '/'));
+        const fullPath = join(rootDir, entry);
+        const s = await stat(fullPath).catch(() => null);
+        if (!s || !s.isFile()) continue;
+        matches.push(relative(rootDir, fullPath).replaceAll('\\', '/'));
       }
       return matches;
     },

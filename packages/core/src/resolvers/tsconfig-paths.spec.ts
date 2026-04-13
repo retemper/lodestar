@@ -27,6 +27,26 @@ describe('stripJsonComments', () => {
     const input = '{"a": 1}';
     expect(stripJsonComments(input)).toBe(input);
   });
+
+  it('preserves URLs inside string literals', () => {
+    const input = '{\n  "$schema": "https://json.schemastore.org/tsconfig"\n}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({
+      $schema: 'https://json.schemastore.org/tsconfig',
+    });
+  });
+
+  it('handles mixed: URLs in strings and real comments', () => {
+    const input = '{\n  "$schema": "https://example.com/schema", // a comment\n  "a": 1\n}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({
+      $schema: 'https://example.com/schema',
+      a: 1,
+    });
+  });
+
+  it('preserves escaped quotes inside strings', () => {
+    const input = '{"a": "foo\\"bar//baz"}';
+    expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 'foo"bar//baz' });
+  });
 });
 
 describe('compileMappings', () => {
