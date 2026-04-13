@@ -240,6 +240,6 @@ function createMyReporter(): Reporter {
 | `createJsonReporter()`    | stdout | Collects all violations and writes a single JSON object on completion. Useful for CI pipelines and programmatic consumption.                     |
 
 ```ts
-import { createConsoleReporter } from '@retemper/lodestar-cli';
-import { createJsonReporter } from '@retemper/lodestar-cli';
+import { createConsoleReporter } from '@retemper/lodestar';
+import { createJsonReporter } from '@retemper/lodestar';
 ```

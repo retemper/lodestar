@@ -98,3 +98,6 @@ export type {
   PackageSummary,
 } from '@retemper/lodestar-core';
 export type { WorkspacePackage } from '@retemper/lodestar-config';
+
+// CLI reporters (re-exported for convenience)
+export { createConsoleReporter, createJsonReporter } from '@retemper/lodestar-cli';
