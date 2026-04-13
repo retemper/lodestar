@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { ModuleNode } from '@retemper/lodestar';
+import type { ModuleNode } from '@retemper/lodestar-types';
 import {
   buildGraphApiResponse,
   collectEdges,

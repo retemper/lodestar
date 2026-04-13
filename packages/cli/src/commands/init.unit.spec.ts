@@ -5,7 +5,7 @@ vi.mock('node:fs/promises', () => ({
   writeFile: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@retemper/lodestar', () => ({
+vi.mock('@retemper/lodestar-core', () => ({
   createLogger: vi.fn(() => ({
     debug: vi.fn((...args: unknown[]) => console.error(...args)),
     error: vi.fn((...args: unknown[]) => console.error(...args)),

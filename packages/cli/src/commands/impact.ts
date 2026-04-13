@@ -1,7 +1,7 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import type { Logger } from '@retemper/lodestar';
-import { createProviders, createLogger } from '@retemper/lodestar';
+import type { Logger } from '@retemper/lodestar-types';
+import { createProviders, createLogger } from '@retemper/lodestar-core';
 
 /** Options for the impact analysis command */
 interface ImpactOptions {

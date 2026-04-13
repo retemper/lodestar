@@ -1,14 +1,13 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import type { Logger, WorkspaceReporter } from '@retemper/lodestar';
+import type { Logger, WorkspaceReporter } from '@retemper/lodestar-types';
+import { loadConfigFile, resolveConfig } from '@retemper/lodestar-config';
 import {
-  loadConfigFile,
-  resolveConfig,
   createDiskCacheProvider,
   createLogger,
   createWatcher,
   createCompositeReporter,
-} from '@retemper/lodestar';
+} from '@retemper/lodestar-core';
 import { createConsoleReporter } from '../reporters/console';
 import { createJsonReporter } from '../reporters/json';
 import { filterRules, filterAdapters } from '../filter';

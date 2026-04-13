@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { WrittenConfig } from '@retemper/lodestar';
+import type { WrittenConfig } from '@retemper/lodestar-types';
 
 /** Creates a test logger that delegates to console.error (spied in beforeEach) */
 function createMockLogger() {
@@ -13,7 +13,7 @@ function createMockLogger() {
 
 const mockWatcherHandle = { close: vi.fn() };
 
-vi.mock('@retemper/lodestar', () => ({
+vi.mock('@retemper/lodestar-config', () => ({
   loadConfigFile: vi.fn(),
   resolveConfig: vi.fn(() => ({
     rootDir: '/fake',
@@ -24,6 +24,9 @@ vi.mock('@retemper/lodestar', () => ({
     adapters: [],
     reporters: [],
   })),
+}));
+
+vi.mock('@retemper/lodestar-core', () => ({
   createDiskCacheProvider: vi.fn(() => ({
     get: vi.fn().mockResolvedValue(null),
     set: vi.fn().mockResolvedValue(undefined),
@@ -61,7 +64,8 @@ vi.mock('../reporters/json', () => ({
 }));
 
 import { watchCommand } from './watch';
-import { loadConfigFile, createWatcher, createCompositeReporter } from '@retemper/lodestar';
+import { loadConfigFile } from '@retemper/lodestar-config';
+import { createWatcher, createCompositeReporter } from '@retemper/lodestar-core';
 import { createJsonReporter } from '../reporters/json';
 
 const mockLoadConfigFile = vi.mocked(loadConfigFile);

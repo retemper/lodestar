@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { RunSummary, WorkspaceSummary, WrittenConfig } from '@retemper/lodestar';
+import type { RunSummary, WrittenConfig } from '@retemper/lodestar-types';
+import type { WorkspaceSummary } from '@retemper/lodestar-core';
 
 /** Creates a test logger that delegates to console.error (spied in beforeEach) */
 function createMockLogger() {
@@ -11,7 +12,7 @@ function createMockLogger() {
   };
 }
 
-vi.mock('@retemper/lodestar', () => ({
+vi.mock('@retemper/lodestar-config', () => ({
   loadConfigFile: vi.fn(),
   discoverWorkspaces: vi.fn(),
   resolveConfig: vi.fn(() => ({
@@ -23,6 +24,9 @@ vi.mock('@retemper/lodestar', () => ({
     adapters: [],
     reporters: [],
   })),
+}));
+
+vi.mock('@retemper/lodestar-core', () => ({
   run: vi.fn(),
   runWorkspace: vi.fn(),
   createCompositeReporter: vi.fn((reporters: readonly unknown[]) => reporters[0]),
@@ -90,17 +94,16 @@ vi.mock('@retemper/lodestar-reporter-junit', () => ({
 }));
 
 import { checkCommand } from './check';
+import { loadConfigFile, discoverWorkspaces } from '@retemper/lodestar-config';
 import {
   createCompositeReporter,
   createDiskCacheProvider,
   createProviders,
   computeImpactScope,
-  discoverWorkspaces,
   getChangedFiles,
-  loadConfigFile,
   run,
   runWorkspace,
-} from '@retemper/lodestar';
+} from '@retemper/lodestar-core';
 import { createSarifReporter } from '@retemper/lodestar-reporter-sarif';
 import { createJunitReporter } from '@retemper/lodestar-reporter-junit';
 

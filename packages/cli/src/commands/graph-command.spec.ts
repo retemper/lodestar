@@ -1,14 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { ModuleNode } from '@retemper/lodestar';
+import type { ModuleNode } from '@retemper/lodestar-types';
 import { createServer } from 'node:http';
 
 vi.mock('node:http', () => ({
   createServer: vi.fn(),
 }));
 
-vi.mock('@retemper/lodestar', () => ({
-  createProviders: vi.fn(),
+vi.mock('@retemper/lodestar-config', () => ({
   loadConfigFile: vi.fn(),
+}));
+
+vi.mock('@retemper/lodestar-core', () => ({
+  createProviders: vi.fn(),
   createLogger: vi.fn(() => ({
     debug: vi.fn((...args: unknown[]) => console.error(...args)),
     error: vi.fn((...args: unknown[]) => console.error(...args)),
@@ -20,7 +23,8 @@ vi.mock('@retemper/lodestar', () => ({
 const mockCreateServer = vi.mocked(createServer);
 
 import { graphCommand } from './graph';
-import { createProviders, loadConfigFile } from '@retemper/lodestar';
+import { loadConfigFile } from '@retemper/lodestar-config';
+import { createProviders } from '@retemper/lodestar-core';
 
 const mockCreateProviders = vi.mocked(createProviders);
 const mockLoadConfigFile = vi.mocked(loadConfigFile);

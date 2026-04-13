@@ -1,7 +1,7 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { writeFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
-import { createLogger } from '@retemper/lodestar';
+import { createLogger } from '@retemper/lodestar-core';
 
 /** Initialize a new lodestar.config.ts in the current directory, then run adapter setup */
 async function initCommand(_args: ArgumentsCamelCase<Record<string, unknown>>): Promise<void> {

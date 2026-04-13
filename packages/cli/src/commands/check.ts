@@ -1,10 +1,8 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import type { Logger, WorkspaceReporter, WrittenConfig } from '@retemper/lodestar';
+import type { Logger, WorkspaceReporter, WrittenConfig } from '@retemper/lodestar-types';
+import { loadConfigFile, discoverWorkspaces, resolveConfig } from '@retemper/lodestar-config';
 import {
-  loadConfigFile,
-  discoverWorkspaces,
-  resolveConfig,
   run,
   runWorkspace,
   createCompositeReporter,
@@ -13,7 +11,7 @@ import {
   getChangedFiles,
   computeImpactScope,
   createProviders,
-} from '@retemper/lodestar';
+} from '@retemper/lodestar-core';
 import { createConsoleReporter } from '../reporters/console';
 import { createJsonReporter } from '../reporters/json';
 import { createSarifReporter } from '@retemper/lodestar-reporter-sarif';

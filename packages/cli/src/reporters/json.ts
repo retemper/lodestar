@@ -3,7 +3,7 @@ import type {
   WorkspacePackageInfo,
   Violation,
   RunSummary,
-} from '@retemper/lodestar';
+} from '@retemper/lodestar-types';
 
 /** Create a JSON reporter that outputs structured results to stdout */
 function createJsonReporter(): WorkspaceReporter {
