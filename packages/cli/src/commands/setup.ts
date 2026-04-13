@@ -1,7 +1,8 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
-import type { WrittenConfigBlock } from '@retemper/lodestar';
-import { loadConfigFile, createLogger } from '@retemper/lodestar';
+import type { WrittenConfigBlock } from '@retemper/lodestar-types';
+import { loadConfigFile } from '@retemper/lodestar-config';
+import { createLogger } from '@retemper/lodestar-core';
 
 /** Run verifySetup and apply fixes for all adapters */
 async function setupCommand(_args: ArgumentsCamelCase<Record<string, unknown>>): Promise<void> {

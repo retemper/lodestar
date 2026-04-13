@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('@retemper/lodestar', () => ({
+vi.mock('@retemper/lodestar-config', () => ({
   loadConfigFile: vi.fn(),
+}));
+
+vi.mock('@retemper/lodestar-core', () => ({
   createLogger: vi.fn(() => ({
     debug: vi.fn((...args: unknown[]) => console.error(...args)),
     error: vi.fn((...args: unknown[]) => console.error(...args)),
@@ -11,7 +14,7 @@ vi.mock('@retemper/lodestar', () => ({
 }));
 
 import { setupCommand } from './setup';
-import { loadConfigFile } from '@retemper/lodestar';
+import { loadConfigFile } from '@retemper/lodestar-config';
 
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 

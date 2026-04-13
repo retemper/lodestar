@@ -330,15 +330,21 @@ importers:
 
   packages/cli:
     dependencies:
-      '@retemper/lodestar':
+      '@retemper/lodestar-config':
         specifier: workspace:*
-        version: link:../lodestar
+        version: link:../config
+      '@retemper/lodestar-core':
+        specifier: workspace:*
+        version: link:../core
       '@retemper/lodestar-reporter-junit':
         specifier: workspace:*
         version: link:../reporter-junit
       '@retemper/lodestar-reporter-sarif':
         specifier: workspace:*
         version: link:../reporter-sarif
+      '@retemper/lodestar-types':
+        specifier: workspace:*
+        version: link:../types
       yargs:
         specifier: ^17.7.2
         version: 17.7.2
@@ -408,6 +414,9 @@ importers:
 
   packages/lodestar:
     dependencies:
+      '@retemper/lodestar-cli':
+        specifier: workspace:*
+        version: link:../cli
       '@retemper/lodestar-config':
         specifier: workspace:*
         version: link:../config

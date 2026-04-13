@@ -5,7 +5,7 @@ import type {
   WorkspaceReporter,
   WorkspacePackageInfo,
   Logger,
-} from '@retemper/lodestar';
+} from '@retemper/lodestar-types';
 
 /** ANSI color codes */
 const GREEN = '\x1b[32m';

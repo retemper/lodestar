@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('@retemper/lodestar', () => ({
+vi.mock('@retemper/lodestar-core', () => ({
   createProviders: vi.fn(),
   createLogger: vi.fn(() => ({
     debug: vi.fn((...args: unknown[]) => console.error(...args)),
@@ -11,7 +11,7 @@ vi.mock('@retemper/lodestar', () => ({
 }));
 
 import { collectTransitiveDependents, impactCommand } from './impact';
-import { createProviders } from '@retemper/lodestar';
+import { createProviders } from '@retemper/lodestar-core';
 
 const mockCreateProviders = vi.mocked(createProviders);
 

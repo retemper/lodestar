@@ -1,4 +1,4 @@
-import type { WrittenConfig, WrittenConfigBlock, ToolAdapter } from '@retemper/lodestar';
+import type { WrittenConfig, WrittenConfigBlock, ToolAdapter } from '@retemper/lodestar-types';
 
 /** Check if a rule ID matches any filter pattern (exact or prefix/*) */
 function matchesRuleFilter(ruleId: string, patterns: readonly string[]): boolean {

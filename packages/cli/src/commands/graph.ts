@@ -1,8 +1,9 @@
 import type { ArgumentsCamelCase } from 'yargs';
 import { resolve } from 'node:path';
 import { createServer } from 'node:http';
-import { createProviders, loadConfigFile, createLogger } from '@retemper/lodestar';
-import type { Logger, ModuleNode } from '@retemper/lodestar';
+import type { Logger, ModuleNode } from '@retemper/lodestar-types';
+import { loadConfigFile } from '@retemper/lodestar-config';
+import { createProviders, createLogger } from '@retemper/lodestar-core';
 
 /** Supported graph output formats */
 type GraphFormat = 'mermaid' | 'dot';
