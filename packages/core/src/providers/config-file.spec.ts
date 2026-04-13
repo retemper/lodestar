@@ -30,7 +30,7 @@ afterAll(async () => {
 
 describe('createConfigFileProvider', () => {
   describe('getPackageJson', () => {
-    it('루트의 package.json을 읽는다', async () => {
+    it('reads root package.json', async () => {
       const rootDir = await setupFixture({
         'package.json': { name: 'test-pkg', version: '1.0.0' },
       });
@@ -41,7 +41,7 @@ describe('createConfigFileProvider', () => {
       expect(result).toStrictEqual({ name: 'test-pkg', version: '1.0.0' });
     });
 
-    it('dir 파라미터로 하위 디렉토리의 package.json을 읽는다', async () => {
+    it('reads package.json from subdirectory via dir parameter', async () => {
       const rootDir = await setupFixture({
         'packages/sub/package.json': { name: 'sub-pkg' },
       });
@@ -52,7 +52,7 @@ describe('createConfigFileProvider', () => {
       expect(result).toStrictEqual({ name: 'sub-pkg' });
     });
 
-    it('파일이 없으면 에러를 던진다', async () => {
+    it('throws error when file is missing', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-config-test-'));
       dirs.push(rootDir);
       const provider = createConfigFileProvider(rootDir);
@@ -62,7 +62,7 @@ describe('createConfigFileProvider', () => {
   });
 
   describe('getTsConfig', () => {
-    it('루트의 tsconfig.json을 읽는다', async () => {
+    it('reads root tsconfig.json', async () => {
       const rootDir = await setupFixture({
         'tsconfig.json': { compilerOptions: { strict: true } },
       });
@@ -73,7 +73,7 @@ describe('createConfigFileProvider', () => {
       expect(result).toStrictEqual({ compilerOptions: { strict: true } });
     });
 
-    it('dir 파라미터로 하위 디렉토리의 tsconfig.json을 읽는다', async () => {
+    it('reads tsconfig.json from subdirectory via dir parameter', async () => {
       const rootDir = await setupFixture({
         'packages/app/tsconfig.json': { compilerOptions: { target: 'es2020' } },
       });
@@ -84,7 +84,7 @@ describe('createConfigFileProvider', () => {
       expect(result).toStrictEqual({ compilerOptions: { target: 'es2020' } });
     });
 
-    it('파일이 없으면 에러를 던진다', async () => {
+    it('throws error when file is missing', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-config-test-'));
       dirs.push(rootDir);
       const provider = createConfigFileProvider(rootDir);
@@ -94,7 +94,7 @@ describe('createConfigFileProvider', () => {
   });
 
   describe('getCustomConfig', () => {
-    it('임의의 JSON 설정 파일을 읽는다', async () => {
+    it('reads arbitrary JSON config files', async () => {
       const rootDir = await setupFixture({
         '.eslintrc.json': { extends: ['recommended'] },
       });
@@ -105,7 +105,7 @@ describe('createConfigFileProvider', () => {
       expect(result).toStrictEqual({ extends: ['recommended'] });
     });
 
-    it('dir 파라미터로 하위 디렉토리의 설정 파일을 읽는다', async () => {
+    it('reads config file from subdirectory via dir parameter', async () => {
       const rootDir = await setupFixture({
         'apps/web/.prettierrc.json': { singleQuote: true },
       });
@@ -116,7 +116,7 @@ describe('createConfigFileProvider', () => {
       expect(result).toStrictEqual({ singleQuote: true });
     });
 
-    it('파일이 없으면 에러를 던진다', async () => {
+    it('throws error when file is missing', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-config-test-'));
       dirs.push(rootDir);
       const provider = createConfigFileProvider(rootDir);

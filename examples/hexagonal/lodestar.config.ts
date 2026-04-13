@@ -9,7 +9,7 @@ export default defineConfig([
     plugins: [pluginArchitecture, pluginStructure],
     rules: {
       'architecture/layers': {
-        severity: 'error',
+        severity: 'warn',
         options: {
           layers: [
             { name: 'core/domain', path: 'src/core/domain/**/*.ts' },

@@ -3,15 +3,15 @@ import { createMockProviders, createTestContext } from '@retemper/lodestar-test-
 import { noForbiddenPath } from './no-forbidden-path.rule';
 
 describe('structure/no-forbidden-path', () => {
-  describe('규칙 메타데이터', () => {
-    it('올바른 이름과 provider 의존성을 가진다', () => {
+  describe('rule metadata', () => {
+    it('has correct name and provider dependencies', () => {
       expect(noForbiddenPath.name).toBe('structure/no-forbidden-path');
       expect(noForbiddenPath.needs).toStrictEqual(['fs']);
     });
   });
 
-  describe('금지된 경로가 존재하지 않는 경우', () => {
-    it('매칭되는 파일이 없으면 위반이 없다', async () => {
+  describe('when forbidden paths do not exist', () => {
+    it('no violation when no files match', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue([]),
       });
@@ -27,8 +27,8 @@ describe('structure/no-forbidden-path', () => {
     });
   });
 
-  describe('금지된 경로가 존재하는 경우', () => {
-    it('매칭되는 파일이 있으면 각각 위반을 보고한다', async () => {
+  describe('when forbidden paths exist', () => {
+    it('reports violations for each matching file', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'dist/**') {
@@ -52,8 +52,8 @@ describe('structure/no-forbidden-path', () => {
     });
   });
 
-  describe('여러 패턴 검사', () => {
-    it('여러 패턴에서 각각 매칭된 파일에 대해 위반을 보고한다', async () => {
+  describe('multiple pattern checks', () => {
+    it('reports violations for each matched file across multiple patterns', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'dist/**') {
@@ -79,8 +79,8 @@ describe('structure/no-forbidden-path', () => {
     });
   });
 
-  describe('빈 patterns 목록', () => {
-    it('patterns가 비어있으면 위반이 없다', async () => {
+  describe('empty patterns list', () => {
+    it('no violation when patterns is empty', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue([]),
       });
@@ -96,8 +96,8 @@ describe('structure/no-forbidden-path', () => {
     });
   });
 
-  describe('위반 위치 정보', () => {
-    it('위반에 파일 위치 정보를 포함한다', async () => {
+  describe('violation location info', () => {
+    it('includes file location info in violations', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src/.env']),
       });
@@ -114,8 +114,8 @@ describe('structure/no-forbidden-path', () => {
     });
   });
 
-  describe('메타데이터', () => {
-    it('올바른 패턴 수를 메타에 출력한다', async () => {
+  describe('metadata', () => {
+    it('outputs correct pattern count in meta', async () => {
       const metaSpy = vi.fn();
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue([]),

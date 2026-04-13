@@ -86,12 +86,12 @@ npm ci              # install dependencies
 npx lodestar check  # run checks — exits 1 on errors
 ```
 
-| System       | Config File           | Notes                            |
-| ------------ | --------------------- | -------------------------------- |
-| CircleCI     | `.circleci/config.yml`| Add as a `run` step              |
-| Jenkins      | `Jenkinsfile`         | Use `sh 'npx lodestar check'`   |
-| Azure DevOps | `azure-pipelines.yml` | Add as a `script` step           |
-| Bitbucket    | `bitbucket-pipelines.yml` | Add as a `script` step       |
+| System       | Config File               | Notes                         |
+| ------------ | ------------------------- | ----------------------------- |
+| CircleCI     | `.circleci/config.yml`    | Add as a `run` step           |
+| Jenkins      | `Jenkinsfile`             | Use `sh 'npx lodestar check'` |
+| Azure DevOps | `azure-pipelines.yml`     | Add as a `script` step        |
+| Bitbucket    | `bitbucket-pipelines.yml` | Add as a `script` step        |
 
 ## Tips
 
@@ -105,7 +105,7 @@ Lodestar's analysis is CPU-bound, not I/O-bound. The biggest time savings come f
 
 ### Exit Codes
 
-| Code | Meaning                                      |
-| ---- | -------------------------------------------- |
-| `0`  | All checks passed (warnings are allowed)     |
-| `1`  | At least one `'error'` severity violation    |
+| Code | Meaning                                   |
+| ---- | ----------------------------------------- |
+| `0`  | All checks passed (warnings are allowed)  |
+| `1`  | At least one `'error'` severity violation |

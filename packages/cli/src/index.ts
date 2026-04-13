@@ -32,6 +32,11 @@ function createCli() {
             string: true,
             describe: 'Only run specific rules (e.g., --rule naming-convention/file-naming)',
           })
+          .option('adapter', {
+            type: 'array',
+            string: true,
+            describe: 'Only run specific adapters (e.g., --adapter prettier)',
+          })
           .option('fix', {
             type: 'boolean',
             default: false,
@@ -127,6 +132,11 @@ function createCli() {
             type: 'array',
             string: true,
             describe: 'Only run specific rules',
+          })
+          .option('adapter', {
+            type: 'array',
+            string: true,
+            describe: 'Only run specific adapters (e.g., --adapter prettier)',
           })
           .option('fix', {
             type: 'boolean',

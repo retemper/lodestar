@@ -1,0 +1,136 @@
+import { describe, it, expect, afterEach } from 'vitest';
+import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { loadConfigFile } from './load';
+import type { WrittenConfigBlock } from '@retemper/lodestar-types';
+
+/** Result of creating a test fixture directory */
+interface FixtureResult {
+  readonly rootDir: string;
+  cleanup(): Promise<void>;
+}
+
+/** Creates a temporary directory from a file structure map */
+async function createFixtureDir(
+  structure: Readonly<Record<string, string | null>> = {},
+): Promise<FixtureResult> {
+  const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-load-test-'));
+
+  for (const [relativePath, content] of Object.entries(structure)) {
+    const fullPath = join(rootDir, relativePath);
+    const dir = dirname(fullPath);
+    await mkdir(dir, { recursive: true });
+
+    await (content === null
+      ? mkdir(fullPath, { recursive: true })
+      : writeFile(fullPath, content, 'utf-8'));
+  }
+
+  return {
+    rootDir,
+    async cleanup() {
+      await rm(rootDir, { recursive: true, force: true });
+    },
+  };
+}
+
+/** Converts config to a single block (flat config compatible) */
+function firstBlock(config: unknown): WrittenConfigBlock {
+  if (Array.isArray(config)) return config[0];
+  return config as WrittenConfigBlock;
+}
+
+describe('loadConfigFile', () => {
+  const fixtures: FixtureResult[] = [];
+
+  afterEach(async () => {
+    for (const f of fixtures) {
+      await f.cleanup();
+    }
+    fixtures.length = 0;
+  });
+
+  async function setup(structure: Record<string, string | null> = {}) {
+    const fixture = await createFixtureDir(structure);
+    fixtures.push(fixture);
+    return fixture;
+  }
+
+  it('loads .mjs files', async () => {
+    const { rootDir } = await setup({
+      'lodestar.config.mjs': `export default { rules: { 'test/rule': 'error' } };\n`,
+    });
+
+    const config = await loadConfigFile(rootDir);
+    const block = firstBlock(config);
+
+    expect(config).not.toBeNull();
+    expect(block.rules?.['test/rule']).toBe('error');
+  });
+
+  it('loads .js files', async () => {
+    const { rootDir } = await setup({
+      'lodestar.config.js': `export default { plugins: ['test-plugin'] };\n`,
+    });
+
+    const config = await loadConfigFile(rootDir);
+    const block = firstBlock(config);
+
+    expect(config).not.toBeNull();
+    expect(block.plugins).toStrictEqual(['test-plugin']);
+  });
+
+  it('returns null when config file is missing', async () => {
+    const { rootDir } = await setup({});
+    const config = await loadConfigFile(rootDir);
+    expect(config).toBeNull();
+  });
+
+  it('returns null for modules without default export', async () => {
+    const { rootDir } = await setup({
+      'lodestar.config.mjs': `export const config = { rules: {} };\n`,
+    });
+
+    const config = await loadConfigFile(rootDir);
+    expect(config).toBeNull();
+  });
+
+  it('loads empty object config too', async () => {
+    const { rootDir } = await setup({
+      'lodestar.config.mjs': `export default {};\n`,
+    });
+
+    const config = await loadConfigFile(rootDir);
+    expect(config).toStrictEqual({});
+  });
+
+  it('loads .ts files via jiti', async () => {
+    const { rootDir } = await setup({
+      'lodestar.config.ts': `export default { rules: { 'ts/rule': 'warn' } };\n`,
+    });
+
+    const config = await loadConfigFile(rootDir);
+    const block = firstBlock(config);
+
+    expect(config).not.toBeNull();
+    expect(block.rules?.['ts/rule']).toBe('warn');
+  });
+
+  it('loads array config (flat config)', async () => {
+    const { rootDir } = await setup({
+      'lodestar.config.mjs': `export default [
+        { rules: { 'a/rule': 'error' } },
+        { files: ['src/**'], rules: { 'b/rule': 'warn' } },
+      ];\n`,
+    });
+
+    const config = await loadConfigFile(rootDir);
+
+    expect(Array.isArray(config)).toBe(true);
+    const blocks = config as WrittenConfigBlock[];
+    expect(blocks).toHaveLength(2);
+    expect(blocks[0].rules?.['a/rule']).toBe('error');
+    expect(blocks[1].files).toStrictEqual(['src/**']);
+  });
+});

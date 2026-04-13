@@ -3,7 +3,7 @@ import { mkdtemp, writeFile, rm, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createASTProvider } from './ast';
-import type { CacheProvider } from '../cache';
+import type { CacheProvider } from '../utils/cache';
 
 /** Temporary directory paths for testing */
 const dirs: string[] = [];
@@ -33,7 +33,7 @@ afterAll(async () => {
 
 describe('createASTProvider', () => {
   describe('getSourceFile', () => {
-    it('TypeScript 파일을 파싱하여 AST Module을 반환한다', async () => {
+    it('parses TypeScript file and returns AST Module', async () => {
       const { provider } = await setupFixture({
         'sample.ts': 'const x = 1;',
       });
@@ -44,7 +44,7 @@ describe('createASTProvider', () => {
       expect(result).toHaveProperty('body');
     });
 
-    it('TSX 파일을 파싱할 수 있다', async () => {
+    it('can parse TSX files', async () => {
       const { provider } = await setupFixture({
         'App.tsx': 'const App = () => <div>Hello</div>;\nexport default App;',
       });
@@ -54,7 +54,7 @@ describe('createASTProvider', () => {
       expect(result).toHaveProperty('type', 'Module');
     });
 
-    it('동일 파일을 두 번 파싱하면 캐시된 결과를 반환한다', async () => {
+    it('returns cached result when parsing the same file twice', async () => {
       const { provider } = await setupFixture({
         'cached.ts': 'const a = 1;',
       });
@@ -67,7 +67,7 @@ describe('createASTProvider', () => {
   });
 
   describe('getImports', () => {
-    it('import 선언을 추출한다', async () => {
+    it('extracts import declarations', async () => {
       const { provider } = await setupFixture({
         'imports.ts': `
 import { foo } from './foo';
@@ -91,7 +91,7 @@ import * as utils from './utils';
       expect(imports[2].specifiers).toStrictEqual(['* as utils']);
     });
 
-    it('type-only import를 감지한다', async () => {
+    it('detects type-only imports', async () => {
       const { provider } = await setupFixture({
         'type-imports.ts': `
 import type { Foo } from './foo';
@@ -104,7 +104,7 @@ import type { Foo } from './foo';
       expect(imports[0].isTypeOnly).toBe(true);
     });
 
-    it('import가 없는 파일은 빈 배열을 반환한다', async () => {
+    it('returns empty array for files without imports', async () => {
       const { provider } = await setupFixture({
         'no-imports.ts': 'const x = 1;',
       });
@@ -114,7 +114,7 @@ import type { Foo } from './foo';
       expect(imports).toStrictEqual([]);
     });
 
-    it('named specifier가 여러 개인 import를 추출한다', async () => {
+    it('extracts imports with multiple named specifiers', async () => {
       const { provider } = await setupFixture({
         'multi.ts': `import { a, b, c } from './abc';`,
       });
@@ -124,7 +124,7 @@ import type { Foo } from './foo';
       expect(imports[0].specifiers).toStrictEqual(['a', 'b', 'c']);
     });
 
-    it('static import의 kind는 "static"이다', async () => {
+    it('kind of static import is "static"', async () => {
       const { provider } = await setupFixture({
         'static.ts': `import { foo } from './foo';`,
       });
@@ -134,7 +134,7 @@ import type { Foo } from './foo';
       expect(imports[0].kind).toBe('static');
     });
 
-    it('require() 호출을 추출한다', async () => {
+    it('extracts require() calls', async () => {
       const { provider } = await setupFixture({
         'cjs.ts': `const foo = require('./foo');\nconst { bar } = require('./bar');`,
       });
@@ -149,7 +149,7 @@ import type { Foo } from './foo';
       expect(imports[1].kind).toBe('require');
     });
 
-    it('dynamic import()를 추출한다', async () => {
+    it('extracts dynamic import() calls', async () => {
       const { provider } = await setupFixture({
         'dynamic.ts': `const mod = import('./lazy');\nimport('./chunk').then(m => m.default);`,
       });
@@ -163,7 +163,7 @@ import type { Foo } from './foo';
       expect(imports[1].kind).toBe('dynamic');
     });
 
-    it('동적 인자의 require()는 무시한다', async () => {
+    it('ignores require() with dynamic arguments', async () => {
       const { provider } = await setupFixture({
         'dynamic-require.ts': `const name = 'foo';\nconst mod = require(name);`,
       });
@@ -173,7 +173,7 @@ import type { Foo } from './foo';
       expect(imports).toHaveLength(0);
     });
 
-    it('static, require, dynamic import를 모두 추출한다', async () => {
+    it('extracts all static, require, and dynamic imports', async () => {
       const { provider } = await setupFixture({
         'mixed.ts': `
 import { a } from './static';
@@ -193,7 +193,7 @@ const c = import('./dynamic');
       expect(imports[2].source).toBe('./dynamic');
     });
 
-    it('중첩 함수 내 require()를 추출한다', async () => {
+    it('extracts require() inside nested functions', async () => {
       const { provider } = await setupFixture({
         'nested.ts': `function load() { const x = require('./nested-dep'); return x; }`,
       });
@@ -207,7 +207,7 @@ const c = import('./dynamic');
   });
 
   describe('getExports', () => {
-    it('export default declaration을 추출한다', async () => {
+    it('extracts export default declarations', async () => {
       const { provider } = await setupFixture({
         'default-decl.ts': `export default function main() {}`,
       });
@@ -220,7 +220,7 @@ const c = import('./dynamic');
       expect(exports[0].isTypeOnly).toBe(false);
     });
 
-    it('export default expression을 추출한다', async () => {
+    it('extracts export default expressions', async () => {
       const { provider } = await setupFixture({
         'default-expr.ts': `const x = 1;\nexport default x;`,
       });
@@ -232,7 +232,7 @@ const c = import('./dynamic');
       expect(exports[0].isDefault).toBe(true);
     });
 
-    it('named export specifier를 추출한다', async () => {
+    it('extracts named export specifiers', async () => {
       const { provider } = await setupFixture({
         'named.ts': `const a = 1;\nconst b = 2;\nexport { a, b };`,
       });
@@ -245,7 +245,7 @@ const c = import('./dynamic');
       expect(exports[1].name).toBe('b');
     });
 
-    it('re-export의 source를 포함한다', async () => {
+    it('includes source of re-exports', async () => {
       const { provider } = await setupFixture({
         'reexport.ts': `export { foo } from './foo';`,
       });
@@ -257,7 +257,7 @@ const c = import('./dynamic');
       expect(exports[0].source).toBe('./foo');
     });
 
-    it('export function 선언을 추출한다', async () => {
+    it('extracts export function declarations', async () => {
       const { provider } = await setupFixture({
         'func.ts': `export function myFunc() { return 1; }`,
       });
@@ -269,7 +269,7 @@ const c = import('./dynamic');
       expect(exports[0].isTypeOnly).toBe(false);
     });
 
-    it('export class 선언을 추출한다', async () => {
+    it('extracts export class declarations', async () => {
       const { provider } = await setupFixture({
         'cls.ts': `export class MyClass {}`,
       });
@@ -281,7 +281,7 @@ const c = import('./dynamic');
       expect(exports[0].isTypeOnly).toBe(false);
     });
 
-    it('export const 변수 선언을 추출한다', async () => {
+    it('extracts export const variable declarations', async () => {
       const { provider } = await setupFixture({
         'vars.ts': `export const x = 1, y = 2;`,
       });
@@ -293,7 +293,7 @@ const c = import('./dynamic');
       expect(exports[1].name).toBe('y');
     });
 
-    it('export interface 선언을 type-only로 추출한다', async () => {
+    it('extracts export interface declarations as type-only', async () => {
       const { provider } = await setupFixture({
         'iface.ts': `export interface MyInterface { value: string; }`,
       });
@@ -305,7 +305,7 @@ const c = import('./dynamic');
       expect(exports[0].isTypeOnly).toBe(true);
     });
 
-    it('export type alias 선언을 type-only로 추출한다', async () => {
+    it('extracts export type alias declarations as type-only', async () => {
       const { provider } = await setupFixture({
         'type-alias.ts': `export type MyType = string | number;`,
       });
@@ -317,7 +317,7 @@ const c = import('./dynamic');
       expect(exports[0].isTypeOnly).toBe(true);
     });
 
-    it('export enum 선언을 추출한다', async () => {
+    it('extracts export enum declarations', async () => {
       const { provider } = await setupFixture({
         'enums.ts': `export enum Color { Red, Green, Blue }`,
       });
@@ -329,7 +329,7 @@ const c = import('./dynamic');
       expect(exports[0].isTypeOnly).toBe(false);
     });
 
-    it('export namespace specifier를 추출한다', async () => {
+    it('extracts export namespace specifiers', async () => {
       const { provider } = await setupFixture({
         'ns.ts': `export * as ns from './module';`,
       });
@@ -342,7 +342,7 @@ const c = import('./dynamic');
       expect(exports[0].source).toBe('./module');
     });
 
-    it('type-only named export specifier를 감지한다', async () => {
+    it('detects type-only named export specifiers', async () => {
       const { provider } = await setupFixture({
         'type-export.ts': `export type { Foo } from './foo';`,
       });
@@ -353,7 +353,7 @@ const c = import('./dynamic');
       expect(exports[0].isTypeOnly).toBe(true);
     });
 
-    it('알 수 없는 export declaration 타입은 무시한다', async () => {
+    it('ignores unknown export declaration types', async () => {
       const { provider } = await setupFixture({
         'unknown-decl.ts': `export declare module 'foo' { }`,
       });
@@ -364,7 +364,7 @@ const c = import('./dynamic');
       expect(exports).toStrictEqual([]);
     });
 
-    it('export가 없는 파일은 빈 배열을 반환한다', async () => {
+    it('returns empty array for files without exports', async () => {
       const { provider } = await setupFixture({
         'no-exports.ts': 'const x = 1;',
       });
@@ -374,7 +374,7 @@ const c = import('./dynamic');
       expect(exports).toStrictEqual([]);
     });
 
-    it('destructuring export 변수 선언은 Identifier가 아니므로 무시한다', async () => {
+    it('ignores destructuring export variable declarations since they are not Identifiers', async () => {
       const { provider } = await setupFixture({
         'destruct.ts': `const obj = { a: 1, b: 2 };\nexport const { a, b } = obj;`,
       });
@@ -385,7 +385,7 @@ const c = import('./dynamic');
       expect(exports).toStrictEqual([]);
     });
 
-    it('renamed export specifier의 exported 이름을 사용한다', async () => {
+    it('uses exported name of renamed export specifier', async () => {
       const { provider } = await setupFixture({
         'renamed.ts': `const original = 1;\nexport { original as renamed };`,
       });
@@ -441,7 +441,7 @@ const c = import('./dynamic');
       return { rootDir, provider: createASTProvider(rootDir, cache), cache };
     }
 
-    it('getImports가 디스크 캐시 미스 시 파싱 후 캐시에 저장한다', async () => {
+    it('parses and stores in cache on getImports disk cache miss', async () => {
       const { provider, cache } = await setupFixtureWithCache({
         'a.ts': `import { foo } from './foo';`,
       });
@@ -453,7 +453,7 @@ const c = import('./dynamic');
       expect(cache.set).toHaveBeenCalledWith('imports', expect.any(String), imports);
     });
 
-    it('getImports가 디스크 캐시 히트 시 파싱하지 않고 캐시된 값을 반환한다', async () => {
+    it('returns cached value without parsing on getImports disk cache hit', async () => {
       const { provider, cache } = await setupFixtureWithCache({
         'b.ts': `import { bar } from './bar';`,
       });
@@ -470,7 +470,7 @@ const c = import('./dynamic');
       expect(cache.get).toHaveBeenCalledWith('imports', expect.any(String));
     });
 
-    it('getExports가 디스크 캐시 미스 시 파싱 후 캐시에 저장한다', async () => {
+    it('parses and stores in cache on getExports disk cache miss', async () => {
       const { provider, cache } = await setupFixtureWithCache({
         'c.ts': `export const x = 1;`,
       });
@@ -482,7 +482,7 @@ const c = import('./dynamic');
       expect(cache.set).toHaveBeenCalledWith('exports', expect.any(String), exports);
     });
 
-    it('getExports가 디스크 캐시 히트 시 캐시된 값을 반환한다', async () => {
+    it('returns cached value on getExports disk cache hit', async () => {
       const { provider, cache } = await setupFixtureWithCache({
         'd.ts': `export const y = 2;`,
       });
@@ -495,7 +495,7 @@ const c = import('./dynamic');
       expect(cache.get).toHaveBeenCalledWith('exports', expect.any(String));
     });
 
-    it('디스크 캐시에 값이 있으면 바로 반환한다', async () => {
+    it('returns immediately when value exists in disk cache', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-ast-cache-hit-'));
       dirs.push(rootDir);
 
@@ -524,7 +524,7 @@ const c = import('./dynamic');
       expect(set).not.toHaveBeenCalled();
     });
 
-    it('getExports 디스크 캐시 히트 시 set을 호출하지 않는다', async () => {
+    it('does not call set on getExports disk cache hit', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-ast-export-hit-'));
       dirs.push(rootDir);
 

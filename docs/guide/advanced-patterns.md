@@ -62,11 +62,7 @@ export default defineConfig({
     'architecture/modules': {
       severity: 'error',
       options: {
-        modules: [
-          'src/features/auth',
-          'src/features/billing',
-          'src/features/dashboard',
-        ],
+        modules: ['src/features/auth', 'src/features/billing', 'src/features/dashboard'],
       },
     },
     'architecture/layers': {
@@ -92,6 +88,7 @@ export default defineConfig({
 ```
 
 This enforces:
+
 - Features cannot import each other directly (module encapsulation)
 - Features can only import from `shared`
 - Only the `app` layer can compose features together
@@ -243,6 +240,7 @@ export default defineConfig({
 ```
 
 This single config governs:
+
 - Architecture rules (layers, circular dependencies, module encapsulation)
 - Linting (ESLint) and formatting (Prettier)
 - Git hooks (Husky) and staged file checks (lint-staged)

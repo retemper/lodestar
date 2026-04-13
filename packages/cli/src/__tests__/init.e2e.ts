@@ -21,7 +21,7 @@ describe('lodestar init E2E', () => {
     return fixture;
   }
 
-  it('lodestar.config.ts 파일을 생성한다', async () => {
+  it('creates lodestar.config.ts file', async () => {
     const { rootDir } = await setup();
 
     const result = await runCli(['init'], { cwd: rootDir });
@@ -32,7 +32,7 @@ describe('lodestar init E2E', () => {
     expect(configContent).toContain('defineConfig');
   });
 
-  it('architecture 플러그인을 포함한다', async () => {
+  it('includes architecture plugin', async () => {
     const { rootDir } = await setup();
 
     await runCli(['init'], { cwd: rootDir });
@@ -43,7 +43,7 @@ describe('lodestar init E2E', () => {
     expect(configContent).toContain('architecture/layers');
   });
 
-  it('유효한 TypeScript import 문을 포함한다', async () => {
+  it('includes valid TypeScript import statements', async () => {
     const { rootDir } = await setup();
 
     await runCli(['init'], { cwd: rootDir });
@@ -53,7 +53,7 @@ describe('lodestar init E2E', () => {
     expect(configContent).toContain('export default defineConfig(');
   });
 
-  it('생성 성공 메시지를 stderr에 출력한다', async () => {
+  it('outputs creation success message to stderr', async () => {
     const { rootDir } = await setup();
 
     const result = await runCli(['init'], { cwd: rootDir });

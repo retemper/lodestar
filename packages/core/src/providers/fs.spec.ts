@@ -30,7 +30,7 @@ afterAll(async () => {
 
 describe('createFileSystemProvider', () => {
   describe('glob', () => {
-    it('패턴에 맞는 파일 목록을 반환한다', async () => {
+    it('returns file list matching pattern', async () => {
       const rootDir = await setupFixture({
         'src/a.ts': '',
         'src/b.ts': '',
@@ -44,7 +44,7 @@ describe('createFileSystemProvider', () => {
       expect([...result].sort()).toStrictEqual(['src/a.ts', 'src/b.ts']);
     });
 
-    it('일치하는 파일이 없으면 빈 배열을 반환한다', async () => {
+    it('returns empty array when no files match', async () => {
       const rootDir = await setupFixture({
         'src/a.js': '',
       });
@@ -57,7 +57,7 @@ describe('createFileSystemProvider', () => {
   });
 
   describe('readFile', () => {
-    it('파일 내용을 UTF-8 문자열로 반환한다', async () => {
+    it('returns file content as UTF-8 string', async () => {
       const rootDir = await setupFixture({
         'hello.txt': 'Hello, world!',
       });
@@ -68,7 +68,7 @@ describe('createFileSystemProvider', () => {
       expect(content).toBe('Hello, world!');
     });
 
-    it('존재하지 않는 파일은 에러를 던진다', async () => {
+    it('throws error for non-existent files', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-fs-test-'));
       dirs.push(rootDir);
       const provider = createFileSystemProvider(rootDir);
@@ -78,7 +78,7 @@ describe('createFileSystemProvider', () => {
   });
 
   describe('exists', () => {
-    it('파일이 존재하면 true를 반환한다', async () => {
+    it('returns true when file exists', async () => {
       const rootDir = await setupFixture({
         'exists.txt': '',
       });
@@ -89,7 +89,7 @@ describe('createFileSystemProvider', () => {
       expect(result).toBe(true);
     });
 
-    it('파일이 없으면 false를 반환한다', async () => {
+    it('returns false when file does not exist', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-fs-test-'));
       dirs.push(rootDir);
       const provider = createFileSystemProvider(rootDir);
@@ -101,7 +101,7 @@ describe('createFileSystemProvider', () => {
   });
 
   describe('readJson', () => {
-    it('JSON 파일을 파싱하여 반환한다', async () => {
+    it('parses and returns JSON files', async () => {
       const rootDir = await setupFixture({
         'data.json': JSON.stringify({ key: 'value', count: 42 }),
       });
@@ -112,7 +112,7 @@ describe('createFileSystemProvider', () => {
       expect(result).toStrictEqual({ key: 'value', count: 42 });
     });
 
-    it('존재하지 않는 JSON 파일은 에러를 던진다', async () => {
+    it('throws error for non-existent JSON files', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-fs-test-'));
       dirs.push(rootDir);
       const provider = createFileSystemProvider(rootDir);

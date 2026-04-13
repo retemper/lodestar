@@ -23,13 +23,14 @@
     "lodestar": "lodestar check"
   },
   "dependencies": {
-    "@retemper/lodestar-types": "workspace:*"
+    "@retemper/lodestar-types": "workspace:*",
+    "minimatch": "^10.2.5"
   },
   "devDependencies": {
+    "@retemper/lodestar-test-utils": "workspace:*",
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
-    "vitest": "^4.1.0",
-    "@retemper/lodestar-test-utils": "workspace:*"
+    "vitest": "^4.1.0"
   },
   "sideEffects": false,
   "publishConfig": {

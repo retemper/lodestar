@@ -14,7 +14,7 @@ const ctx: ResolveContext = {
 };
 
 describe('createResolverChain', () => {
-  it('첫 번째 non-null 결과를 반환한다', () => {
+  it('returns first non-null result', () => {
     const chain = createResolverChain([
       mockResolver(null),
       mockResolver('src/utils.ts'),
@@ -24,19 +24,19 @@ describe('createResolverChain', () => {
     expect(chain.resolve(ctx)).toBe('src/utils.ts');
   });
 
-  it('모든 resolver가 null이면 null을 반환한다', () => {
+  it('returns null when all resolvers return null', () => {
     const chain = createResolverChain([mockResolver(null), mockResolver(null)]);
 
     expect(chain.resolve(ctx)).toBeNull();
   });
 
-  it('빈 체인은 null을 반환한다', () => {
+  it('returns null for empty chain', () => {
     const chain = createResolverChain([]);
 
     expect(chain.resolve(ctx)).toBeNull();
   });
 
-  it('첫 번째 resolver가 해석하면 나머지를 호출하지 않는다', () => {
+  it('does not call remaining resolvers when first one resolves', () => {
     const calls: string[] = [];
     const r1: ModuleResolver = {
       resolve() {

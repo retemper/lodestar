@@ -38,7 +38,14 @@ function buildDynamicHead(context: TransformContext): HeadConfig[] {
         href: pageUrl,
       },
     ],
-    ['link', { rel: 'alternate', hreflang: 'x-default', href: `${HOSTNAME}/${isKo ? counterpart : relativePath}` }],
+    [
+      'link',
+      {
+        rel: 'alternate',
+        hreflang: 'x-default',
+        href: `${HOSTNAME}/${isKo ? counterpart : relativePath}`,
+      },
+    ],
   ];
 
   return heads;

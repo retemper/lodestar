@@ -3,7 +3,7 @@ import { createMockProviders, createTestContext } from '@retemper/lodestar-test-
 import { noCircularPackages, detectCycles } from './no-circular-packages.rule';
 
 describe('architecture/no-circular-packages', () => {
-  it('비순환 패키지 그래프에서 위반이 없다', async () => {
+  it('no violation in acyclic package graph', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/core/package.json', 'packages/types/package.json'])
@@ -24,7 +24,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('두 패키지 간 순환 의존성을 감지한다', async () => {
+  it('detects circular dependency between two packages', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/a/package.json', 'packages/b/package.json'])
@@ -47,7 +47,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations[0].message).toContain('@app/b');
   });
 
-  it('3자 순환 의존성을 감지한다', async () => {
+  it('detects 3-node circular dependency', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce([
@@ -74,7 +74,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations[0].message).toContain('→');
   });
 
-  it('외부(비워크스페이스) 의존성은 무시한다', async () => {
+  it('ignores external (non-workspace) dependencies', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/core/package.json'])
@@ -95,7 +95,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('의존성이 없는 패키지를 처리한다', async () => {
+  it('handles packages without dependencies', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/types/package.json'])
@@ -113,7 +113,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('packages/와 plugins/ 디렉토리를 모두 스캔한다', async () => {
+  it('scans both packages/ and plugins/ directories', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/core/package.json'])
@@ -134,7 +134,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations.length).toBeGreaterThan(0);
   });
 
-  it('@ 접두사만 있고 / 가 없는 패키지명은 스코프로 인식하지 않는다', async () => {
+  it('does not recognize package name with @ prefix but no / as scoped', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/core/package.json'])
@@ -152,7 +152,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('스코프가 없는 패키지만 있으면 검사를 건너뛴다', async () => {
+  it('skips checks when there are only packages without scope', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/core/package.json'])
@@ -170,7 +170,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('name이 없는 package.json은 건너뛴다', async () => {
+  it('skips package.json without name', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/nameless/package.json'])
@@ -188,7 +188,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('scope 옵션이 주어지면 자동 감지 대신 해당 scope를 사용한다', async () => {
+  it('uses given scope instead of auto-detection when scope option is provided', async () => {
     const glob = vi
       .fn()
       .mockResolvedValueOnce(['packages/a/package.json', 'packages/b/package.json'])
@@ -209,7 +209,7 @@ describe('architecture/no-circular-packages', () => {
     expect(violations.length).toBeGreaterThan(0);
   });
 
-  it('패키지 디렉토리가 하나도 없으면 조기 반환한다', async () => {
+  it('returns early when no package directories exist', async () => {
     const glob = vi.fn().mockResolvedValue([]);
     const providers = createMockProviders({ glob });
     const { ctx, violations } = createTestContext(
@@ -223,14 +223,14 @@ describe('architecture/no-circular-packages', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('올바른 규칙 메타데이터를 가진다', () => {
+  it('has correct rule metadata', () => {
     expect(noCircularPackages.name).toBe('architecture/no-circular-packages');
     expect(noCircularPackages.needs).toStrictEqual(['fs', 'config']);
   });
 });
 
 describe('detectCycles', () => {
-  it('A→B→A 순환을 찾는다', () => {
+  it('finds A→B→A cycle', () => {
     const graph = new Map([
       ['A', ['B']],
       ['B', ['A']],
@@ -239,7 +239,7 @@ describe('detectCycles', () => {
     expect(cycles.length).toBeGreaterThan(0);
   });
 
-  it('비순환 그래프에서 빈 배열을 반환한다', () => {
+  it('returns empty array for acyclic graph', () => {
     const graph = new Map([
       ['A', ['B']],
       ['B', ['C']],
@@ -249,7 +249,7 @@ describe('detectCycles', () => {
     expect(cycles).toHaveLength(0);
   });
 
-  it('그래프에 없는 의존성 노드를 건너뛴다', () => {
+  it('skips dependency nodes not in the graph', () => {
     const graph = new Map([
       ['A', ['B', 'missing']],
       ['B', [] as string[]],
@@ -258,13 +258,13 @@ describe('detectCycles', () => {
     expect(cycles).toHaveLength(0);
   });
 
-  it('의존성이 없는 노드만 있으면 빈 배열을 반환한다', () => {
+  it('returns empty array when only nodes without dependencies exist', () => {
     const graph = new Map([['A', [] as string[]]]);
     const cycles = detectCycles(graph);
     expect(cycles).toHaveLength(0);
   });
 
-  it('큰 그래프에서 순환을 찾는다', () => {
+  it('finds cycles in large graph', () => {
     const graph = new Map([
       ['A', ['B']],
       ['B', ['C']],

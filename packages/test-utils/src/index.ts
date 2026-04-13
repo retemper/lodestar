@@ -6,6 +6,7 @@ import type {
   DependencyGraphProvider,
   ASTProvider,
   ConfigFileProvider,
+  GitProvider,
   ImportInfo,
   ExportInfo,
 } from '@retemper/lodestar-types';
@@ -26,6 +27,12 @@ interface MockProviderOverrides {
   readonly getPackageJson?: (...args: unknown[]) => Promise<Record<string, unknown>>;
   readonly getTsConfig?: (...args: unknown[]) => Promise<Record<string, unknown>>;
   readonly getCustomConfig?: (...args: unknown[]) => Promise<unknown>;
+  // git
+  readonly stagedFiles?: (...args: unknown[]) => Promise<readonly string[]>;
+  readonly diffFiles?: (...args: unknown[]) => Promise<readonly string[]>;
+  readonly diffContent?: (...args: unknown[]) => Promise<string>;
+  readonly currentBranch?: (...args: unknown[]) => Promise<string | null>;
+  readonly isAncestor?: (...args: unknown[]) => Promise<boolean>;
 }
 
 /** Create mock providers with optional overrides for specific methods */
@@ -64,6 +71,17 @@ function createMockProviders(overrides: MockProviderOverrides = {}): RuleProvide
         (() => Promise.resolve({}))) as ConfigFileProvider['getTsConfig'],
       getCustomConfig: (overrides.getCustomConfig ??
         (() => Promise.resolve({}))) as ConfigFileProvider['getCustomConfig'],
+    },
+    git: {
+      stagedFiles: (overrides.stagedFiles ??
+        (() => Promise.resolve([]))) as GitProvider['stagedFiles'],
+      diffFiles: (overrides.diffFiles ?? (() => Promise.resolve([]))) as GitProvider['diffFiles'],
+      diffContent: (overrides.diffContent ??
+        (() => Promise.resolve(''))) as GitProvider['diffContent'],
+      currentBranch: (overrides.currentBranch ??
+        (() => Promise.resolve('main'))) as GitProvider['currentBranch'],
+      isAncestor: (overrides.isAncestor ??
+        (() => Promise.resolve(false))) as GitProvider['isAncestor'],
     },
   };
 }

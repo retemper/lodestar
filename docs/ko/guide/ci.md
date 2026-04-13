@@ -86,12 +86,12 @@ npm ci              # 의존성 설치
 npx lodestar check  # 검사 실행 -- 에러 시 종료 코드 1
 ```
 
-| 시스템       | 설정 파일                  | 비고                          |
-| ------------ | ------------------------- | ----------------------------- |
-| CircleCI     | `.circleci/config.yml`    | `run` 단계로 추가             |
+| 시스템       | 설정 파일                 | 비고                           |
+| ------------ | ------------------------- | ------------------------------ |
+| CircleCI     | `.circleci/config.yml`    | `run` 단계로 추가              |
 | Jenkins      | `Jenkinsfile`             | `sh 'npx lodestar check'` 사용 |
-| Azure DevOps | `azure-pipelines.yml`     | `script` 단계로 추가          |
-| Bitbucket    | `bitbucket-pipelines.yml` | `script` 단계로 추가          |
+| Azure DevOps | `azure-pipelines.yml`     | `script` 단계로 추가           |
+| Bitbucket    | `bitbucket-pipelines.yml` | `script` 단계로 추가           |
 
 ## 팁
 
@@ -105,7 +105,7 @@ Lodestar의 분석은 I/O 바운드가 아닌 CPU 바운드입니다. 가장 큰
 
 ### 종료 코드
 
-| 코드 | 의미                                        |
-| ---- | ------------------------------------------- |
-| `0`  | 모든 검사 통과 (경고는 허용)                  |
-| `1`  | `'error'` 심각도 위반이 하나 이상 존재        |
+| 코드 | 의미                                   |
+| ---- | -------------------------------------- |
+| `0`  | 모든 검사 통과 (경고는 허용)           |
+| `1`  | `'error'` 심각도 위반이 하나 이상 존재 |

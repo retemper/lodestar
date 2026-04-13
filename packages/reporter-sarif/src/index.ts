@@ -1,2 +1,2 @@
-export { createSarifReporter, sarifReporter, buildSarifLog } from './sarif-reporter';
-export type { SarifReporterOptions, SarifLog, SarifResult, SarifLevel } from './sarif-reporter';
+export { createSarifReporter, sarifReporter, buildSarifLog } from './reporter';
+export type { SarifReporterOptions, SarifLog, SarifResult, SarifLevel } from './reporter';

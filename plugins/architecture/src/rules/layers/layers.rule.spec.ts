@@ -23,15 +23,15 @@ function makeStandardLayers(): readonly LayerDefinition[] {
 }
 
 describe('architecture/layers', () => {
-  describe('규칙 메타데이터', () => {
-    it('올바른 이름과 provider 의존성을 가진다', () => {
+  describe('rule metadata', () => {
+    it('has correct name and provider dependencies', () => {
       expect(layers.name).toBe('architecture/layers');
       expect(layers.needs).toStrictEqual(['ast', 'fs']);
     });
   });
 
-  describe('허용된 레이어 간 import', () => {
-    it('canImport에 선언된 레이어를 import하면 위반이 없다', async () => {
+  describe('allowed inter-layer imports', () => {
+    it('no violation when importing layers declared in canImport', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -66,8 +66,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('금지된 레이어 간 import', () => {
-    it('canImport에 없는 레이어를 import하면 1건의 위반을 보고한다', async () => {
+  describe('forbidden inter-layer imports', () => {
+    it('reports 1 violation when importing a layer not in canImport', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -105,8 +105,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('동일 레이어 내부 import', () => {
-    it('같은 레이어 내의 import는 항상 허용된다', async () => {
+  describe('intra-layer imports', () => {
+    it('imports within the same layer are always allowed', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -139,8 +139,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('레이어에 속하지 않는 파일에서의 import', () => {
-    it('레이어 밖 파일의 import는 무시한다', async () => {
+  describe('imports from files not belonging to any layer', () => {
+    it('ignores imports from files outside layers', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -175,8 +175,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('npm 패키지 import', () => {
-    it('비상대경로(npm 패키지) import는 무시한다', async () => {
+  describe('npm package imports', () => {
+    it('ignores non-relative (npm package) imports', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -212,8 +212,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('allowTypeOnly 옵션', () => {
-    it('allowTypeOnly가 true이면 type-only 크로스레이어 import를 허용한다', async () => {
+  describe('allowTypeOnly option', () => {
+    it('allows type-only cross-layer imports when allowTypeOnly is true', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -248,8 +248,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('canImport가 비어있는 레이어', () => {
-    it('canImport가 없는 레이어는 외부 및 레이어 밖 파일만 import할 수 있다', async () => {
+  describe('layers with empty canImport', () => {
+    it('layers without canImport can only import external and out-of-layer files', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -286,8 +286,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('하나의 파일에서 여러 위반', () => {
-    it('한 파일에서 여러 금지된 import가 있으면 모두 보고한다', async () => {
+  describe('multiple violations from a single file', () => {
+    it('reports all forbidden imports from a single file', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -325,8 +325,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('canImport가 빈 배열인 레이어', () => {
-    it('canImport가 빈 배열이면 다른 레이어를 import할 수 없다', async () => {
+  describe('layers with empty array canImport', () => {
+    it('cannot import other layers when canImport is an empty array', async () => {
       const layerDefs: readonly LayerDefinition[] = [
         { name: 'core', path: 'src/core/**/*.ts', canImport: [] },
         { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['core'] },
@@ -362,8 +362,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('allowTypeOnly가 false일 때 type-only import', () => {
-    it('allowTypeOnly가 false이면 type-only 크로스레이어 import도 위반이다', async () => {
+  describe('type-only imports when allowTypeOnly is false', () => {
+    it('type-only cross-layer imports are also violations when allowTypeOnly is false', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/domain/**/*.ts') {
@@ -398,8 +398,8 @@ describe('architecture/layers', () => {
     });
   });
 
-  describe('메타데이터', () => {
-    it('올바른 파일 수와 레이어 수를 메타에 출력한다', async () => {
+  describe('metadata', () => {
+    it('outputs correct file count and layer count in meta', async () => {
       const metaSpy = vi.fn();
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {

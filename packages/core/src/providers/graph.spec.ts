@@ -40,15 +40,15 @@ function mockFSProvider(
 }
 
 describe('createGraphProvider', () => {
-  describe('astProvider 또는 fsProvider가 없을 때', () => {
-    it('둘 다 없으면 빈 그래프를 반환한다', async () => {
+  describe('when astProvider or fsProvider is missing', () => {
+    it('returns empty graph when both are missing', async () => {
       const provider = createGraphProvider('/root');
       const graph = await provider.getModuleGraph();
 
       expect(graph.nodes.size).toBe(0);
     });
 
-    it('astProvider만 없으면 빈 그래프를 반환한다', async () => {
+    it('returns empty graph when only astProvider is missing', async () => {
       const fs = mockFSProvider();
       const provider = createGraphProvider('/root', undefined, fs);
       const deps = await provider.getDependencies('some.ts');
@@ -56,7 +56,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual([]);
     });
 
-    it('fsProvider만 없으면 빈 그래프를 반환한다', async () => {
+    it('returns empty graph when only fsProvider is missing', async () => {
       const ast = mockASTProvider();
       const provider = createGraphProvider('/root', ast, undefined);
       const deps = await provider.getDependents('some.ts');
@@ -66,7 +66,7 @@ describe('createGraphProvider', () => {
   });
 
   describe('getDependencies', () => {
-    it('파일의 의존성 목록을 반환한다', async () => {
+    it('returns dependency list of a file', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -86,7 +86,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/b.ts']);
     });
 
-    it('존재하지 않는 파일은 빈 배열을 반환한다', async () => {
+    it('returns empty array for non-existent files', async () => {
       const ast = mockASTProvider();
       const fs = mockFSProvider(['src/a.ts']);
       const provider = createGraphProvider('/root', ast, fs);
@@ -98,7 +98,7 @@ describe('createGraphProvider', () => {
   });
 
   describe('getDependents', () => {
-    it('파일을 import하는 파일 목록을 반환한다', async () => {
+    it('returns list of files that import a file', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -119,7 +119,7 @@ describe('createGraphProvider', () => {
       expect(dependents).toStrictEqual(['src/a.ts']);
     });
 
-    it('아무도 import하지 않는 파일은 빈 배열을 반환한다', async () => {
+    it('returns empty array for files that nothing imports', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [],
       });
@@ -133,7 +133,7 @@ describe('createGraphProvider', () => {
   });
 
   describe('hasCircular', () => {
-    it('순환 의존성이 있으면 true를 반환한다', async () => {
+    it('returns true when circular dependency exists', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -162,7 +162,7 @@ describe('createGraphProvider', () => {
       expect(result).toBe(true);
     });
 
-    it('순환 의존성이 없으면 false를 반환한다', async () => {
+    it('returns false when no circular dependency exists', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -183,7 +183,7 @@ describe('createGraphProvider', () => {
       expect(result).toBe(false);
     });
 
-    it('다이아몬드 의존성에서 이미 방문한 노드를 재탐색하지 않는다', async () => {
+    it('does not revisit already visited nodes in diamond dependencies', async () => {
       const ast = mockASTProvider({
         'a.ts': [
           {
@@ -229,7 +229,7 @@ describe('createGraphProvider', () => {
       expect(result).toBe(false);
     });
 
-    it('그래프에 없는 엔트리는 false를 반환한다', async () => {
+    it('returns false for entries not in the graph', async () => {
       const ast = mockASTProvider();
       const fs = mockFSProvider(['src/a.ts']);
       const provider = createGraphProvider('/root', ast, fs);
@@ -239,7 +239,7 @@ describe('createGraphProvider', () => {
       expect(result).toBe(false);
     });
 
-    it('3개 파일의 간접 순환을 감지한다', async () => {
+    it('detects indirect cycle of 3 files', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -279,7 +279,7 @@ describe('createGraphProvider', () => {
   });
 
   describe('getModuleGraph', () => {
-    it('모든 파일의 노드를 포함하는 그래프를 반환한다', async () => {
+    it('returns a graph containing nodes for all files', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -302,7 +302,7 @@ describe('createGraphProvider', () => {
       expect(graph.nodes.get('src/b.ts')?.dependents).toStrictEqual(['src/a.ts']);
     });
 
-    it('그래프를 캐시한다', async () => {
+    it('caches the graph', async () => {
       const globFn = vi
         .fn()
         .mockResolvedValueOnce(['src/a.ts'])
@@ -330,7 +330,7 @@ describe('createGraphProvider', () => {
       expect(globFn).toHaveBeenCalledTimes(2);
     });
 
-    it('tsx 파일도 포함한다', async () => {
+    it('includes tsx files too', async () => {
       const ast = mockASTProvider({
         'src/App.tsx': [],
         'src/utils.ts': [],
@@ -346,8 +346,8 @@ describe('createGraphProvider', () => {
     });
   });
 
-  describe('resolveImport (공개 API를 통한 내부 함수 테스트)', () => {
-    it('비상대 import는 무시한다', async () => {
+  describe('resolveImport (internal function test via public API)', () => {
+    it('ignores non-relative imports', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -367,7 +367,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual([]);
     });
 
-    it('.tsx 확장자를 추론한다', async () => {
+    it('infers .tsx extension', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -387,7 +387,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/App.tsx']);
     });
 
-    it('.js 확장자를 추론한다', async () => {
+    it('infers .js extension', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -407,7 +407,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/util.js']);
     });
 
-    it('.jsx 확장자를 추론한다', async () => {
+    it('infers .jsx extension', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -427,7 +427,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/Comp.jsx']);
     });
 
-    it('index 파일을 추론한다', async () => {
+    it('infers index file', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -447,7 +447,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/utils/index.ts']);
     });
 
-    it('index.tsx 파일을 추론한다', async () => {
+    it('infers index.tsx file', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -467,7 +467,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/components/index.tsx']);
     });
 
-    it('해석할 수 없는 상대 import는 무시한다', async () => {
+    it('ignores unresolvable relative imports', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -487,7 +487,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual([]);
     });
 
-    it('확장자가 있는 정확한 파일 경로를 해석한다', async () => {
+    it('resolves exact file path with extension', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -507,7 +507,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/b.ts']);
     });
 
-    it('절대 경로 스타일 import는 해석되지 않는다 (normalizePath가 선행 슬래시를 제거)', async () => {
+    it('absolute path style imports are not resolved (normalizePath removes leading slash)', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -528,8 +528,8 @@ describe('createGraphProvider', () => {
     });
   });
 
-  describe('normalizePath (공개 API를 통한 내부 함수 테스트)', () => {
-    it('.. 세그먼트를 해석한다', async () => {
+  describe('normalizePath (internal function test via public API)', () => {
+    it('resolves .. segments', async () => {
       const ast = mockASTProvider({
         'src/deep/a.ts': [
           {
@@ -549,7 +549,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/b.ts']);
     });
 
-    it('루트를 넘어가는 .. 경로도 처리한다', async () => {
+    it('handles .. paths that go beyond root', async () => {
       const ast = mockASTProvider({
         'a.ts': [
           {
@@ -570,7 +570,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['b.ts']);
     });
 
-    it('여러 단계의 .. 를 정상적으로 해석한다', async () => {
+    it('correctly resolves multiple levels of ..', async () => {
       const ast = mockASTProvider({
         'src/deep/nested/a.ts': [
           {
@@ -590,7 +590,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/b.ts']);
     });
 
-    it('빈 세그먼트를 무시한다 (연속 슬래시)', async () => {
+    it('ignores empty segments (consecutive slashes)', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {
@@ -610,7 +610,7 @@ describe('createGraphProvider', () => {
       expect(deps).toStrictEqual(['src/b.ts']);
     });
 
-    it('. 세그먼트를 제거한다', async () => {
+    it('removes . segments', async () => {
       const ast = mockASTProvider({
         'src/a.ts': [
           {

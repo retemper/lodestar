@@ -3,8 +3,8 @@ import { readFile } from 'node:fs/promises';
 import { parseSync } from '@swc/core';
 import type { Module, ModuleItem, Expression, Statement } from '@swc/core';
 import type { ASTProvider, ImportInfo, ExportInfo } from '@retemper/lodestar-types';
-import type { CacheProvider } from '../cache';
-import { contentHash } from '../cache';
+import type { CacheProvider } from '../utils/cache';
+import { contentHash } from '../utils/cache';
 
 /**
  * Create an AST provider backed by SWC for TypeScript source analysis.
