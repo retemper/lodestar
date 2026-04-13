@@ -1,5 +1,12 @@
 # @retemper/lodestar
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`ac335b2`](https://github.com/retemper/lodestar/commit/ac335b2e6bffa066f7469130b628fda85bb90e13)]:
+  - @retemper/lodestar-core@0.0.2
+
 ## 0.0.1
 
 ### Patch Changes

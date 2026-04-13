@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "Core engine for Lodestar rule execution with ESLint integration",
   "license": "MIT",

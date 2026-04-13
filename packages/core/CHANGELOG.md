@@ -1,5 +1,11 @@
 # @retemper/lodestar-core
 
+## 0.0.2
+
+### Patch Changes
+
+- [#18](https://github.com/retemper/lodestar/pull/18) [`ac335b2`](https://github.com/retemper/lodestar/commit/ac335b2e6bffa066f7469130b628fda85bb90e13) Thanks [@devKangMinHyeok](https://github.com/devKangMinHyeok)! - Fix `stripJsonComments` treating `//` inside JSON string literals as comments, which caused `JSON.parse` to crash on tsconfig files containing URLs (e.g. `$schema`). Also filter out directories from `fsProvider.glob()` results to prevent EISDIR errors.
+
 ## 0.0.1
 
 ### Patch Changes
