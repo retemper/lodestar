@@ -1,5 +1,11 @@
 # @retemper/lodestar-cli
 
+## 0.0.5
+
+### Patch Changes
+
+- [#27](https://github.com/retemper/lodestar/pull/27) [`64a44ad`](https://github.com/retemper/lodestar/commit/64a44ada4572aff4c007b79603b9f23e3c21db2f) Thanks [@devKangMinHyeok](https://github.com/devKangMinHyeok)! - Fix ERR_PACKAGE_PATH_NOT_EXPORTED when running `lodestar check` with only `@retemper/lodestar` installed. Add `./bin` subpath export to cli package and update bin.js wrapper to use the exported path. Also re-export `createConsoleReporter` and `createJsonReporter` from the lodestar facade package.
+
 ## 0.0.4
 
 ### Patch Changes

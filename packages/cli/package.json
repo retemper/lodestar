@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "description": "CLI for Lodestar architecture rule engine",
   "license": "MIT",
