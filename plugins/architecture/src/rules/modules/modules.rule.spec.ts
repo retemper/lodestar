@@ -28,7 +28,7 @@ function makeImport(source: string, file: string): ImportInfo {
 }
 
 describe('architecture/modules', () => {
-  it('모듈 내부 파일을 직접 import하면 위반을 보고한다', async () => {
+  it('reports violation when directly importing files inside a module', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['src/app.ts'],
@@ -38,7 +38,7 @@ describe('architecture/modules', () => {
     expect(violations[0].message).toContain('web/service');
   });
 
-  it('배럴(index) import는 위반으로 보고하지 않는다', async () => {
+  it('does not report barrel (index) imports as violations', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['src/app.ts'],
@@ -47,7 +47,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('npm 패키지 import는 무시한다', async () => {
+  it('ignores npm package imports', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['src/app.ts'],
@@ -56,7 +56,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('스코프 npm 패키지 import는 무시한다', async () => {
+  it('ignores scoped npm package imports', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['src/app.ts'],
@@ -65,7 +65,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('관련 없는 상대경로 import는 무시한다', async () => {
+  it('ignores unrelated relative path imports', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['src/app.ts'],
@@ -74,7 +74,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('절대경로로 모듈 내부를 import하면 위반을 보고한다', async () => {
+  it('reports violation when importing module internals via absolute path', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['src/app.ts'],
@@ -83,7 +83,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(1);
   });
 
-  it('Windows 백슬래시 경로를 정규화하여 감지한다', async () => {
+  it('normalizes and detects Windows backslash paths', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['src/app.ts'],
@@ -92,7 +92,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(1);
   });
 
-  it('빈 소스 문자열은 무시한다', async () => {
+  it('ignores empty source strings', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['src/app.ts'],
@@ -101,7 +101,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('deep import가 없으면 위반이 없다', async () => {
+  it('no violation when there are no deep imports', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['web/service/index.ts'],
@@ -110,12 +110,12 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('모듈 목록이 비어있으면 위반이 없다', async () => {
+  it('no violation when module list is empty', async () => {
     const violations = await checkModules([], [], []);
     expect(violations).toHaveLength(0);
   });
 
-  it('위반 메시지에 배럴 사용 안내를 포함한다', async () => {
+  it('includes barrel usage guidance in violation message', async () => {
     const violations = await checkModules(
       ['web/service'],
       ['web/service/consumer.ts'],
@@ -125,7 +125,7 @@ describe('architecture/modules', () => {
     expect(violations[0].message).toContain('barrel');
   });
 
-  it('allow 옵션에 포함된 deep import는 위반으로 보고하지 않는다', async () => {
+  it('does not report deep imports included in allow option as violations', async () => {
     const providers = createMockProviders({
       glob: vi.fn().mockResolvedValue(['src/app.ts']),
       getImports: vi
@@ -148,7 +148,7 @@ describe('architecture/modules', () => {
     expect(violations[0].message).not.toContain('testing');
   });
 
-  it('allow 목록이 비어있으면 deep import를 모두 위반으로 보고한다', async () => {
+  it('reports all deep imports as violations when allow list is empty', async () => {
     const providers = createMockProviders({
       glob: vi.fn().mockResolvedValue(['src/app.ts']),
       getImports: vi.fn().mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
@@ -164,7 +164,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(1);
   });
 
-  it('exclude 패턴에 매칭되는 파일은 검사하지 않는다', async () => {
+  it('does not check files matching exclude patterns', async () => {
     const providers = createMockProviders({
       glob: vi.fn().mockResolvedValue(['src/app.ts', 'src/app.spec.ts']),
       getImports: vi.fn().mockResolvedValue([makeImport('./web/service/internal', 'src/app.ts')]),
@@ -180,7 +180,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(1);
   });
 
-  it('include 패턴을 사용하여 검사 범위를 지정한다', async () => {
+  it('uses include patterns to specify the inspection scope', async () => {
     const providers = createMockProviders({
       glob: vi.fn().mockResolvedValue(['custom/path/app.ts']),
       getImports: vi
@@ -198,7 +198,7 @@ describe('architecture/modules', () => {
     expect(violations).toHaveLength(1);
   });
 
-  it('올바른 규칙 메타데이터를 가진다', () => {
+  it('has correct rule metadata', () => {
     expect(modules.name).toBe('architecture/modules');
     expect(modules.needs).toStrictEqual(['ast', 'fs']);
   });

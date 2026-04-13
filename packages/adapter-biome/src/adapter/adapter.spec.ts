@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { biomeAdapter, buildBiomeConfig, buildBiomeRules } from './adapter';
 
 describe('buildBiomeRules', () => {
-  it('플랫한 규칙 맵을 그룹/규칙 구조로 변환한다', () => {
+  it('converts flat rule map to group/rule structure', () => {
     const result = buildBiomeRules({
       'style/noNonNullAssertion': 'warn',
       'style/useConst': 'error',
@@ -23,7 +23,7 @@ describe('buildBiomeRules', () => {
     });
   });
 
-  it('슬래시가 없는 키는 무시한다', () => {
+  it('ignores keys without slash', () => {
     const result = buildBiomeRules({
       'style/useConst': 'error',
       invalidKey: 'warn',
@@ -34,7 +34,7 @@ describe('buildBiomeRules', () => {
     });
   });
 
-  it('빈 규칙 맵은 빈 객체를 반환한다', () => {
+  it('returns empty object for empty rule map', () => {
     const result = buildBiomeRules({});
     expect(result).toStrictEqual({});
   });
@@ -57,7 +57,7 @@ describe('biomeAdapter verifySetup()', () => {
     return dir;
   }
 
-  it('biome.json이 없으면 setup violation을 보고한다', async () => {
+  it('reports setup violation when biome.json is missing', async () => {
     const rootDir = await createTempDir();
     const adapter = biomeAdapter({ rules: { 'style/useConst': 'error' } });
 
@@ -69,7 +69,7 @@ describe('biomeAdapter verifySetup()', () => {
     expect(violations[0].fix).toBeDefined();
   });
 
-  it('biome.json 내용이 config과 다르면 setup violation을 보고한다', async () => {
+  it('reports setup violation when biome.json content differs from config', async () => {
     const rootDir = await createTempDir();
     await writeFile(join(rootDir, 'biome.json'), '{}\n', 'utf-8');
 
@@ -84,7 +84,7 @@ describe('biomeAdapter verifySetup()', () => {
     expect(violations[0].message).toContain('actual:');
   });
 
-  it('biome.json 내용이 일치하면 violation이 없다', async () => {
+  it('no violation when biome.json content matches', async () => {
     const rootDir = await createTempDir();
     const config = { rules: { 'style/useConst': 'error' } as const };
     const expected = JSON.stringify(buildBiomeConfig(config), null, 2) + '\n';
@@ -97,7 +97,7 @@ describe('biomeAdapter verifySetup()', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('fix로 biome.json을 생성한다', async () => {
+  it('creates biome.json via fix', async () => {
     const rootDir = await createTempDir();
     const adapter = biomeAdapter({ rules: { 'style/useConst': 'error' } });
 
@@ -115,7 +115,7 @@ describe('biomeAdapter verifySetup()', () => {
 });
 
 describe('buildBiomeConfig', () => {
-  it('규칙이 있으면 linter 섹션을 생성한다', () => {
+  it('creates linter section when rules exist', () => {
     const result = buildBiomeConfig({
       rules: { 'style/useConst': 'error' },
     });
@@ -126,7 +126,7 @@ describe('buildBiomeConfig', () => {
     });
   });
 
-  it('ignore 패턴이 있으면 files.ignore를 생성한다', () => {
+  it('creates files.ignore when ignore patterns are present', () => {
     const result = buildBiomeConfig({
       ignore: ['dist/**', 'node_modules/**'],
     });
@@ -136,7 +136,7 @@ describe('buildBiomeConfig', () => {
     });
   });
 
-  it('extends가 있으면 배열로 감싼다', () => {
+  it('wraps extends in array when present', () => {
     const result = buildBiomeConfig({
       extends: './base-biome.json',
     });
@@ -144,7 +144,7 @@ describe('buildBiomeConfig', () => {
     expect(result.extends).toStrictEqual(['./base-biome.json']);
   });
 
-  it('빈 config은 스키마만 포함한다', () => {
+  it('includes only schema for empty config', () => {
     const result = buildBiomeConfig({});
 
     expect(result.$schema).toBeDefined();

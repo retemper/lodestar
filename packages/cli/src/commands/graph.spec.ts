@@ -22,21 +22,21 @@ function makeNodes(defs: Record<string, string[]>): ReadonlyMap<string, ModuleNo
 }
 
 describe('matchesScope', () => {
-  it('prefix가 일치하면 true를 반환한다', () => {
+  it('returns true when prefix matches', () => {
     expect(matchesScope('src/domain/entity.ts', 'src/domain')).toBe(true);
   });
 
-  it('prefix가 불일치하면 false를 반환한다', () => {
+  it('returns false when prefix does not match', () => {
     expect(matchesScope('src/infra/repo.ts', 'src/domain')).toBe(false);
   });
 
-  it('trailing **를 제거하고 매칭한다', () => {
+  it('removes trailing ** and matches', () => {
     expect(matchesScope('src/domain/entity.ts', 'src/domain/**')).toBe(true);
   });
 });
 
 describe('collectEdges', () => {
-  it('모든 의존성 edge를 수집한다', () => {
+  it('collects all dependency edges', () => {
     const nodes = makeNodes({
       'src/a.ts': ['src/b.ts'],
       'src/b.ts': ['src/c.ts'],
@@ -48,7 +48,7 @@ describe('collectEdges', () => {
     expect(edges).toHaveLength(2);
   });
 
-  it('scope로 필터링한다', () => {
+  it('filters by scope', () => {
     const nodes = makeNodes({
       'src/domain/a.ts': ['src/infra/b.ts'],
       'src/infra/b.ts': [],
@@ -67,7 +67,7 @@ describe('collectLayerEdges', () => {
     { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['domain', 'application'] },
   ];
 
-  it('파일 의존성을 레이어 간 edge로 집계한다', () => {
+  it('aggregates file dependencies into inter-layer edges', () => {
     const nodes = makeNodes({
       'src/app/service.ts': ['src/domain/entity.ts'],
       'src/domain/entity.ts': [],
@@ -84,7 +84,7 @@ describe('collectLayerEdges', () => {
     expect(infraToDomain?.allowed).toBe(true);
   });
 
-  it('canImport에 없는 의존성을 violation으로 표시한다', () => {
+  it('marks dependencies not in canImport as violations', () => {
     const nodes = makeNodes({
       'src/domain/entity.ts': ['src/infra/repo.ts'],
       'src/infra/repo.ts': [],
@@ -98,7 +98,7 @@ describe('collectLayerEdges', () => {
     expect(edges[0].allowed).toBe(false);
   });
 
-  it('레이어에 속하지 않는 파일의 의존성은 무시한다', () => {
+  it('ignores dependencies of files not belonging to any layer', () => {
     const nodes = makeNodes({
       'lib/external.ts': ['src/domain/entity.ts'],
       'src/domain/entity.ts': [],
@@ -109,7 +109,7 @@ describe('collectLayerEdges', () => {
     expect(edges).toHaveLength(0);
   });
 
-  it('canImport가 없는 레이어에서 다른 레이어로의 의존성은 violation이다', () => {
+  it('dependencies from layers without canImport to other layers are violations', () => {
     const defsNoCan: LayerDef[] = [
       { name: 'domain', path: 'src/domain/**/*.ts' },
       { name: 'orphan', path: 'src/orphan/**/*.ts' },
@@ -125,7 +125,7 @@ describe('collectLayerEdges', () => {
     expect(edges[0].allowed).toBe(false);
   });
 
-  it('같은 레이어 내 의존성은 무시한다', () => {
+  it('ignores intra-layer dependencies', () => {
     const nodes = makeNodes({
       'src/domain/entity.ts': ['src/domain/value-object.ts'],
       'src/domain/value-object.ts': [],
@@ -136,7 +136,7 @@ describe('collectLayerEdges', () => {
     expect(edges).toHaveLength(0);
   });
 
-  it('여러 파일의 의존성을 하나의 edge 카운트로 합친다', () => {
+  it('merges dependencies of multiple files into a single edge count', () => {
     const nodes = makeNodes({
       'src/app/service-a.ts': ['src/domain/entity.ts'],
       'src/app/service-b.ts': ['src/domain/entity.ts'],
@@ -151,7 +151,7 @@ describe('collectLayerEdges', () => {
 });
 
 describe('formatMermaid', () => {
-  it('Mermaid graph TD 형식을 생성한다', () => {
+  it('generates Mermaid graph TD format', () => {
     const edges = [{ from: 'a.ts', to: 'b.ts' }];
     const result = formatMermaid(edges);
 
@@ -161,7 +161,7 @@ describe('formatMermaid', () => {
 });
 
 describe('formatDot', () => {
-  it('DOT digraph 형식을 생성한다', () => {
+  it('generates DOT digraph format', () => {
     const edges = [{ from: 'a.ts', to: 'b.ts' }];
     const result = formatDot(edges);
 
@@ -176,7 +176,7 @@ describe('formatLayerMermaid', () => {
     { name: 'infra', path: 'src/infra/**', canImport: ['domain'] },
   ];
 
-  it('레이어 간 의존성을 Mermaid로 출력한다', () => {
+  it('outputs inter-layer dependencies in Mermaid format', () => {
     const edges = [{ from: 'infra', to: 'domain', count: 3, allowed: true }];
     const result = formatLayerMermaid(layerDefs, edges);
 
@@ -184,7 +184,7 @@ describe('formatLayerMermaid', () => {
     expect(result).toContain('infra -->|3| domain');
   });
 
-  it('연결되지 않은 레이어를 독립 노드로 출력한다', () => {
+  it('outputs disconnected layers as independent nodes', () => {
     const defs: LayerDef[] = [
       { name: 'domain', path: 'src/domain/**' },
       { name: 'infra', path: 'src/infra/**', canImport: ['domain'] },
@@ -198,7 +198,7 @@ describe('formatLayerMermaid', () => {
     expect(result).not.toContain('--> isolated');
   });
 
-  it('위반을 점선으로 표시한다', () => {
+  it('displays violations as dashed lines', () => {
     const edges = [{ from: 'domain', to: 'infra', count: 1, allowed: false }];
     const result = formatLayerMermaid(layerDefs, edges);
 
@@ -208,7 +208,7 @@ describe('formatLayerMermaid', () => {
 });
 
 describe('buildGraphApiResponse', () => {
-  it('레이어 없이 노드와 edge를 반환한다', () => {
+  it('returns nodes and edges without layers', () => {
     const nodes = makeNodes({
       'src/a.ts': ['src/b.ts'],
       'src/b.ts': [],
@@ -226,7 +226,7 @@ describe('buildGraphApiResponse', () => {
     });
   });
 
-  it('레이어 정보를 포함하여 노드와 edge를 반환한다', () => {
+  it('returns nodes and edges with layer info', () => {
     const layerDefs: LayerDef[] = [
       { name: 'domain', path: 'src/domain/**/*.ts' },
       { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['domain'] },
@@ -247,7 +247,7 @@ describe('buildGraphApiResponse', () => {
     expect(result.layers).toHaveLength(2);
   });
 
-  it('허용되지 않은 의존성을 violation으로 표시한다', () => {
+  it('marks unauthorized dependencies as violations', () => {
     const layerDefs: LayerDef[] = [
       { name: 'domain', path: 'src/domain/**/*.ts' },
       { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['domain'] },
@@ -262,7 +262,7 @@ describe('buildGraphApiResponse', () => {
     expect(result.edges[0].allowed).toBe(false);
   });
 
-  it('scope로 필터링한다', () => {
+  it('filters by scope', () => {
     const nodes = makeNodes({
       'src/domain/a.ts': ['src/infra/b.ts'],
       'src/infra/b.ts': [],
@@ -274,7 +274,7 @@ describe('buildGraphApiResponse', () => {
     expect(result.edges).toHaveLength(0);
   });
 
-  it('노드 size는 의존성 개수를 반영한다', () => {
+  it('node size reflects dependency count', () => {
     const nodes = makeNodes({
       'src/a.ts': ['src/b.ts', 'src/c.ts'],
       'src/b.ts': [],
@@ -287,7 +287,7 @@ describe('buildGraphApiResponse', () => {
     expect(nodeA?.size).toBe(2);
   });
 
-  it('레이어별 파일 수를 계산한다', () => {
+  it('calculates file count per layer', () => {
     const layerDefs: LayerDef[] = [
       { name: 'domain', path: 'src/domain/**/*.ts' },
       { name: 'infra', path: 'src/infra/**/*.ts', canImport: ['domain'] },
@@ -306,7 +306,7 @@ describe('buildGraphApiResponse', () => {
     expect(infraLayer?.fileCount).toBe(1);
   });
 
-  it('같은 레이어 내 edge는 allowed로 표시한다', () => {
+  it('marks intra-layer edges as allowed', () => {
     const layerDefs: LayerDef[] = [{ name: 'domain', path: 'src/domain/**/*.ts' }];
     const nodes = makeNodes({
       'src/domain/a.ts': ['src/domain/b.ts'],
@@ -325,7 +325,7 @@ describe('formatLayerDot', () => {
     { name: 'infra', path: 'src/infra/**', canImport: ['domain'] },
   ];
 
-  it('레이어 그래프를 DOT로 출력한다', () => {
+  it('outputs layer graph in DOT format', () => {
     const edges = [{ from: 'infra', to: 'domain', count: 3, allowed: true }];
     const result = formatLayerDot(layerDefs, edges);
 
@@ -333,7 +333,7 @@ describe('formatLayerDot', () => {
     expect(result).toContain('"infra" -> "domain"');
   });
 
-  it('위반을 빨간 점선으로 표시한다', () => {
+  it('displays violations as red dashed lines', () => {
     const edges = [{ from: 'domain', to: 'infra', count: 1, allowed: false }];
     const result = formatLayerDot(layerDefs, edges);
 

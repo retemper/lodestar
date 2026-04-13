@@ -13,24 +13,24 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 describe('stripJsonComments', () => {
-  it('단일행 주석을 제거한다', () => {
+  it('removes single-line comments', () => {
     const input = '{\n  "a": 1 // comment\n}';
     expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 1 });
   });
 
-  it('다중행 주석을 제거한다', () => {
+  it('removes multiline comments', () => {
     const input = '{\n  /* multi\n  line */\n  "a": 1\n}';
     expect(JSON.parse(stripJsonComments(input))).toStrictEqual({ a: 1 });
   });
 
-  it('주석이 없으면 원본을 반환한다', () => {
+  it('returns original when there are no comments', () => {
     const input = '{"a": 1}';
     expect(stripJsonComments(input)).toBe(input);
   });
 });
 
 describe('compileMappings', () => {
-  it('와일드카드 패턴을 파싱한다', () => {
+  it('parses wildcard patterns', () => {
     const mappings = compileMappings({ '@app/*': ['src/*'] });
 
     expect(mappings).toHaveLength(1);
@@ -40,14 +40,14 @@ describe('compileMappings', () => {
     expect(mappings[0].targets[0].prefix).toBe('src/');
   });
 
-  it('정확 매칭 패턴을 파싱한다', () => {
+  it('parses exact match patterns', () => {
     const mappings = compileMappings({ 'exact-match': ['src/exact.ts'] });
 
     expect(mappings[0].hasWildcard).toBe(false);
     expect(mappings[0].prefix).toBe('exact-match');
   });
 
-  it('여러 타겟을 파싱한다', () => {
+  it('parses multiple targets', () => {
     const mappings = compileMappings({ '@lib/*': ['lib/*', 'vendor/*'] });
 
     expect(mappings[0].targets).toHaveLength(2);
@@ -56,7 +56,7 @@ describe('compileMappings', () => {
 });
 
 describe('matchPattern', () => {
-  it('와일드카드 패턴을 매칭하고 캡처한다', () => {
+  it('matches and captures wildcard patterns', () => {
     const mapping: PathMapping = {
       prefix: '@app/',
       suffix: '',
@@ -68,7 +68,7 @@ describe('matchPattern', () => {
     expect(matchPattern('@app/deep/path', mapping)).toBe('deep/path');
   });
 
-  it('매칭되지 않으면 null을 반환한다', () => {
+  it('returns null when no match', () => {
     const mapping: PathMapping = {
       prefix: '@app/',
       suffix: '',
@@ -80,7 +80,7 @@ describe('matchPattern', () => {
     expect(matchPattern('@other/pkg', mapping)).toBeNull();
   });
 
-  it('정확 매칭을 처리한다', () => {
+  it('handles exact matching', () => {
     const mapping: PathMapping = {
       prefix: 'config',
       suffix: '',
@@ -92,7 +92,7 @@ describe('matchPattern', () => {
     expect(matchPattern('config/sub', mapping)).toBeNull();
   });
 
-  it('suffix가 있는 패턴을 매칭한다', () => {
+  it('matches patterns with suffix', () => {
     const mapping: PathMapping = {
       prefix: '@test/',
       suffix: '.mock',
@@ -106,15 +106,15 @@ describe('matchPattern', () => {
 });
 
 describe('toRootRelative', () => {
-  it('rootDir 내부 경로를 상대 경로로 변환한다', () => {
+  it('converts rootDir internal path to relative path', () => {
     expect(toRootRelative('/project/src/a.ts', '/project')).toBe('src/a.ts');
   });
 
-  it('rootDir 외부 경로는 정규화된 절대 경로를 반환한다', () => {
+  it('returns normalized absolute path for rootDir external path', () => {
     expect(toRootRelative('/other/path/a.ts', '/project')).toBe('/other/path/a.ts');
   });
 
-  it('백슬래시를 슬래시로 정규화한다', () => {
+  it('normalizes backslashes to slashes', () => {
     expect(toRootRelative('/project\\src\\a.ts', '/project')).toBe('src/a.ts');
   });
 });
@@ -131,7 +131,7 @@ describe('parseTsconfigPaths', () => {
     await rm(testDir2, { recursive: true, force: true });
   }
 
-  it('순환 extends를 감지하고 null을 반환한다', async () => {
+  it('detects circular extends and returns null', async () => {
     await setup('a.json', { extends: './b.json', compilerOptions: { paths: { '@a/*': ['a/*'] } } });
     await setup('b.json', { extends: './a.json', compilerOptions: { paths: { '@b/*': ['b/*'] } } });
 
@@ -142,7 +142,7 @@ describe('parseTsconfigPaths', () => {
     await cleanup2();
   });
 
-  it('extends 깊이가 10을 초과하면 null을 반환한다', async () => {
+  it('returns null when extends depth exceeds 10', async () => {
     // Create a chain of 12 extends
     for (const i of Array.from({ length: 12 }, (_, idx) => idx)) {
       const content =
@@ -175,7 +175,7 @@ describe('createTsconfigPathsResolver', () => {
     await rm(testDir, { recursive: true, force: true });
   }
 
-  it('tsconfig paths로 alias를 해석한다', async () => {
+  it('resolves alias via tsconfig paths', async () => {
     await setupTsconfig({
       compilerOptions: {
         baseUrl: '.',
@@ -196,7 +196,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('상대 경로 import는 무시한다', async () => {
+  it('ignores relative path imports', async () => {
     await setupTsconfig({
       compilerOptions: { baseUrl: '.', paths: { '@app/*': ['src/*'] } },
     });
@@ -214,7 +214,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('tsconfig가 없으면 null을 반환한다', async () => {
+  it('returns null when tsconfig is missing', async () => {
     const resolver = createTsconfigPathsResolver('/nonexistent');
     await (resolver as unknown as { loadPaths: () => Promise<unknown> }).loadPaths();
 
@@ -227,7 +227,7 @@ describe('createTsconfigPathsResolver', () => {
     expect(result).toBeNull();
   });
 
-  it('정확 매칭 alias를 해석한다', async () => {
+  it('resolves exact match alias', async () => {
     await setupTsconfig({
       compilerOptions: {
         baseUrl: '.',
@@ -248,7 +248,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('확장자를 추론하여 해석한다', async () => {
+  it('resolves by inferring extension', async () => {
     await setupTsconfig({
       compilerOptions: {
         baseUrl: '.',
@@ -269,7 +269,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('여러 타겟 중 첫 번째 매칭을 반환한다', async () => {
+  it('returns first match among multiple targets', async () => {
     await setupTsconfig({
       compilerOptions: {
         baseUrl: '.',
@@ -290,7 +290,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('extends로 부모 tsconfig의 paths를 상속한다', async () => {
+  it('inherits parent tsconfig paths via extends', async () => {
     await setupTsconfig(
       { compilerOptions: { baseUrl: '.', paths: { '@base/*': ['base/*'] } } },
       'tsconfig.base.json',
@@ -310,7 +310,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('자식 tsconfig의 paths가 부모를 오버라이드한다', async () => {
+  it('child tsconfig paths override parent', async () => {
     await setupTsconfig(
       { compilerOptions: { baseUrl: '.', paths: { '@app/*': ['old/*'] } } },
       'tsconfig.base.json',
@@ -333,7 +333,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('index 파일 fallback으로 해석한다', async () => {
+  it('resolves via index file fallback', async () => {
     await setupTsconfig({
       compilerOptions: {
         baseUrl: '.',
@@ -354,7 +354,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('어떤 타겟도 매칭되지 않으면 null을 반환한다', async () => {
+  it('returns null when no target matches', async () => {
     await setupTsconfig({
       compilerOptions: {
         baseUrl: '.',
@@ -375,7 +375,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('절대 경로 import는 무시한다', async () => {
+  it('ignores absolute path imports', async () => {
     await setupTsconfig({
       compilerOptions: { baseUrl: '.', paths: { '@app/*': ['src/*'] } },
     });
@@ -393,7 +393,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('baseUrl이 없으면 부모의 baseUrl 또는 tsconfig 디렉토리를 사용한다', async () => {
+  it('uses parent baseUrl or tsconfig directory when baseUrl is missing', async () => {
     await setupTsconfig({
       compilerOptions: {
         paths: { '@app/*': ['src/*'] },
@@ -413,7 +413,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('loadPaths 캐시: 두 번째 호출은 캐시된 결과를 반환한다', async () => {
+  it('loadPaths cache: second call returns cached result', async () => {
     await setupTsconfig({
       compilerOptions: { baseUrl: '.', paths: { '@app/*': ['src/*'] } },
     });
@@ -428,7 +428,7 @@ describe('createTsconfigPathsResolver', () => {
     await cleanup();
   });
 
-  it('paths가 없고 extends도 없는 tsconfig에서는 null을 반환한다', async () => {
+  it('returns null for tsconfig without paths and without extends', async () => {
     await setupTsconfig({
       compilerOptions: { strict: true },
     });

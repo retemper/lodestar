@@ -27,7 +27,7 @@ function makeGraph(defs: Record<string, { deps: string[]; dependents: string[] }
 }
 
 describe('computeImpactScope', () => {
-  it('변경 파일을 포함한다', () => {
+  it('includes changed files', () => {
     const graph = makeGraph({
       'a.ts': { deps: [], dependents: [] },
     });
@@ -37,7 +37,7 @@ describe('computeImpactScope', () => {
     expect(scope.has('a.ts')).toBe(true);
   });
 
-  it('변경 파일의 직접 의존자를 포함한다', () => {
+  it('includes direct dependents of changed files', () => {
     const graph = makeGraph({
       'a.ts': { deps: [], dependents: ['b.ts'] },
       'b.ts': { deps: ['a.ts'], dependents: [] },
@@ -49,7 +49,7 @@ describe('computeImpactScope', () => {
     expect(scope.has('b.ts')).toBe(true);
   });
 
-  it('간접 의존자를 재귀적으로 포함한다', () => {
+  it('recursively includes indirect dependents', () => {
     const graph = makeGraph({
       'a.ts': { deps: [], dependents: ['b.ts'] },
       'b.ts': { deps: ['a.ts'], dependents: ['c.ts'] },
@@ -62,7 +62,7 @@ describe('computeImpactScope', () => {
     expect(scope.size).toBe(3);
   });
 
-  it('그래프에 없는 변경 파일도 scope에 포함한다', () => {
+  it('includes changed files not in graph in scope', () => {
     const graph = makeGraph({});
 
     const scope = computeImpactScope(['new-file.ts'], graph);
@@ -70,7 +70,7 @@ describe('computeImpactScope', () => {
     expect(scope.has('new-file.ts')).toBe(true);
   });
 
-  it('순환 의존성에서 무한 루프에 빠지지 않는다', () => {
+  it('does not fall into infinite loop on circular dependencies', () => {
     const graph = makeGraph({
       'a.ts': { deps: ['b.ts'], dependents: ['b.ts'] },
       'b.ts': { deps: ['a.ts'], dependents: ['a.ts'] },
@@ -81,7 +81,7 @@ describe('computeImpactScope', () => {
     expect(scope.size).toBe(2);
   });
 
-  it('같은 파일이 여러 경로로 큐에 추가되면 중복 처리하지 않는다', () => {
+  it('does not process duplicates when same file is queued via multiple paths', () => {
     // Both a.ts and b.ts changed, and both have dependent c.ts
     // c.ts gets queued twice (from a.ts and b.ts processing)
     const graph = makeGraph({
@@ -96,7 +96,7 @@ describe('computeImpactScope', () => {
     expect(scope.has('c.ts')).toBe(true);
   });
 
-  it('여러 변경 파일의 영향 범위를 합친다', () => {
+  it('merges impact scope of multiple changed files', () => {
     const graph = makeGraph({
       'a.ts': { deps: [], dependents: ['c.ts'] },
       'b.ts': { deps: [], dependents: ['d.ts'] },
@@ -111,7 +111,7 @@ describe('computeImpactScope', () => {
 });
 
 describe('createScopedFsProvider', () => {
-  it('glob 결과를 scope 내 파일로 필터링한다', async () => {
+  it('filters glob results to files within scope', async () => {
     const base: FileSystemProvider = {
       async glob() {
         return ['a.ts', 'b.ts', 'c.ts'];
@@ -133,7 +133,7 @@ describe('createScopedFsProvider', () => {
     expect(result).toStrictEqual(['a.ts', 'c.ts']);
   });
 
-  it('scope가 비어있으면 빈 배열을 반환한다', async () => {
+  it('returns empty array when scope is empty', async () => {
     const base: FileSystemProvider = {
       async glob() {
         return ['a.ts'];
@@ -155,7 +155,7 @@ describe('createScopedFsProvider', () => {
     expect(result).toStrictEqual([]);
   });
 
-  it('다른 메서드는 원본 provider를 사용한다', async () => {
+  it('uses original provider for other methods', async () => {
     const base: FileSystemProvider = {
       async glob() {
         return [];
@@ -183,7 +183,7 @@ describe('getChangedFiles', () => {
     mockExecFile.mockReset();
   });
 
-  it('base ref가 주어지면 git diff base...HEAD를 실행한다', async () => {
+  it('runs git diff base...HEAD when base ref is given', async () => {
     mockExecFile.mockResolvedValue({ stdout: 'src/a.ts\nsrc/b.ts\n' });
 
     const result = await getChangedFiles('/root', 'main');
@@ -194,7 +194,7 @@ describe('getChangedFiles', () => {
     expect(result).toStrictEqual(['src/a.ts', 'src/b.ts']);
   });
 
-  it('base ref가 없으면 unstaged, staged, untracked를 합친다', async () => {
+  it('combines unstaged, staged, and untracked when base ref is absent', async () => {
     mockExecFile
       .mockResolvedValueOnce({ stdout: 'src/unstaged.ts\n' })
       .mockResolvedValueOnce({ stdout: 'src/staged.ts\n' })
@@ -218,7 +218,7 @@ describe('getChangedFiles', () => {
     expect(result).toContain('src/new.ts');
   });
 
-  it('중복 파일을 제거한다', async () => {
+  it('removes duplicate files', async () => {
     mockExecFile
       .mockResolvedValueOnce({ stdout: 'src/a.ts\n' })
       .mockResolvedValueOnce({ stdout: 'src/a.ts\n' })
@@ -229,7 +229,7 @@ describe('getChangedFiles', () => {
     expect(result).toStrictEqual(['src/a.ts']);
   });
 
-  it('빈 출력이면 빈 배열을 반환한다', async () => {
+  it('returns empty array for empty output', async () => {
     mockExecFile.mockResolvedValue({ stdout: '' });
 
     const result = await getChangedFiles('/root', 'main');
@@ -237,7 +237,7 @@ describe('getChangedFiles', () => {
     expect(result).toStrictEqual([]);
   });
 
-  it('빈 줄을 무시한다', async () => {
+  it('ignores blank lines', async () => {
     mockExecFile.mockResolvedValue({ stdout: 'src/a.ts\n\n\nsrc/b.ts\n' });
 
     const result = await getChangedFiles('/root', 'main');
@@ -245,7 +245,7 @@ describe('getChangedFiles', () => {
     expect(result).toStrictEqual(['src/a.ts', 'src/b.ts']);
   });
 
-  it('base 없이 모든 명령이 빈 출력이면 빈 배열을 반환한다', async () => {
+  it('returns empty array when all commands output empty without base', async () => {
     mockExecFile
       .mockResolvedValueOnce({ stdout: '' })
       .mockResolvedValueOnce({ stdout: '' })

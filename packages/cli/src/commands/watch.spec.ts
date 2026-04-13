@@ -87,8 +87,8 @@ describe('watchCommand', () => {
     process.exitCode = undefined;
   });
 
-  describe('설정 파일이 없는 경우', () => {
-    it('에러 메시지를 출력하고 exitCode를 1로 설정한다', async () => {
+  describe('when config file is missing', () => {
+    it('outputs error message and sets exitCode to 1', async () => {
       mockLoadConfigFile.mockResolvedValue(null);
 
       await watchCommand({ _: ['watch'], $0: 'lodestar', format: 'console' });
@@ -99,7 +99,7 @@ describe('watchCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('createWatcher를 호출하지 않는다', async () => {
+    it('does not call createWatcher', async () => {
       mockLoadConfigFile.mockResolvedValue(null);
 
       await watchCommand({ _: ['watch'], $0: 'lodestar', format: 'console' });
@@ -108,7 +108,7 @@ describe('watchCommand', () => {
     });
   });
 
-  describe('설정 파일이 있는 경우', () => {
+  describe('when config file exists', () => {
     const stubConfig: WrittenConfig = { plugins: [], rules: {} };
 
     beforeEach(() => {
@@ -119,7 +119,7 @@ describe('watchCommand', () => {
       }) as never);
     });
 
-    it('createWatcher를 호출한다', async () => {
+    it('calls createWatcher', async () => {
       // watchCommand awaits a forever-pending Promise, so verify internal logic via mocks
       const promise = watchCommand({ _: ['watch'], $0: 'lodestar', format: 'console' });
 
@@ -138,7 +138,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('--fix 옵션을 createWatcher에 전달한다', async () => {
+    it('passes --fix option to createWatcher', async () => {
       const promise = watchCommand({
         _: ['watch'],
         $0: 'lodestar',
@@ -156,7 +156,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('--cache=false이면 캐시 프로바이더를 전달하지 않는다', async () => {
+    it('does not pass cache provider when --cache=false', async () => {
       const promise = watchCommand({
         _: ['watch'],
         $0: 'lodestar',
@@ -174,7 +174,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('--debounce 옵션을 createWatcher에 전달한다', async () => {
+    it('passes --debounce option to createWatcher', async () => {
       const promise = watchCommand({
         _: ['watch'],
         $0: 'lodestar',
@@ -192,7 +192,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('json format을 지정하면 JSON reporter를 사용한다', async () => {
+    it('uses JSON reporter when json format is specified', async () => {
       const promise = watchCommand({
         _: ['watch'],
         $0: 'lodestar',
@@ -208,7 +208,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('config에 reporters가 있으면 compositeReporter를 생성한다', async () => {
+    it('creates compositeReporter when config has reporters', async () => {
       const mockResolveConfig = vi.mocked((await import('@retemper/lodestar')).resolveConfig);
       mockResolveConfig.mockReturnValueOnce({
         rootDir: '/fake',
@@ -237,7 +237,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('SIGINT와 SIGTERM 핸들러를 등록한다', async () => {
+    it('registers SIGINT and SIGTERM handlers', async () => {
       const promise = watchCommand({
         _: ['watch'],
         $0: 'lodestar',
@@ -255,7 +255,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('SIGINT 핸들러가 watcher를 정리하고 process.exit을 호출한다', async () => {
+    it('SIGINT handler cleans up watcher and calls process.exit', async () => {
       const mockExit = vi.spyOn(process, 'exit').mockImplementation((() => {}) as never);
 
       const promise = watchCommand({
@@ -278,7 +278,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('onCycle 콜백이 요약 정보를 로그에 출력한다', async () => {
+    it('onCycle callback outputs summary info to log', async () => {
       const promise = watchCommand({
         _: ['watch'],
         $0: 'lodestar',
@@ -305,7 +305,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('onCycle에서 변경된 파일이 5개 이하이면 파일 목록을 출력한다', async () => {
+    it('outputs file list when changed files are 5 or fewer in onCycle', async () => {
       const promise = watchCommand({
         _: ['watch'],
         $0: 'lodestar',
@@ -332,7 +332,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('onCycle에서 변경된 파일이 5개 초과이면 파일 목록을 출력하지 않는다', async () => {
+    it('does not output file list when changed files exceed 5 in onCycle', async () => {
       const promise = watchCommand({
         _: ['watch'],
         $0: 'lodestar',
@@ -366,8 +366,8 @@ describe('watchCommand', () => {
     });
   });
 
-  describe('--rule 필터', () => {
-    it('--rule 필터가 주어지면 매칭되는 규칙만 전달한다', async () => {
+  describe('--rule filter', () => {
+    it('passes only matching rules when --rule filter is given', async () => {
       const configWithRules: WrittenConfig = {
         plugins: [],
         rules: {
@@ -396,7 +396,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('--rule에 와일드카드 패턴을 사용할 수 있다', async () => {
+    it('supports wildcard patterns in --rule', async () => {
       const configWithRules: WrittenConfig = {
         plugins: [],
         rules: {
@@ -429,7 +429,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('어떤 패턴에도 매칭되지 않으면 false를 반환한다', async () => {
+    it('returns false when no pattern matches', async () => {
       const configWithRules: WrittenConfig = {
         plugins: [],
         rules: {
@@ -457,7 +457,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('block에 rules가 없으면 그대로 반환한다', async () => {
+    it('returns block as-is when it has no rules', async () => {
       const configWithoutRules: WrittenConfig = { plugins: [] };
       mockLoadConfigFile.mockResolvedValue(configWithoutRules);
 
@@ -475,7 +475,7 @@ describe('watchCommand', () => {
       void promise;
     });
 
-    it('배열 형태의 config에서 규칙을 필터링한다', async () => {
+    it('filters rules in array-style config', async () => {
       const arrayConfig: WrittenConfig = [
         { plugins: [], rules: { 'test/a': 'error' } },
         { plugins: [], rules: { 'test/b': 'warn', 'other/c': 'error' } },

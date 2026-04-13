@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { RunSummary } from '@retemper/lodestar-types';
 import { createJunitReporter, buildJunitXml, escapeXml, junitReporter } from './junit-reporter';
 
-/** 최소 RunSummary */
+/** Minimal RunSummary */
 function makeSummary(overrides: Partial<RunSummary> = {}): RunSummary {
   return {
     totalFiles: 0,
@@ -17,19 +17,19 @@ function makeSummary(overrides: Partial<RunSummary> = {}): RunSummary {
 }
 
 describe('escapeXml', () => {
-  it('특수 문자를 이스케이프한다', () => {
+  it('escapes special characters', () => {
     expect(escapeXml('a & b < c > d "e" \'f\'')).toBe(
       'a &amp; b &lt; c &gt; d &quot;e&quot; &apos;f&apos;',
     );
   });
 
-  it('특수 문자가 없으면 원본을 반환한다', () => {
+  it('returns original when there are no special characters', () => {
     expect(escapeXml('hello world')).toBe('hello world');
   });
 });
 
 describe('buildJunitXml', () => {
-  it('빈 entries에 대해 유효한 XML을 생성한다', () => {
+  it('generates valid XML for empty entries', () => {
     const xml = buildJunitXml([], makeSummary());
 
     expect(xml).toContain('<?xml version="1.0"');
@@ -38,7 +38,7 @@ describe('buildJunitXml', () => {
     expect(xml).toContain('</testsuites>');
   });
 
-  it('통과한 규칙은 self-closing testcase로 출력한다', () => {
+  it('outputs passed rules as self-closing testcase', () => {
     const entries = [{ ruleId: 'test/rule', violations: [], durationMs: 5 }];
     const xml = buildJunitXml(entries, makeSummary({ durationMs: 5 }));
 
@@ -47,7 +47,7 @@ describe('buildJunitXml', () => {
     expect(xml).not.toContain('<failure');
   });
 
-  it('에러 위반이 있으면 failure 요소를 출력한다', () => {
+  it('outputs failure element when error violations exist', () => {
     const entries = [
       {
         ruleId: 'arch/layers',
@@ -69,7 +69,7 @@ describe('buildJunitXml', () => {
     expect(xml).toContain('failures="1"');
   });
 
-  it('경고만 있으면 system-out으로 출력한다', () => {
+  it('outputs via system-out when only warnings exist', () => {
     const entries = [
       {
         ruleId: 'test/warn',
@@ -86,7 +86,7 @@ describe('buildJunitXml', () => {
     expect(xml).not.toContain('<failure');
   });
 
-  it('규칙이 에러를 throw하면 error 요소를 출력한다', () => {
+  it('outputs error element when rule throws', () => {
     const entries = [
       {
         ruleId: 'broken/rule',
@@ -102,7 +102,7 @@ describe('buildJunitXml', () => {
     expect(xml).toContain('errors="1"');
   });
 
-  it('location이 없는 위반은 파일 경로 없이 출력한다', () => {
+  it('outputs without file path when violation has no location', () => {
     const entries = [
       {
         ruleId: 'test/rule',
@@ -116,7 +116,7 @@ describe('buildJunitXml', () => {
     expect(xml).not.toContain(' at ');
   });
 
-  it('시간을 초 단위로 변환한다', () => {
+  it('converts time to seconds', () => {
     const entries = [{ ruleId: 'test/rule', violations: [], durationMs: 1500 }];
     const xml = buildJunitXml(entries, makeSummary({ durationMs: 1500 }));
 
@@ -130,12 +130,12 @@ describe('createJunitReporter', () => {
     vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   });
 
-  it('name이 "junit"이다', () => {
+  it('name is "junit"', () => {
     const reporter = createJunitReporter();
     expect(reporter.name).toBe('junit');
   });
 
-  it('onComplete에서 JUnit XML을 stdout에 출력한다', () => {
+  it('outputs JUnit XML to stdout in onComplete', () => {
     const reporter = createJunitReporter();
 
     reporter.onRuleComplete!({
@@ -153,12 +153,12 @@ describe('createJunitReporter', () => {
 });
 
 describe('junitReporter', () => {
-  it('name이 "junit"인 ReporterFactory를 반환한다', () => {
+  it('returns a ReporterFactory with name "junit"', () => {
     const factory = junitReporter();
     expect(factory.name).toBe('junit');
   });
 
-  it('create()로 WorkspaceReporter를 생성한다', () => {
+  it('creates WorkspaceReporter via create()', () => {
     const factory = junitReporter();
     const reporter = factory.create();
     expect(reporter.name).toBe('junit');

@@ -57,7 +57,7 @@ describe('loadConfigFile', () => {
     return fixture;
   }
 
-  it('.mjs 파일을 로드한다', async () => {
+  it('loads .mjs files', async () => {
     const { rootDir } = await setup({
       'lodestar.config.mjs': `export default { rules: { 'test/rule': 'error' } };\n`,
     });
@@ -69,7 +69,7 @@ describe('loadConfigFile', () => {
     expect(block.rules?.['test/rule']).toBe('error');
   });
 
-  it('.js 파일을 로드한다', async () => {
+  it('loads .js files', async () => {
     const { rootDir } = await setup({
       'lodestar.config.js': `export default { plugins: ['test-plugin'] };\n`,
     });
@@ -81,13 +81,13 @@ describe('loadConfigFile', () => {
     expect(block.plugins).toStrictEqual(['test-plugin']);
   });
 
-  it('config 파일이 없으면 null을 반환한다', async () => {
+  it('returns null when config file is missing', async () => {
     const { rootDir } = await setup({});
     const config = await loadConfigFile(rootDir);
     expect(config).toBeNull();
   });
 
-  it('default export가 없는 모듈은 null을 반환한다', async () => {
+  it('returns null for modules without default export', async () => {
     const { rootDir } = await setup({
       'lodestar.config.mjs': `export const config = { rules: {} };\n`,
     });
@@ -96,7 +96,7 @@ describe('loadConfigFile', () => {
     expect(config).toBeNull();
   });
 
-  it('빈 객체 config도 로드한다', async () => {
+  it('loads empty object config too', async () => {
     const { rootDir } = await setup({
       'lodestar.config.mjs': `export default {};\n`,
     });
@@ -105,7 +105,7 @@ describe('loadConfigFile', () => {
     expect(config).toStrictEqual({});
   });
 
-  it('.ts 파일을 jiti를 통해 로드한다', async () => {
+  it('loads .ts files via jiti', async () => {
     const { rootDir } = await setup({
       'lodestar.config.ts': `export default { rules: { 'ts/rule': 'warn' } };\n`,
     });
@@ -117,7 +117,7 @@ describe('loadConfigFile', () => {
     expect(block.rules?.['ts/rule']).toBe('warn');
   });
 
-  it('배열 config(flat config)을 로드한다', async () => {
+  it('loads array config (flat config)', async () => {
     const { rootDir } = await setup({
       'lodestar.config.mjs': `export default [
         { rules: { 'a/rule': 'error' } },

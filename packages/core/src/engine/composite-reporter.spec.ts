@@ -30,12 +30,12 @@ function makeSummary(): RunSummary {
 }
 
 describe('createCompositeReporter', () => {
-  it('name이 "composite"이다', () => {
+  it('name is "composite"', () => {
     const composite = createCompositeReporter([]);
     expect(composite.name).toBe('composite');
   });
 
-  it('onStart를 모든 delegate에 전달한다', () => {
+  it('forwards onStart to all delegates', () => {
     const a = makeReporter('a');
     const b = makeReporter('b');
     const composite = createCompositeReporter([a, b]);
@@ -46,7 +46,7 @@ describe('createCompositeReporter', () => {
     expect(b.onStart).toHaveBeenCalledWith({ rootDir: '/root', ruleCount: 3 });
   });
 
-  it('onRuleStart를 모든 delegate에 전달한다', () => {
+  it('forwards onRuleStart to all delegates', () => {
     const a = makeReporter('a');
     const b = makeReporter('b');
     const composite = createCompositeReporter([a, b]);
@@ -57,7 +57,7 @@ describe('createCompositeReporter', () => {
     expect(b.onRuleStart).toHaveBeenCalledWith('test/rule');
   });
 
-  it('onRuleComplete를 모든 delegate에 전달한다', () => {
+  it('forwards onRuleComplete to all delegates', () => {
     const a = makeReporter('a');
     const b = makeReporter('b');
     const composite = createCompositeReporter([a, b]);
@@ -69,7 +69,7 @@ describe('createCompositeReporter', () => {
     expect(b.onRuleComplete).toHaveBeenCalledWith(result);
   });
 
-  it('onViolation을 모든 delegate에 전달한다', () => {
+  it('forwards onViolation to all delegates', () => {
     const a = makeReporter('a');
     const b = makeReporter('b');
     const composite = createCompositeReporter([a, b]);
@@ -81,7 +81,7 @@ describe('createCompositeReporter', () => {
     expect(b.onViolation).toHaveBeenCalledWith(violation);
   });
 
-  it('onComplete를 모든 delegate에 전달한다', () => {
+  it('forwards onComplete to all delegates', () => {
     const a = makeReporter('a');
     const b = makeReporter('b');
     const composite = createCompositeReporter([a, b]);
@@ -93,7 +93,7 @@ describe('createCompositeReporter', () => {
     expect(b.onComplete).toHaveBeenCalledWith(summary);
   });
 
-  it('onPackageStart를 모든 delegate에 전달한다', () => {
+  it('forwards onPackageStart to all delegates', () => {
     const a = makeReporter('a');
     const b = makeReporter('b');
     const composite = createCompositeReporter([a, b]);
@@ -105,7 +105,7 @@ describe('createCompositeReporter', () => {
     expect(b.onPackageStart).toHaveBeenCalledWith(pkg);
   });
 
-  it('onPackageComplete를 모든 delegate에 전달한다', () => {
+  it('forwards onPackageComplete to all delegates', () => {
     const a = makeReporter('a');
     const b = makeReporter('b');
     const composite = createCompositeReporter([a, b]);
@@ -118,7 +118,7 @@ describe('createCompositeReporter', () => {
     expect(b.onPackageComplete).toHaveBeenCalledWith(pkg, summary);
   });
 
-  it('optional 메서드가 없는 delegate도 에러 없이 처리한다', () => {
+  it('handles delegates without optional methods without error', () => {
     const minimal: WorkspaceReporter = {
       name: 'minimal',
       onStart: vi.fn(),
@@ -137,7 +137,7 @@ describe('createCompositeReporter', () => {
     ).not.toThrow();
   });
 
-  it('delegate가 비어있으면 에러 없이 동작한다', () => {
+  it('works without error when delegates are empty', () => {
     const composite = createCompositeReporter([]);
 
     expect(() => {

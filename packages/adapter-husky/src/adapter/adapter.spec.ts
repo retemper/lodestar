@@ -5,20 +5,20 @@ import { tmpdir } from 'node:os';
 import { buildHookScript, buildLodestarCommand, normalizeHook, huskyAdapter } from './adapter';
 
 describe('normalizeHook', () => {
-  it('배열을 HookDefinition으로 변환한다', () => {
+  it('converts array to HookDefinition', () => {
     const result = normalizeHook(['lodestar check', 'prettier --write --staged']);
     expect(result).toStrictEqual({
       commands: ['lodestar check', 'prettier --write --staged'],
     });
   });
 
-  it('HookDefinition은 그대로 반환한다', () => {
+  it('returns HookDefinition as-is', () => {
     const hook = { commands: ['lodestar check'] };
     const result = normalizeHook(hook);
     expect(result).toStrictEqual(hook);
   });
 
-  it('선언적 HookDefinition(adapters/rules)을 그대로 반환한다', () => {
+  it('returns declarative HookDefinition (adapters/rules) as-is', () => {
     const hook = { adapters: ['prettier'], rules: ['structure/*'] };
     const result = normalizeHook(hook);
     expect(result).toStrictEqual(hook);
@@ -26,14 +26,14 @@ describe('normalizeHook', () => {
 });
 
 describe('buildHookScript', () => {
-  it('shebang과 커맨드를 포함한 스크립트를 생성한다', () => {
+  it('generates script with shebang and commands', () => {
     const script = buildHookScript({ commands: ['lodestar check'] });
 
     expect(script).toContain('#!/usr/bin/env sh');
     expect(script).toContain('lodestar check');
   });
 
-  it('여러 커맨드를 각 줄에 배치한다', () => {
+  it('places multiple commands on separate lines', () => {
     const script = buildHookScript({
       commands: ['lodestar check', 'prettier --write --staged'],
     });
@@ -45,44 +45,44 @@ describe('buildHookScript', () => {
 });
 
 describe('buildLodestarCommand', () => {
-  it('단일 adapter로 명령어를 생성한다', () => {
+  it('generates command from a single adapter', () => {
     expect(buildLodestarCommand({ adapters: ['prettier'] })).toBe(
       'npx lodestar check --adapter prettier',
     );
   });
 
-  it('복수 adapter로 명령어를 생성한다', () => {
+  it('generates command from multiple adapters', () => {
     expect(buildLodestarCommand({ adapters: ['prettier', 'eslint'] })).toBe(
       'npx lodestar check --adapter prettier --adapter eslint',
     );
   });
 
-  it('rule 패턴으로 명령어를 생성한다', () => {
+  it('generates command from rule patterns', () => {
     expect(buildLodestarCommand({ rules: ['structure/*'] })).toBe(
       'npx lodestar check --rule "structure/*"',
     );
   });
 
-  it('adapter와 rule을 조합한다', () => {
+  it('combines adapter and rule', () => {
     expect(buildLodestarCommand({ adapters: ['prettier'], rules: ['structure/*'] })).toBe(
       'npx lodestar check --adapter prettier --rule "structure/*"',
     );
   });
 
-  it('adapter도 rule도 없으면 null을 반환한다', () => {
+  it('returns null when neither adapter nor rule is present', () => {
     expect(buildLodestarCommand({})).toBeNull();
     expect(buildLodestarCommand({ commands: ['echo hi'] })).toBeNull();
   });
 });
 
 describe('buildHookScript (declarative)', () => {
-  it('adapter 선언으로 lodestar 명령어를 생성한다', () => {
+  it('generates lodestar command from adapter declarations', () => {
     const script = buildHookScript({ adapters: ['prettier'] });
     expect(script).toContain('npx lodestar check --adapter prettier');
     expect(script).toContain('#!/usr/bin/env sh');
   });
 
-  it('lodestar 명령어가 raw commands보다 먼저 온다', () => {
+  it('lodestar commands come before raw commands', () => {
     const script = buildHookScript({
       adapters: ['prettier'],
       commands: ['pnpm turbo build'],
@@ -93,13 +93,13 @@ describe('buildHookScript (declarative)', () => {
     expect(lodestarIdx).toBeLessThan(buildIdx);
   });
 
-  it('commands만 있으면 기존과 동일하게 동작한다', () => {
+  it('behaves the same when only commands are present', () => {
     const script = buildHookScript({ commands: ['echo hello'] });
     expect(script).not.toContain('npx lodestar check');
     expect(script).toContain('echo hello');
   });
 
-  it('빈 hook은 shebang만 포함한다', () => {
+  it('empty hook contains only shebang', () => {
     const script = buildHookScript({});
     expect(script).toBe('#!/usr/bin/env sh\n\n');
   });
@@ -121,7 +121,7 @@ describe('huskyAdapter verifySetup()', () => {
     return dir;
   }
 
-  it('hook 파일이 없으면 hook-missing violation을 보고한다', async () => {
+  it('reports hook-missing violation when hook file does not exist', async () => {
     const rootDir = await createTempDir();
     const adapter = huskyAdapter({
       hooks: { 'pre-commit': ['npx lodestar check'] },
@@ -134,7 +134,7 @@ describe('huskyAdapter verifySetup()', () => {
     expect(violations[0].fix).toBeDefined();
   });
 
-  it('hook 내용이 config과 다르면 hook-drift violation을 보고한다', async () => {
+  it('reports hook-drift violation when hook content differs from config', async () => {
     const rootDir = await createTempDir();
     await mkdir(join(rootDir, '.husky'), { recursive: true });
     await writeFile(join(rootDir, '.husky/pre-commit'), '#!/bin/sh\necho old\n');
@@ -151,7 +151,7 @@ describe('huskyAdapter verifySetup()', () => {
     expect(violations[0].fix).toBeDefined();
   });
 
-  it('hook 내용이 config과 일치하면 violation이 없다', async () => {
+  it('no violation when hook content matches config', async () => {
     const rootDir = await createTempDir();
     const adapter = huskyAdapter({
       hooks: { 'pre-commit': ['npx lodestar check'] },
@@ -165,7 +165,7 @@ describe('huskyAdapter verifySetup()', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('--fix로 missing hook을 생성한다', async () => {
+  it('creates missing hook via --fix', async () => {
     const rootDir = await createTempDir();
     const adapter = huskyAdapter({
       hooks: { 'pre-commit': ['npx lodestar check'] },
@@ -185,7 +185,7 @@ describe('huskyAdapter verifySetup()', () => {
     expect(after).toHaveLength(0);
   });
 
-  it('--fix로 drift된 hook을 수정한다', async () => {
+  it('fixes drifted hook via --fix', async () => {
     const rootDir = await createTempDir();
     await mkdir(join(rootDir, '.husky'), { recursive: true });
     await writeFile(join(rootDir, '.husky/pre-commit'), '#!/bin/sh\necho wrong\n');
@@ -203,7 +203,7 @@ describe('huskyAdapter verifySetup()', () => {
     expect(after).toHaveLength(0);
   });
 
-  it('선언적 hook config로 setup/verify가 동작한다', async () => {
+  it('setup/verify works with declarative hook config', async () => {
     const rootDir = await createTempDir();
     const adapter = huskyAdapter({
       hooks: {

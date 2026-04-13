@@ -157,8 +157,8 @@ describe('checkCommand', () => {
     process.exitCode = undefined;
   });
 
-  describe('설정 파일이 없는 경우', () => {
-    it('에러 메시지를 출력하고 exitCode를 1로 설정한다', async () => {
+  describe('when config file is missing', () => {
+    it('outputs error message and sets exitCode to 1', async () => {
       mockLoadConfigFile.mockResolvedValue(null);
 
       await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
@@ -169,7 +169,7 @@ describe('checkCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('run이나 runWorkspace를 호출하지 않는다', async () => {
+    it('does not call run or runWorkspace', async () => {
       mockLoadConfigFile.mockResolvedValue(null);
 
       await checkCommand({ _: ['check'], $0: 'lodestar', format: 'console' });
@@ -179,8 +179,8 @@ describe('checkCommand', () => {
     });
   });
 
-  describe('단일 프로젝트 모드', () => {
-    it('워크스페이스가 없으면 run을 호출한다', async () => {
+  describe('single project mode', () => {
+    it('calls run when no workspace is detected', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary());
@@ -191,7 +191,7 @@ describe('checkCommand', () => {
       expect(mockRunWorkspace).not.toHaveBeenCalled();
     });
 
-    it('에러가 없으면 exitCode를 설정하지 않는다', async () => {
+    it('does not set exitCode when there are no errors', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary({ errorCount: 0, warnCount: 3 }));
@@ -201,7 +201,7 @@ describe('checkCommand', () => {
       expect(process.exitCode).toBeUndefined();
     });
 
-    it('에러가 있으면 exitCode를 1로 설정한다', async () => {
+    it('sets exitCode to 1 when there are errors', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary({ errorCount: 2 }));
@@ -212,8 +212,8 @@ describe('checkCommand', () => {
     });
   });
 
-  describe('워크스페이스 모드', () => {
-    it('워크스페이스가 감지되면 runWorkspace를 호출한다', async () => {
+  describe('workspace mode', () => {
+    it('calls runWorkspace when workspace is detected', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
         { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
@@ -226,7 +226,7 @@ describe('checkCommand', () => {
       expect(mockRun).not.toHaveBeenCalled();
     });
 
-    it('--workspace 플래그가 true이면 워크스페이스 모드를 강제한다', async () => {
+    it('forces workspace mode when --workspace flag is true', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRunWorkspace.mockResolvedValue(makeWorkspaceSummary());
@@ -237,7 +237,7 @@ describe('checkCommand', () => {
       expect(mockDiscoverWorkspaces).not.toHaveBeenCalled();
     });
 
-    it('--workspace 플래그가 false이면 단일 프로젝트 모드를 강제한다', async () => {
+    it('forces single project mode when --workspace flag is false', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockRun.mockResolvedValue(makeSummary());
 
@@ -248,7 +248,7 @@ describe('checkCommand', () => {
       expect(mockDiscoverWorkspaces).not.toHaveBeenCalled();
     });
 
-    it('워크스페이스 모드에서 에러가 있으면 exitCode를 1로 설정한다', async () => {
+    it('sets exitCode to 1 when there are errors in workspace mode', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
         { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
@@ -260,7 +260,7 @@ describe('checkCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('워크스페이스 모드에서 경고만 있으면 exitCode를 설정하지 않는다', async () => {
+    it('does not set exitCode when there are only warnings in workspace mode', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
         { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
@@ -277,7 +277,7 @@ describe('checkCommand', () => {
       expect(process.exitCode).toBeUndefined();
     });
 
-    it('워크스페이스 모드에서 총 소요 시간을 포함하여 출력한다', async () => {
+    it('outputs total elapsed time in workspace mode', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
         { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
@@ -300,7 +300,7 @@ describe('checkCommand', () => {
       expect(totalLine).toContain('43ms');
     });
 
-    it('패키지 수를 포함한 합계 메시지를 출력한다', async () => {
+    it('outputs total message including package count', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
         { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
@@ -335,8 +335,8 @@ describe('checkCommand', () => {
     });
   });
 
-  describe('--rule 필터', () => {
-    it('--rule 필터가 주어지면 매칭되는 규칙만 전달한다', async () => {
+  describe('--rule filter', () => {
+    it('passes only matching rules when --rule filter is given', async () => {
       const configWithRules: WrittenConfig = {
         plugins: [],
         rules: {
@@ -364,7 +364,7 @@ describe('checkCommand', () => {
       expect(blocks[0].rules).toStrictEqual({ 'test/specific': 'error' });
     });
 
-    it('--rule에 와일드카드 패턴을 사용할 수 있다', async () => {
+    it('supports wildcard patterns in --rule', async () => {
       const configWithRules: WrittenConfig = {
         plugins: [],
         rules: {
@@ -395,7 +395,7 @@ describe('checkCommand', () => {
       ]);
     });
 
-    it('block에 rules가 없으면 그대로 반환한다', async () => {
+    it('returns block as-is when it has no rules', async () => {
       const configWithoutRules: WrittenConfig = { plugins: [] };
       mockLoadConfigFile.mockResolvedValue(configWithoutRules);
       mockDiscoverWorkspaces.mockResolvedValue([]);
@@ -411,7 +411,7 @@ describe('checkCommand', () => {
       expect(mockRun).toHaveBeenCalledTimes(1);
     });
 
-    it('json format을 지정하면 JSON reporter를 사용한다', async () => {
+    it('uses JSON reporter when json format is specified', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary());
@@ -426,7 +426,7 @@ describe('checkCommand', () => {
       expect(mockRun).toHaveBeenCalledTimes(1);
     });
 
-    it('--fix 옵션을 run에 전달한다', async () => {
+    it('passes --fix option to run', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary());
@@ -443,7 +443,7 @@ describe('checkCommand', () => {
   });
 
   describe('--clearCache', () => {
-    it('캐시를 클리어하고 메시지를 출력한다', async () => {
+    it('clears cache and prints message', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary());
@@ -462,7 +462,7 @@ describe('checkCommand', () => {
       expect(console.error).toHaveBeenCalledWith('Cache cleared.');
     });
 
-    it('--cache=false이면 clearCache가 실행되지 않는다', async () => {
+    it('does not run clearCache when --cache=false', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary());
@@ -479,8 +479,8 @@ describe('checkCommand', () => {
     });
   });
 
-  describe('--changed 증분 분석', () => {
-    it('변경된 파일이 없으면 메시지를 출력하고 반환한다', async () => {
+  describe('--changed incremental analysis', () => {
+    it('prints message and returns when no files changed', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockGetChangedFiles.mockResolvedValue([]);
 
@@ -495,7 +495,7 @@ describe('checkCommand', () => {
       expect(mockRun).not.toHaveBeenCalled();
     });
 
-    it('변경된 파일이 있으면 영향 범위를 계산하고 run을 호출한다', async () => {
+    it('calculates impact scope and calls run when files changed', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockGetChangedFiles.mockResolvedValue(['src/a.ts', 'src/b.ts']);
       mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts', 'src/b.ts', 'src/c.ts']));
@@ -520,7 +520,7 @@ describe('checkCommand', () => {
       );
     });
 
-    it('--changed에 문자열을 전달하면 base로 사용한다', async () => {
+    it('uses the string passed to --changed as base', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockGetChangedFiles.mockResolvedValue(['src/a.ts']);
       mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts']));
@@ -542,7 +542,7 @@ describe('checkCommand', () => {
       expect(console.error).toHaveBeenCalledWith(expect.stringContaining('vs main'));
     });
 
-    it('증분 분석에서 에러가 있으면 exitCode를 1로 설정한다', async () => {
+    it('sets exitCode to 1 when incremental analysis has errors', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockGetChangedFiles.mockResolvedValue(['src/a.ts']);
       mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts']));
@@ -563,7 +563,7 @@ describe('checkCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('증분 분석에서 에러가 없으면 exitCode를 설정하지 않는다', async () => {
+    it('does not set exitCode when incremental analysis has no errors', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockGetChangedFiles.mockResolvedValue(['src/a.ts']);
       mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts']));
@@ -585,8 +585,8 @@ describe('checkCommand', () => {
     });
   });
 
-  describe('--adapter 필터', () => {
-    it('--adapter 필터가 주어지면 매칭되는 adapter만 전달한다', async () => {
+  describe('--adapter filter', () => {
+    it('passes only matching adapters when --adapter filter is given', async () => {
       const configWithAdapters: WrittenConfig = {
         plugins: [],
         adapters: [
@@ -615,7 +615,7 @@ describe('checkCommand', () => {
       expect(blocks[0].adapters![0].name).toBe('prettier');
     });
 
-    it('--adapter와 --rule을 함께 사용할 수 있다', async () => {
+    it('can use --adapter and --rule together', async () => {
       const config: WrittenConfig = {
         plugins: [],
         rules: { 'test/one': 'error', 'test/two': 'warn' },
@@ -648,7 +648,7 @@ describe('checkCommand', () => {
   });
 
   describe('workspace configTransform', () => {
-    it('--adapter와 --rule이 있으면 configTransform을 runWorkspace에 전달한다', async () => {
+    it('passes configTransform to runWorkspace when --adapter and --rule are given', async () => {
       const configWithAdapters: WrittenConfig = {
         plugins: [],
         adapters: [
@@ -682,7 +682,7 @@ describe('checkCommand', () => {
       expect(blocks[0].rules).toStrictEqual({ 'structure/no-loose-files': 'error' });
     });
 
-    it('--adapter도 --rule도 없으면 configTransform을 전달하지 않는다', async () => {
+    it('does not pass configTransform when neither --adapter nor --rule is given', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([
         { name: '@retemper/lodestar-core', dir: '/fake/packages/core' },
@@ -700,8 +700,8 @@ describe('checkCommand', () => {
     });
   });
 
-  describe('reporter 선택', () => {
-    it('sarif format을 지정하면 SARIF reporter를 사용한다', async () => {
+  describe('reporter selection', () => {
+    it('uses SARIF reporter when sarif format is specified', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary());
@@ -715,7 +715,7 @@ describe('checkCommand', () => {
       expect(createSarifReporter).toHaveBeenCalled();
     });
 
-    it('junit format을 지정하면 JUnit reporter를 사용한다', async () => {
+    it('uses JUnit reporter when junit format is specified', async () => {
       mockLoadConfigFile.mockResolvedValue(stubConfig);
       mockDiscoverWorkspaces.mockResolvedValue([]);
       mockRun.mockResolvedValue(makeSummary());
@@ -729,7 +729,7 @@ describe('checkCommand', () => {
       expect(createJunitReporter).toHaveBeenCalled();
     });
 
-    it('config에 reporters가 있으면 compositeReporter를 생성한다', async () => {
+    it('creates compositeReporter when config has reporters', async () => {
       const mockResolveConfig = vi.mocked((await import('@retemper/lodestar')).resolveConfig);
       mockResolveConfig.mockReturnValueOnce({
         rootDir: '/fake',

@@ -50,13 +50,13 @@ describe('resolvePlugins', () => {
     fixtures.length = 0;
   });
 
-  it('빈 플러그인 배열은 빈 규칙 배열을 반환한다', async () => {
+  it('returns empty rules array for empty plugin array', async () => {
     const rules = await resolvePlugins([]);
 
     expect(rules).toStrictEqual([]);
   });
 
-  it('플러그인 모듈을 로드하고 규칙을 수집한다', async () => {
+  it('loads plugin module and collects rules', async () => {
     const pluginCode = `
       export default {
         name: 'test-plugin',
@@ -80,7 +80,7 @@ describe('resolvePlugins', () => {
     expect(rules[1].rule.name).toBe('test-plugin/no-bar');
   });
 
-  it('팩토리 함수 플러그인에 옵션을 전달한다', async () => {
+  it('passes options to factory function plugin', async () => {
     const pluginCode = `
       export default function createPlugin(opts) {
         return {
@@ -109,7 +109,7 @@ describe('resolvePlugins', () => {
     expect(rules[0].pluginName).toBe('factory-plugin');
   });
 
-  it('플러그인을 찾을 수 없으면 에러를 throw한다', async () => {
+  it('throws error when plugin is not found', async () => {
     const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-resolver-test-'));
     fixtures.push({
       rootDir,
@@ -132,7 +132,7 @@ describe('resolvePlugins', () => {
     ).rejects.toThrow('Failed to resolve plugin: nonexistent-plugin');
   });
 
-  it('여러 플러그인의 규칙을 합친다', async () => {
+  it('merges rules from multiple plugins', async () => {
     const pluginACode = `
       export default {
         name: 'plugin-a',
@@ -192,7 +192,7 @@ describe('resolvePlugins', () => {
     expect(rules[1].pluginName).toBe('plugin-b');
   });
 
-  it('rules가 이미 로드된 플러그인은 module import 없이 직접 사용한다', async () => {
+  it('uses already-loaded plugins directly without module import', async () => {
     const rule = {
       name: 'inline/rule',
       description: 'A rule',
@@ -221,7 +221,7 @@ describe('importPlugin', () => {
     fixtures.length = 0;
   });
 
-  it('node_modules에서 플러그인을 해석한다', async () => {
+  it('resolves plugin from node_modules', async () => {
     const pluginCode = `
       export default {
         name: 'my-plugin',
@@ -237,7 +237,7 @@ describe('importPlugin', () => {
     expect(typeof plugin === 'object' && plugin !== null && 'name' in plugin).toBe(true);
   });
 
-  it('존재하지 않는 플러그인은 null을 반환한다', async () => {
+  it('returns null for non-existent plugin', async () => {
     const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-resolver-test-'));
     fixtures.push({
       rootDir,
@@ -251,7 +251,7 @@ describe('importPlugin', () => {
     expect(plugin).toBeNull();
   });
 
-  it('main 필드로 entry point를 해석한다', async () => {
+  it('resolves entry point via main field', async () => {
     const pluginCode = `
       export default { name: 'main-plugin', rules: [] };
     `;
@@ -266,7 +266,7 @@ describe('importPlugin', () => {
     expect(plugin).not.toBeNull();
   });
 
-  it('exports 필드의 문자열 형식을 해석한다', async () => {
+  it('resolves string format of exports field', async () => {
     const pluginCode = `
       export default { name: 'str-exports', rules: [] };
     `;
@@ -280,7 +280,7 @@ describe('importPlugin', () => {
     expect(plugin).not.toBeNull();
   });
 
-  it('named export에서 플러그인을 추출한다', async () => {
+  it('extracts plugin from named export', async () => {
     const pluginCode = `
       export const myPlugin = { name: 'named-export-plugin', rules: [] };
     `;
@@ -292,7 +292,7 @@ describe('importPlugin', () => {
     expect(plugin).not.toBeNull();
   });
 
-  it('named export에서 팩토리 함수를 추출한다', async () => {
+  it('extracts factory function from named export', async () => {
     const pluginCode = `
       export function createPlugin() {
         return { name: 'factory-named', rules: [] };
@@ -307,7 +307,7 @@ describe('importPlugin', () => {
     expect(typeof plugin).toBe('function');
   });
 
-  it('async 팩토리 함수 플러그인을 해석한다', async () => {
+  it('resolves async factory function plugin', async () => {
     const pluginCode = `
       export default async function createPlugin(opts) {
         return {
@@ -336,7 +336,7 @@ describe('importPlugin', () => {
     expect(rules[0].pluginName).toBe('async-factory');
   });
 
-  it('NODE_PATH가 빈 문자열이면 무시한다', async () => {
+  it('ignores NODE_PATH when it is an empty string', async () => {
     const originalNodePath = process.env['NODE_PATH'];
     process.env['NODE_PATH'] = '';
 
@@ -352,7 +352,7 @@ describe('importPlugin', () => {
     }
   });
 
-  it('NODE_PATH 환경변수에서 빈 항목은 무시한다', async () => {
+  it('ignores empty entries in NODE_PATH environment variable', async () => {
     const pluginCode = `
       export default { name: 'nodepath-plugin', rules: [] };
     `;
@@ -374,7 +374,7 @@ describe('importPlugin', () => {
     }
   });
 
-  it('exports 필드가 없고 main 필드도 없으면 index.js로 fallback한다', async () => {
+  it('falls back to index.js when neither exports nor main field exists', async () => {
     const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-resolver-test-'));
     fixtures.push({
       rootDir,
@@ -397,7 +397,7 @@ describe('importPlugin', () => {
     expect(plugin).not.toBeNull();
   });
 
-  it('플러그인처럼 보이지 않는 모듈은 null을 반환한다', async () => {
+  it('returns null for module that does not look like a plugin', async () => {
     const pluginCode = `
       export const version = '1.0.0';
       export const config = { debug: true };
@@ -410,7 +410,7 @@ describe('importPlugin', () => {
     expect(plugin).toBeNull();
   });
 
-  it('exports의 import 필드가 null이면 main 필드로 fallback한다', async () => {
+  it('falls back to main when exports import field is null', async () => {
     const pluginCode = `
       export default { name: 'null-import', rules: [] };
     `;
@@ -443,7 +443,7 @@ describe('importPlugin', () => {
     expect(plugin).not.toBeNull();
   });
 
-  it('exports에 import 필드가 없는 object는 main으로 fallback한다', async () => {
+  it('falls back to main for exports object without import field', async () => {
     const pluginCode = `
       export default { name: 'no-import-field', rules: [] };
     `;
@@ -475,7 +475,7 @@ describe('importPlugin', () => {
     expect(plugin).not.toBeNull();
   });
 
-  it('exports가 plain string인 package.json을 해석한다', async () => {
+  it('resolves package.json with plain string exports', async () => {
     const pluginCode = `
       export default { name: 'plain-str', rules: [] };
     `;

@@ -63,7 +63,7 @@ describe('engine.run() integration test', () => {
     return fixture;
   }
 
-  it('레이어 위반을 감지하고 보고한다', async () => {
+  it('detects and reports layer violations', async () => {
     const { rootDir } = await setup({
       'src/domain/entity.ts': "import { repo } from '../infra/repo.ts';",
       'src/infra/repo.ts': 'export const repo = {};',
@@ -94,7 +94,7 @@ describe('engine.run() integration test', () => {
     expect(summary.violations[0].message).toContain('infra');
   });
 
-  it('위반이 없으면 에러 카운트가 0이다', async () => {
+  it('error count is 0 when there are no violations', async () => {
     const { rootDir } = await setup({
       'src/domain/entity.ts': 'export const entity = {};',
       'src/infra/repo.ts': "import { entity } from '../domain/entity.ts';",
@@ -123,7 +123,7 @@ describe('engine.run() integration test', () => {
     expect(summary.warnCount).toBe(0);
   });
 
-  it('severity: off로 설정된 규칙은 실행하지 않는다', async () => {
+  it('does not run rules set to severity: off', async () => {
     const { rootDir } = await setup({
       'src/domain/entity.ts': "import { repo } from '../infra/repo.ts';",
       'src/infra/repo.ts': 'export const repo = {};',
@@ -144,7 +144,7 @@ describe('engine.run() integration test', () => {
     expect(summary.violations).toHaveLength(0);
   });
 
-  it('reporter 라이프사이클 메서드를 순서대로 호출한다', async () => {
+  it('calls reporter lifecycle methods in order', async () => {
     const { rootDir } = await setup({
       'src/domain/entity.ts': "import { repo } from '../infra/repo.ts';",
       'src/infra/repo.ts': 'export const repo = {};',

@@ -35,36 +35,36 @@ async function createFixtureDir(
 }
 
 describe('parsePnpmWorkspaceYaml', () => {
-  it('패키지 패턴을 추출한다', () => {
+  it('extracts package patterns', () => {
     const content = `packages:\n  - packages/*\n  - apps/*\n`;
     const result = parsePnpmWorkspaceYaml(content);
     expect(result).toStrictEqual(['packages/*', 'apps/*']);
   });
 
-  it('negation 패턴은 무시한다', () => {
+  it('ignores negation patterns', () => {
     const content = `packages:\n  - packages/*\n  - '!packages/internal'\n`;
     const result = parsePnpmWorkspaceYaml(content);
     expect(result).toStrictEqual(['packages/*']);
   });
 
-  it('packages 키가 없으면 빈 배열을 반환한다', () => {
+  it('returns empty array when packages key is missing', () => {
     const content = `other:\n  - something\n`;
     const result = parsePnpmWorkspaceYaml(content);
     expect(result).toStrictEqual([]);
   });
 
-  it('빈 문자열이면 빈 배열을 반환한다', () => {
+  it('returns empty array for empty string', () => {
     const result = parsePnpmWorkspaceYaml('');
     expect(result).toStrictEqual([]);
   });
 
-  it('주석과 빈 줄을 건너뛴다', () => {
+  it('skips comments and blank lines', () => {
     const content = `packages:\n  # comment\n\n  - packages/*\n`;
     const result = parsePnpmWorkspaceYaml(content);
     expect(result).toStrictEqual(['packages/*']);
   });
 
-  it('따옴표로 감싼 패턴을 처리한다', () => {
+  it('handles quoted patterns', () => {
     const content = `packages:\n  - 'packages/*'\n  - "apps/*"\n`;
     const result = parsePnpmWorkspaceYaml(content);
     expect(result).toStrictEqual(['packages/*', 'apps/*']);
@@ -88,7 +88,7 @@ describe('discoverWorkspaces', () => {
     return fixture;
   }
 
-  it('pnpm-workspace.yaml에서 워크스페이스 패키지를 탐색한다', async () => {
+  it('discovers workspace packages from pnpm-workspace.yaml', async () => {
     const { rootDir } = await setup({
       'pnpm-workspace.yaml': 'packages:\n  - packages/*\n',
       'packages/core/package.json': JSON.stringify({ name: '@my/core' }),
@@ -102,7 +102,7 @@ describe('discoverWorkspaces', () => {
     expect(names).toStrictEqual(['@my/cli', '@my/core']);
   });
 
-  it('package.json의 workspaces 필드에서 탐색한다', async () => {
+  it('discovers from package.json workspaces field', async () => {
     const { rootDir } = await setup({
       'package.json': JSON.stringify({ name: 'root', workspaces: ['packages/*'] }),
       'packages/utils/package.json': JSON.stringify({ name: '@my/utils' }),
@@ -114,7 +114,7 @@ describe('discoverWorkspaces', () => {
     expect(packages[0].name).toBe('@my/utils');
   });
 
-  it('워크스페이스 설정이 없으면 빈 배열을 반환한다', async () => {
+  it('returns empty array when workspace config is missing', async () => {
     const { rootDir } = await setup({
       'package.json': JSON.stringify({ name: 'single-project' }),
     });
@@ -124,7 +124,7 @@ describe('discoverWorkspaces', () => {
     expect(packages).toStrictEqual([]);
   });
 
-  it('package.json이 없는 디렉토리는 basename을 이름으로 사용한다', async () => {
+  it('uses basename as name for directories without package.json', async () => {
     const { rootDir } = await setup({
       'pnpm-workspace.yaml': 'packages:\n  - packages/*\n',
       'packages/no-pkg/src/index.ts': '',
@@ -136,7 +136,7 @@ describe('discoverWorkspaces', () => {
     expect(packages[0].name).toBe('no-pkg');
   });
 
-  it('workspaces 객체 형식({ packages: [...] })을 처리한다', async () => {
+  it('handles workspaces object format ({ packages: [...] })', async () => {
     const { rootDir } = await setup({
       'package.json': JSON.stringify({
         name: 'root',
@@ -151,7 +151,7 @@ describe('discoverWorkspaces', () => {
     expect(packages[0].name).toBe('@my/lib');
   });
 
-  it('pnpm-workspace.yaml도 package.json도 없으면 빈 배열을 반환한다', async () => {
+  it('returns empty array when neither pnpm-workspace.yaml nor package.json exists', async () => {
     const { rootDir } = await setup({});
 
     const packages = await discoverWorkspaces(rootDir);
@@ -159,7 +159,7 @@ describe('discoverWorkspaces', () => {
     expect(packages).toStrictEqual([]);
   });
 
-  it('workspaces가 인식할 수 없는 형식이면 빈 배열을 반환한다', async () => {
+  it('returns empty array when workspaces is an unrecognizable format', async () => {
     const { rootDir } = await setup({
       'package.json': JSON.stringify({ name: 'root', workspaces: 'invalid' }),
     });
@@ -169,7 +169,7 @@ describe('discoverWorkspaces', () => {
     expect(packages).toStrictEqual([]);
   });
 
-  it('workspaces 배열에 비문자열 항목이 있으면 필터링한다', async () => {
+  it('filters out non-string items in workspaces array', async () => {
     const { rootDir } = await setup({
       'package.json': JSON.stringify({ name: 'root', workspaces: ['packages/*', 123] }),
       'packages/lib/package.json': JSON.stringify({ name: '@my/lib' }),
@@ -181,7 +181,7 @@ describe('discoverWorkspaces', () => {
     expect(packages[0].name).toBe('@my/lib');
   });
 
-  it('package.json에 name이 없는 워크스페이스 패키지는 basename을 사용한다', async () => {
+  it('uses basename for workspace packages without name in package.json', async () => {
     const { rootDir } = await setup({
       'pnpm-workspace.yaml': 'packages:\n  - packages/*\n',
       'packages/unnamed/package.json': JSON.stringify({ version: '1.0.0' }),
@@ -193,7 +193,7 @@ describe('discoverWorkspaces', () => {
     expect(packages[0].name).toBe('unnamed');
   });
 
-  it('** 패턴을 사용하는 워크스페이스를 처리한다', async () => {
+  it('handles workspaces using ** pattern', async () => {
     const { rootDir } = await setup({
       'pnpm-workspace.yaml': 'packages:\n  - packages/**\n',
       'packages/lib/package.json': JSON.stringify({ name: '@my/lib' }),
@@ -206,7 +206,7 @@ describe('discoverWorkspaces', () => {
     expect(names).toContain('@my/lib');
   });
 
-  it('여러 glob 패턴을 처리한다', async () => {
+  it('handles multiple glob patterns', async () => {
     const { rootDir } = await setup({
       'pnpm-workspace.yaml': 'packages:\n  - packages/*\n  - apps/*\n',
       'packages/lib/package.json': JSON.stringify({ name: '@my/lib' }),

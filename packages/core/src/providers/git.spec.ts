@@ -43,7 +43,7 @@ beforeAll(async () => {
 
 describe('createGitProvider', () => {
   describe('currentBranch', () => {
-    it('현재 브랜치 이름을 반환한다', async () => {
+    it('returns current branch name', async () => {
       const git = createGitProvider(sharedRepo);
       const branch = await git.currentBranch();
 
@@ -52,7 +52,7 @@ describe('createGitProvider', () => {
       expect(branch).toBeTruthy();
     });
 
-    it('detached HEAD 상태에서는 null을 반환한다', async () => {
+    it('returns null in detached HEAD state', async () => {
       const rootDir = await setupGitRepo();
 
       // Create a second commit to detach from
@@ -70,7 +70,7 @@ describe('createGitProvider', () => {
   });
 
   describe('stagedFiles', () => {
-    it('GIT_INDEX_FILE이 없으면 빈 배열을 반환한다', async () => {
+    it('returns empty array when GIT_INDEX_FILE is missing', async () => {
       const git = createGitProvider(sharedRepo);
 
       // Ensure GIT_INDEX_FILE is not set
@@ -81,7 +81,7 @@ describe('createGitProvider', () => {
       expect(staged).toStrictEqual([]);
     });
 
-    it('GIT_INDEX_FILE이 있으면 staged 파일을 반환한다', async () => {
+    it('returns staged files when GIT_INDEX_FILE exists', async () => {
       const rootDir = await setupGitRepo();
 
       // Stage a new file
@@ -108,7 +108,7 @@ describe('createGitProvider', () => {
   });
 
   describe('diffFiles', () => {
-    it('두 커밋 사이의 변경된 파일 목록을 반환한다', async () => {
+    it('returns list of changed files between two commits', async () => {
       const rootDir = await setupGitRepo();
 
       // Get first commit ref
@@ -128,7 +128,7 @@ describe('createGitProvider', () => {
       expect(files).toContain('src/app.ts');
     }, 30_000);
 
-    it('head를 생략하면 HEAD를 기본값으로 사용한다', async () => {
+    it('uses HEAD as default when head is omitted', async () => {
       const rootDir = await setupGitRepo();
 
       const { stdout: base } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
@@ -147,7 +147,7 @@ describe('createGitProvider', () => {
   });
 
   describe('diffContent', () => {
-    it('staged 파일의 diff를 반환한다', async () => {
+    it('returns diff of staged files', async () => {
       const rootDir = await setupGitRepo();
 
       // Modify existing file and stage it
@@ -161,7 +161,7 @@ describe('createGitProvider', () => {
       expect(diff).toContain('diff --git');
     }, 30_000);
 
-    it('base ref 기준 diff를 반환한다', async () => {
+    it('returns diff relative to base ref', async () => {
       const rootDir = await setupGitRepo();
 
       const { stdout: base } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
@@ -178,7 +178,7 @@ describe('createGitProvider', () => {
       expect(diff).toContain('Changed');
     }, 30_000);
 
-    it('옵션 없이 호출하면 working tree diff를 반환한다', async () => {
+    it('returns working tree diff when called without options', async () => {
       const rootDir = await setupGitRepo();
 
       // Modify file without staging
@@ -192,7 +192,7 @@ describe('createGitProvider', () => {
   });
 
   describe('isAncestor', () => {
-    it('ancestor가 맞으면 true를 반환한다', async () => {
+    it('returns true when it is an ancestor', async () => {
       const rootDir = await setupGitRepo();
 
       const { stdout: ancestor } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
@@ -210,7 +210,7 @@ describe('createGitProvider', () => {
       expect(result).toBe(true);
     }, 30_000);
 
-    it('ancestor가 아니면 false를 반환한다', async () => {
+    it('returns false when it is not an ancestor', async () => {
       const rootDir = await setupGitRepo();
 
       // Create two diverging branches
@@ -233,7 +233,7 @@ describe('createGitProvider', () => {
       expect(result).toBe(false);
     }, 30_000);
 
-    it('descendant를 생략하면 HEAD를 기본값으로 사용한다', async () => {
+    it('uses HEAD as default when descendant is omitted', async () => {
       const rootDir = await setupGitRepo();
 
       const { stdout: ancestor } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
@@ -252,20 +252,20 @@ describe('createGitProvider', () => {
   });
 
   describe('execGit', () => {
-    it('성공한 git 명령의 stdout을 반환한다', async () => {
+    it('returns stdout of successful git command', async () => {
       const result = await execGit(['rev-parse', '--git-dir'], sharedRepo);
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toBeTruthy();
     });
 
-    it('allowNonZero=false이면 non-zero exit code에서 reject한다', async () => {
+    it('rejects on non-zero exit code when allowNonZero=false', async () => {
       await expect(
         execGit(['merge-base', '--is-ancestor', 'HEAD', 'nonexistent-ref'], sharedRepo, false),
       ).rejects.toThrow();
     });
 
-    it('allowNonZero=true이면 non-zero exit code를 resolve한다', async () => {
+    it('resolves on non-zero exit code when allowNonZero=true', async () => {
       const rootDir = await setupGitRepo();
 
       // Create diverging branches so isAncestor returns exit code 1
@@ -292,8 +292,8 @@ describe('createGitProvider', () => {
     }, 30_000);
   });
 
-  describe('git이 없는 환경', () => {
-    it('git 저장소가 아닌 디렉토리에서 에러를 던진다', async () => {
+  describe('environment without git', () => {
+    it('throws error in non-git directory', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-git-test-nogit-'));
       dirs.push(rootDir);
       const git = createGitProvider(rootDir);
@@ -301,7 +301,7 @@ describe('createGitProvider', () => {
       await expect(git.currentBranch()).rejects.toThrow('Git is not available');
     });
 
-    it('한 번 실패한 후 다시 호출해도 에러를 던진다', async () => {
+    it('throws error when called again after failing once', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-git-test-nogit2-'));
       dirs.push(rootDir);
       const git = createGitProvider(rootDir);

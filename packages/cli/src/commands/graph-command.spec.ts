@@ -46,8 +46,8 @@ describe('graphCommand', () => {
     process.exitCode = undefined;
   });
 
-  describe('파일 레벨 그래프', () => {
-    it('mermaid 형식으로 의존성 그래프를 출력한다', async () => {
+  describe('file-level graph', () => {
+    it('outputs dependency graph in mermaid format', async () => {
       const nodes = makeNodes({
         'src/a.ts': ['src/b.ts'],
         'src/b.ts': [],
@@ -63,7 +63,7 @@ describe('graphCommand', () => {
       expect(output).toContain('"src/a.ts" --> "src/b.ts"');
     });
 
-    it('dot 형식으로 의존성 그래프를 출력한다', async () => {
+    it('outputs dependency graph in dot format', async () => {
       const nodes = makeNodes({
         'src/a.ts': ['src/b.ts'],
         'src/b.ts': [],
@@ -78,7 +78,7 @@ describe('graphCommand', () => {
       expect(output).toContain('digraph dependencies');
     });
 
-    it('의존성이 없으면 메시지를 출력하고 반환한다', async () => {
+    it('prints message and returns when there are no dependencies', async () => {
       const nodes = makeNodes({ 'src/a.ts': [] });
       mockCreateProviders.mockReturnValue({
         graph: { getModuleGraph: vi.fn().mockResolvedValue({ nodes }) },
@@ -90,7 +90,7 @@ describe('graphCommand', () => {
       expect(process.stdout.write).not.toHaveBeenCalled();
     });
 
-    it('scope 옵션을 전달한다', async () => {
+    it('passes scope option', async () => {
       const nodes = makeNodes({
         'src/domain/a.ts': ['src/domain/b.ts'],
         'src/domain/b.ts': [],
@@ -113,8 +113,8 @@ describe('graphCommand', () => {
     });
   });
 
-  describe('레이어 레벨 그래프', () => {
-    it('architecture/layers 규칙이 없으면 에러를 출력하고 exitCode를 1로 설정한다', async () => {
+  describe('layer-level graph', () => {
+    it('outputs error and sets exitCode to 1 when architecture/layers rule is missing', async () => {
       mockLoadConfigFile.mockResolvedValue({ plugins: [], rules: {} } as never);
 
       await graphCommand({ _: ['graph'], $0: 'lodestar', format: 'mermaid', layers: true });
@@ -125,7 +125,7 @@ describe('graphCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('config가 없으면 에러를 출력한다', async () => {
+    it('outputs error when config is missing', async () => {
       mockLoadConfigFile.mockResolvedValue(null);
 
       await graphCommand({ _: ['graph'], $0: 'lodestar', format: 'mermaid', layers: true });
@@ -136,7 +136,7 @@ describe('graphCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('layers 규칙이 string 타입이면 무시한다', async () => {
+    it('ignores layers rule when it is a string type', async () => {
       mockLoadConfigFile.mockResolvedValue({
         plugins: [],
         rules: { 'architecture/layers': 'error' },
@@ -147,7 +147,7 @@ describe('graphCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('layers가 빈 배열이면 에러를 출력한다', async () => {
+    it('outputs error when layers is an empty array', async () => {
       mockLoadConfigFile.mockResolvedValue({
         plugins: [],
         rules: {
@@ -160,7 +160,7 @@ describe('graphCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('mermaid 형식으로 레이어 그래프를 출력한다', async () => {
+    it('outputs layer graph in mermaid format', async () => {
       const layerDefs = [
         { name: 'domain', path: 'src/domain/**/*.ts' },
         { name: 'app', path: 'src/app/**/*.ts', canImport: ['domain'] },
@@ -186,7 +186,7 @@ describe('graphCommand', () => {
       expect(output).toContain('domain');
     });
 
-    it('dot 형식으로 레이어 그래프를 출력한다', async () => {
+    it('outputs layer graph in dot format', async () => {
       const layerDefs = [
         { name: 'domain', path: 'src/domain/**/*.ts' },
         { name: 'app', path: 'src/app/**/*.ts', canImport: ['domain'] },
@@ -210,7 +210,7 @@ describe('graphCommand', () => {
       expect(output).toContain('digraph architecture');
     });
 
-    it('layers 규칙에 options가 없으면 에러를 출력한다', async () => {
+    it('outputs error when layers rule has no options', async () => {
       mockLoadConfigFile.mockResolvedValue({
         plugins: [],
         rules: { 'architecture/layers': { severity: 'error' } },
@@ -221,7 +221,7 @@ describe('graphCommand', () => {
       expect(process.exitCode).toBe(1);
     });
 
-    it('배열 형태의 config에서 layers 규칙을 찾는다', async () => {
+    it('finds layers rule in array-style config', async () => {
       const layerDefs = [
         { name: 'domain', path: 'src/domain/**/*.ts' },
         { name: 'app', path: 'src/app/**/*.ts', canImport: ['domain'] },
@@ -246,8 +246,8 @@ describe('graphCommand', () => {
     });
   });
 
-  describe('--serve 모드', () => {
-    it('HTTP 서버를 생성하고 시작한다', async () => {
+  describe('--serve mode', () => {
+    it('creates and starts an HTTP server', async () => {
       const nodes = makeNodes({
         'src/a.ts': ['src/b.ts'],
         'src/b.ts': [],
@@ -278,7 +278,7 @@ describe('graphCommand', () => {
       expect(console.error).toHaveBeenCalledWith(expect.stringContaining('http://localhost:5050'));
     });
 
-    it('포트가 지정되지 않으면 기본 포트 4040을 사용한다', async () => {
+    it('uses default port 4040 when port is not specified', async () => {
       const nodes = makeNodes({ 'src/a.ts': [] });
       mockCreateProviders.mockReturnValue({
         graph: { getModuleGraph: vi.fn().mockResolvedValue({ nodes }) },
@@ -302,7 +302,7 @@ describe('graphCommand', () => {
       expect(mockServer.listen).toHaveBeenCalledWith(4040, expect.any(Function));
     });
 
-    it('/api/graph 엔드포인트가 JSON을 반환한다', async () => {
+    it('/api/graph endpoint returns JSON', async () => {
       const nodes = makeNodes({
         'src/a.ts': ['src/b.ts'],
         'src/b.ts': [],
@@ -350,7 +350,7 @@ describe('graphCommand', () => {
       expect(jsonOutput).toHaveProperty('layers');
     });
 
-    it('기타 URL은 HTML 뷰어를 반환한다', async () => {
+    it('other URLs return HTML viewer', async () => {
       const nodes = makeNodes({ 'src/a.ts': [] });
       mockCreateProviders.mockReturnValue({
         graph: { getModuleGraph: vi.fn().mockResolvedValue({ nodes }) },
@@ -393,7 +393,7 @@ describe('graphCommand', () => {
       expect(htmlOutput).toContain('Lodestar');
     });
 
-    it('config에 layers가 있으면 레이어 정보를 API 응답에 포함한다', async () => {
+    it('includes layer info in API response when config has layers', async () => {
       const layerDefs = [
         { name: 'domain', path: 'src/domain/**/*.ts' },
         { name: 'app', path: 'src/app/**/*.ts', canImport: ['domain'] },

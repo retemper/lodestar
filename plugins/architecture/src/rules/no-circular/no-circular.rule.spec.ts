@@ -14,7 +14,7 @@ function cyclicGraph(): Map<string, ModuleNode> {
 }
 
 describe('architecture/no-circular', () => {
-  it('순환이 없으면 위반을 보고하지 않는다', async () => {
+  it('does not report violations when there are no cycles', async () => {
     const nodes = new Map<string, ModuleNode>([
       ['a.ts', { id: 'a.ts', dependencies: ['b.ts'], dependents: [] }],
       ['b.ts', { id: 'b.ts', dependencies: [], dependents: ['a.ts'] }],
@@ -30,7 +30,7 @@ describe('architecture/no-circular', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('순환이 있으면 위반을 보고한다', async () => {
+  it('reports violations when there are cycles', async () => {
     const nodes = new Map<string, ModuleNode>([
       ['a.ts', { id: 'a.ts', dependencies: ['b.ts'], dependents: ['b.ts'] }],
       ['b.ts', { id: 'b.ts', dependencies: ['a.ts'], dependents: ['a.ts'] }],
@@ -46,7 +46,7 @@ describe('architecture/no-circular', () => {
     expect(violations).toHaveLength(2);
   });
 
-  it('entries 옵션으로 검사 대상을 필터링한다', async () => {
+  it('filters check targets with entries option', async () => {
     const nodes = cyclicGraph();
     const providers = createMockProviders({
       getModuleGraph: vi.fn().mockResolvedValue({ nodes }),
@@ -60,7 +60,7 @@ describe('architecture/no-circular', () => {
     expect(violations[0].location?.file).toBe('src/a.ts');
   });
 
-  it('entries에 glob 패턴을 지원한다', async () => {
+  it('supports glob patterns in entries', async () => {
     const nodes = cyclicGraph();
     const providers = createMockProviders({
       getModuleGraph: vi.fn().mockResolvedValue({ nodes }),
@@ -73,7 +73,7 @@ describe('architecture/no-circular', () => {
     expect(violations).toHaveLength(1);
   });
 
-  it('ignore 패턴에 매칭되는 파일은 제외한다', async () => {
+  it('excludes files matching ignore patterns', async () => {
     const nodes = cyclicGraph();
     const hasCircular = vi
       .fn()
@@ -90,7 +90,7 @@ describe('architecture/no-circular', () => {
     expect(violations[0].location?.file).toBe('src/a.ts');
   });
 
-  it('maxDepth 옵션을 준수한다', async () => {
+  it('respects maxDepth option', async () => {
     const nodes = new Map<string, ModuleNode>([
       ['a.ts', { id: 'a.ts', dependencies: ['b.ts'], dependents: ['b.ts'] }],
       ['b.ts', { id: 'b.ts', dependencies: ['a.ts'], dependents: ['a.ts'] }],
@@ -106,7 +106,7 @@ describe('architecture/no-circular', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('maxDepth 이하의 순환은 위반으로 보고한다', async () => {
+  it('reports cycles within maxDepth as violations', async () => {
     const nodes = new Map([
       ['a.ts', { id: 'a.ts', dependencies: ['b.ts'], dependents: ['b.ts'] }],
       ['b.ts', { id: 'b.ts', dependencies: ['a.ts'], dependents: ['a.ts'] }],
@@ -122,7 +122,7 @@ describe('architecture/no-circular', () => {
     expect(violations).toHaveLength(2);
   });
 
-  it('entries와 ignore를 동시에 사용한다', async () => {
+  it('uses entries and ignore simultaneously', async () => {
     const nodes = cyclicGraph();
     const providers = createMockProviders({
       getModuleGraph: vi.fn().mockResolvedValue({ nodes }),
@@ -138,31 +138,31 @@ describe('architecture/no-circular', () => {
     expect(violations).toHaveLength(2);
   });
 
-  it('올바른 규칙 메타데이터를 가진다', () => {
+  it('has correct rule metadata', () => {
     expect(noCircular.name).toBe('architecture/no-circular');
     expect(noCircular.needs).toStrictEqual(['graph']);
   });
 });
 
 describe('matchGlob', () => {
-  it('정확한 경로를 매칭한다', () => {
+  it('matches exact paths', () => {
     expect(matchGlob('src/a.ts', 'src/a.ts')).toBe(true);
     expect(matchGlob('src/a.ts', 'src/b.ts')).toBe(false);
   });
 
-  it('* 와일드카드를 매칭한다', () => {
+  it('matches * wildcard', () => {
     expect(matchGlob('src/a.ts', 'src/*.ts')).toBe(true);
     expect(matchGlob('src/deep/a.ts', 'src/*.ts')).toBe(false);
   });
 
-  it('** 글로브스타를 매칭한다', () => {
+  it('matches ** globstar', () => {
     expect(matchGlob('src/deep/nested/a.ts', 'src/**/*.ts')).toBe(true);
     expect(matchGlob('lib/a.ts', 'src/**/*.ts')).toBe(false);
   });
 });
 
 describe('estimateChainLength', () => {
-  it('A→B→A 순환의 길이를 올바르게 계산한다', () => {
+  it('correctly calculates length of A→B→A cycle', () => {
     const nodes = new Map([
       ['a', { dependencies: ['b'] }],
       ['b', { dependencies: ['a'] }],
@@ -170,7 +170,7 @@ describe('estimateChainLength', () => {
     expect(estimateChainLength(nodes, 'a')).toBe(2);
   });
 
-  it('순환이 없으면 Infinity를 반환한다', () => {
+  it('returns Infinity when there are no cycles', () => {
     const nodes = new Map([
       ['a', { dependencies: ['b'] }],
       ['b', { dependencies: [] as string[] }],
@@ -178,7 +178,7 @@ describe('estimateChainLength', () => {
     expect(estimateChainLength(nodes, 'a')).toBe(Infinity);
   });
 
-  it('BFS에서 이미 방문한 노드를 건너뛴다', () => {
+  it('skips already visited nodes in BFS', () => {
     const nodes = new Map([
       ['a', { dependencies: ['b', 'c'] }],
       ['b', { dependencies: ['c'] }],
@@ -187,7 +187,7 @@ describe('estimateChainLength', () => {
     expect(estimateChainLength(nodes, 'a')).toBe(2);
   });
 
-  it('그래프에 존재하지 않는 의존성 노드를 건너뛴다', () => {
+  it('skips dependency nodes that do not exist in the graph', () => {
     const nodes = new Map([
       ['a', { dependencies: ['missing', 'b'] }],
       ['b', { dependencies: ['a'] }],

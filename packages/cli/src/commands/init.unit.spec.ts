@@ -20,7 +20,7 @@ describe('initCommand', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  it('올바른 경로에 설정 파일을 작성한다', async () => {
+  it('writes config file to the correct path', async () => {
     const { writeFile } = await import('node:fs/promises');
 
     await initCommand({} as Parameters<typeof initCommand>[0]);
@@ -32,7 +32,7 @@ describe('initCommand', () => {
     expect(encoding).toBe('utf-8');
   });
 
-  it('작성 완료 후 성공 메시지를 출력한다', async () => {
+  it('prints success message after writing', async () => {
     await initCommand({} as Parameters<typeof initCommand>[0]);
 
     const calls = (console.error as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0] as string);

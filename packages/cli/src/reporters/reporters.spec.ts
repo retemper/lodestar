@@ -102,7 +102,7 @@ describe('createConsoleReporter', () => {
       expect(calls[1]).toContain('Bad name');
     });
 
-    it('위반에 location이 없으면 위치 정보를 출력하지 않는다', () => {
+    it('does not output location info when violation has no location', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'fs-layout/directory-exists',
@@ -126,7 +126,7 @@ describe('createConsoleReporter', () => {
       expect(violationLine).not.toContain('at ');
     });
 
-    it('위반에 location은 있지만 line이 없으면 파일 경로만 출력한다', () => {
+    it('outputs only file path when violation has location but no line', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
@@ -151,7 +151,7 @@ describe('createConsoleReporter', () => {
       expect(violationLine).not.toContain(':');
     });
 
-    it('위반에 location과 line이 모두 있으면 파일 경로와 줄 번호를 출력한다', () => {
+    it('outputs file path and line number when violation has both location and line', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
@@ -175,7 +175,7 @@ describe('createConsoleReporter', () => {
       expect(violationLine).toContain('at src/MyComponent.ts:42');
     });
 
-    it('meta가 있으면 출력에 포함한다', () => {
+    it('includes meta in output when present', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
@@ -190,7 +190,7 @@ describe('createConsoleReporter', () => {
       expect(output).toContain('42 files checked');
     });
 
-    it('docsUrl이 있으면 경고에도 표시한다', () => {
+    it('shows docsUrl in warnings when present', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'naming-convention/file-naming',
@@ -213,7 +213,7 @@ describe('createConsoleReporter', () => {
       expect(calls.some((c) => c.includes('docs: https://docs.example.com/naming'))).toBe(true);
     });
 
-    it('docsUrl이 있으면 에러에도 표시한다', () => {
+    it('shows docsUrl in errors when present', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const result: RuleResultSummary = {
         ruleId: 'test/rule',
@@ -279,7 +279,7 @@ describe('createConsoleReporter', () => {
       expect(summary).toContain('0 warnings');
     });
 
-    it('ruleResults가 있으면 위반 없는 규칙 수를 계산한다', () => {
+    it('calculates count of rules without violations when ruleResults exist', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       reporter.onComplete(
         makeSummary({
@@ -317,25 +317,25 @@ describe('createConsoleReporter', () => {
     });
   });
 
-  describe('no-op 메서드', () => {
-    it('onStart는 예외를 던지지 않는다', () => {
+  describe('no-op methods', () => {
+    it('onStart does not throw', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       expect(() => reporter.onStart({ rootDir: '/root', ruleCount: 5 })).not.toThrow();
     });
 
-    it('onRuleStart는 예외를 던지지 않는다', () => {
+    it('onRuleStart does not throw', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       expect(() => reporter.onRuleStart!('test/rule')).not.toThrow();
     });
 
-    it('onPackageComplete는 예외를 던지지 않는다', () => {
+    it('onPackageComplete does not throw', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       expect(() =>
         reporter.onPackageComplete!(undefined as never, undefined as never),
       ).not.toThrow();
     });
 
-    it('onViolation은 예외를 던지지 않는다', () => {
+    it('onViolation does not throw', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       expect(() =>
         reporter.onViolation({ ruleId: 'test', message: 'msg', severity: 'error' }),
@@ -343,8 +343,8 @@ describe('createConsoleReporter', () => {
     });
   });
 
-  describe('onComplete 폴백 분기', () => {
-    it('ruleResults가 없으면 totalRules 기반으로 passed를 계산한다 (에러 있음)', () => {
+  describe('onComplete fallback branch', () => {
+    it('calculates passed based on totalRules when ruleResults is absent (with errors)', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const summary = {
         totalFiles: 0,
@@ -364,7 +364,7 @@ describe('createConsoleReporter', () => {
       expect(line).toContain('4 rules passed');
     });
 
-    it('ruleResults가 없으면 totalRules 기반으로 passed를 계산한다 (에러 없음)', () => {
+    it('calculates passed based on totalRules when ruleResults is absent (no errors)', () => {
       const reporter = createConsoleReporter({ logger: createSpyLogger() });
       const summary = {
         totalFiles: 0,
@@ -385,8 +385,8 @@ describe('createConsoleReporter', () => {
     });
   });
 
-  describe('logger 없이 생성하면 stderr logger를 사용한다', () => {
-    it('createStderrLogger가 생성되어 동작한다', () => {
+  describe('uses stderr logger when created without logger', () => {
+    it('createStderrLogger creates and works correctly', () => {
       vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
 
       const reporter = createConsoleReporter();
@@ -443,19 +443,19 @@ describe('createJsonReporter', () => {
     expect(parsed.violations).toStrictEqual([]);
   });
 
-  it('onStart는 예외를 던지지 않는다', () => {
+  it('onStart does not throw', () => {
     const reporter = createJsonReporter();
     expect(() => reporter.onStart({ rootDir: '/root', ruleCount: 3 })).not.toThrow();
   });
 
-  it('onPackageStart는 예외를 던지지 않는다', () => {
+  it('onPackageStart does not throw', () => {
     const reporter = createJsonReporter();
     expect(() =>
       reporter.onPackageStart!({ name: '@retemper/core', dir: '/root/packages/core' }),
     ).not.toThrow();
   });
 
-  it('onPackageComplete는 예외를 던지지 않는다', () => {
+  it('onPackageComplete does not throw', () => {
     const reporter = createJsonReporter();
     expect(() =>
       reporter.onPackageComplete!(

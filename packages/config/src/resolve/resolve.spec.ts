@@ -13,7 +13,7 @@ import {
 } from './resolve';
 
 describe('normalizeRuleConfig', () => {
-  it('severity 문자열을 기본 options와 함께 정규화한다', () => {
+  it('normalizes severity string with default options', () => {
     const result = normalizeRuleConfig('test/rule', 'error');
     expect(result).toStrictEqual({
       ruleId: 'test/rule',
@@ -22,7 +22,7 @@ describe('normalizeRuleConfig', () => {
     });
   });
 
-  it('전체 config 객체의 모든 필드를 보존한다', () => {
+  it('preserves all fields of the full config object', () => {
     const result = normalizeRuleConfig('test/rule', {
       severity: 'warn',
       options: { foo: 'bar' },
@@ -34,7 +34,7 @@ describe('normalizeRuleConfig', () => {
     });
   });
 
-  it('options가 없는 config 객체에 빈 객체를 기본값으로 설정한다', () => {
+  it('sets empty object as default for config object without options', () => {
     const result = normalizeRuleConfig('test/rule', {
       severity: 'error',
     });
@@ -47,7 +47,7 @@ describe('normalizeRuleConfig', () => {
 });
 
 describe('resolveConfig', () => {
-  it('빈 config을 기본값으로 정규화한다', () => {
+  it('normalizes empty config to defaults', () => {
     const result = resolveConfig({}, '/root');
     expect(result).toStrictEqual({
       rootDir: '/root',
@@ -60,7 +60,7 @@ describe('resolveConfig', () => {
     });
   });
 
-  it('rules를 Map으로 정규화한다', () => {
+  it('normalizes rules to Map', () => {
     const result = resolveConfig(
       {
         rules: { 'test/a': 'error', 'test/b': { severity: 'warn', options: { x: 1 } } },
@@ -80,14 +80,14 @@ describe('resolveConfig', () => {
     });
   });
 
-  it('배열 config에서 files가 없는 블록은 global rules로 처리한다', () => {
+  it('treats blocks without files as global rules in array config', () => {
     const result = resolveConfig([{ rules: { 'a/rule': 'error' } }], '/root');
 
     expect(result.rules.has('a/rule')).toBe(true);
     expect(result.scopedRules).toHaveLength(0);
   });
 
-  it('배열 config에서 files가 있는 블록은 scoped rules로 처리한다', () => {
+  it('treats blocks with files as scoped rules in array config', () => {
     const result = resolveConfig([{ files: ['src/**'], rules: { 'a/rule': 'error' } }], '/root');
 
     expect(result.rules.size).toBe(0);
@@ -96,7 +96,7 @@ describe('resolveConfig', () => {
     expect(result.scopedRules[0].rules.has('a/rule')).toBe(true);
   });
 
-  it('여러 블록의 plugins를 중복 없이 합친다', () => {
+  it('merges plugins from multiple blocks without duplicates', () => {
     const pluginA = { name: 'a', rules: [] };
     const pluginB = { name: 'b', rules: [] };
     const result = resolveConfig(
@@ -107,7 +107,7 @@ describe('resolveConfig', () => {
     expect(result.plugins).toHaveLength(2);
   });
 
-  it('여러 블록의 adapters를 name 기준으로 중복 제거한다 (마지막 우선)', () => {
+  it('deduplicates adapters from multiple blocks by name (last wins)', () => {
     const adapter1 = { name: 'eslint', config: { v: 1 } };
     const adapter2 = { name: 'eslint', config: { v: 2 } };
     const result = resolveConfig([{ adapters: [adapter1] }, { adapters: [adapter2] }], '/root');
@@ -116,13 +116,13 @@ describe('resolveConfig', () => {
     expect(result.adapters[0].config).toStrictEqual({ v: 2 });
   });
 
-  it('scoped rules에 ignores가 없으면 빈 배열을 기본값으로 설정한다', () => {
+  it('sets empty array as default for scoped rules without ignores', () => {
     const result = resolveConfig([{ files: ['src/**'], rules: { 'a/rule': 'warn' } }], '/root');
 
     expect(result.scopedRules[0].ignores).toStrictEqual([]);
   });
 
-  it('단일 객체 config을 배열처럼 처리한다', () => {
+  it('treats single object config as an array', () => {
     const result = resolveConfig(
       {
         rules: { 'test/rule': 'error' },
@@ -135,7 +135,7 @@ describe('resolveConfig', () => {
 });
 
 describe('resolvePluginEntry', () => {
-  it('[factoryFunction, options] 형식의 플러그인 엔트리를 해석한다', () => {
+  it('resolves [factoryFunction, options] format plugin entry', () => {
     const factory: PluginFactory = () => ({ name: 'my-plugin', rules: [] });
     const result = resolvePluginEntry([factory, { key: 'value' }]);
 
@@ -145,14 +145,14 @@ describe('resolvePluginEntry', () => {
     expect(result.plugin.rules).toStrictEqual([]);
   });
 
-  it('[문자열, options] 형식의 플러그인 엔트리를 해석한다', () => {
+  it('resolves [string, options] format plugin entry', () => {
     const result = resolvePluginEntry(['my-plugin', { key: 'value' }]);
 
     expect(result.name).toBe('my-plugin');
     expect(result.options).toStrictEqual({ key: 'value' });
   });
 
-  it('bare function 형식의 플러그인 엔트리를 해석한다', () => {
+  it('resolves bare function format plugin entry', () => {
     const factory = () => ({ name: 'fn-plugin', rules: [] });
     const result = resolvePluginEntry(factory);
 
@@ -161,7 +161,7 @@ describe('resolvePluginEntry', () => {
     expect(result.options).toStrictEqual({});
   });
 
-  it('Plugin 객체를 직접 전달하면 그대로 사용한다', () => {
+  it('uses Plugin object directly when passed', () => {
     const plugin: Plugin = { name: 'direct-plugin', rules: [] };
     const result = resolvePluginEntry(plugin);
 
@@ -170,7 +170,7 @@ describe('resolvePluginEntry', () => {
     expect(result.options).toStrictEqual({});
   });
 
-  it('문자열 플러그인 엔트리를 해석한다', () => {
+  it('resolves string plugin entry', () => {
     const result = resolvePluginEntry('string-plugin');
 
     expect(result.name).toBe('string-plugin');
@@ -180,12 +180,12 @@ describe('resolvePluginEntry', () => {
 });
 
 describe('resolveReporterEntry', () => {
-  it('문자열 엔트리는 null을 반환한다', () => {
+  it('returns null for string entry', () => {
     const result = resolveReporterEntry('console');
     expect(result).toBeNull();
   });
 
-  it('create 메서드가 있는 팩토리 객체를 해석한다', () => {
+  it('resolves factory object with create method', () => {
     const mockReporter: WorkspaceReporter = {
       name: 'mock',
       onStart() {},
@@ -198,7 +198,7 @@ describe('resolveReporterEntry', () => {
     expect(result).toBe(mockReporter);
   });
 
-  it('튜플 [factory, options] 형태를 해석한다', () => {
+  it('resolves [factory, options] tuple format', () => {
     const mockReporter: WorkspaceReporter = {
       name: 'mock-with-opts',
       onStart() {},
@@ -213,7 +213,7 @@ describe('resolveReporterEntry', () => {
 });
 
 describe('resolveConfig — reporters', () => {
-  it('설정 블록의 reporters를 해석하여 반환한다', () => {
+  it('resolves and returns reporters from config block', () => {
     const mockReporter: WorkspaceReporter = {
       name: 'test-reporter',
       onStart() {},
@@ -227,7 +227,7 @@ describe('resolveConfig — reporters', () => {
     expect(result.reporters).toStrictEqual([mockReporter]);
   });
 
-  it('reporters가 없으면 빈 배열을 반환한다', () => {
+  it('returns empty array when reporters are missing', () => {
     const result = resolveConfig({ plugins: [], rules: {} }, '/root');
 
     expect(result.reporters).toStrictEqual([]);

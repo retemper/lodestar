@@ -263,8 +263,8 @@ describe('runRule', () => {
     });
   });
 
-  describe('severity가 off인 경우', () => {
-    it('severity가 off이면 report를 호출해도 violations에 추가하지 않는다', async () => {
+  describe('when severity is off', () => {
+    it('does not add to violations when report is called with off severity', async () => {
       const result = await runRule(
         createFailingRule(),
         createRuleConfig({ severity: 'off' }),
@@ -277,7 +277,7 @@ describe('runRule', () => {
   });
 
   describe('meta', () => {
-    it('ctx.meta를 호출하면 result.meta에 반영된다', async () => {
+    it('calling ctx.meta is reflected in result.meta', async () => {
       const rule: RuleDefinition = {
         name: 'test/meta',
         description: 'Reports meta',
@@ -292,13 +292,13 @@ describe('runRule', () => {
       expect(result.meta).toBe('14 files checked');
     });
 
-    it('ctx.meta를 호출하지 않으면 result.meta는 undefined이다', async () => {
+    it('result.meta is undefined when ctx.meta is not called', async () => {
       const result = await runRule(createPassingRule(), createRuleConfig(), providers, '/root');
 
       expect(result.meta).toBeUndefined();
     });
 
-    it('에러 발생 시에도 이전에 설정한 meta를 유지한다', async () => {
+    it('retains previously set meta even when error occurs', async () => {
       const rule: RuleDefinition = {
         name: 'test/meta-error',
         description: 'Sets meta then throws',

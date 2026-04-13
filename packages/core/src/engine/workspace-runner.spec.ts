@@ -53,7 +53,7 @@ describe('runWorkspace', () => {
     mockDiscoverWorkspaces.mockResolvedValue([]);
   });
 
-  it('루트 config를 rootDir에서 실행한다', async () => {
+  it('runs root config from rootDir', async () => {
     const rootConfig = { rules: { 'test/rule': 'error' as const } };
 
     await runWorkspace({ rootDir: '/root', rootConfig });
@@ -62,7 +62,7 @@ describe('runWorkspace', () => {
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
-  it('config가 있는 패키지만 실행한다', async () => {
+  it('runs only packages with config', async () => {
     const packages: WorkspacePackage[] = [
       { name: '@my/core', dir: '/root/packages/core' },
       { name: '@my/cli', dir: '/root/packages/cli' },
@@ -80,7 +80,7 @@ describe('runWorkspace', () => {
     expect(result.packages[0].package.name).toBe('@my/core');
   });
 
-  it('config가 없는 패키지는 건너뛴다', async () => {
+  it('skips packages without config', async () => {
     mockDiscoverWorkspaces.mockResolvedValue([{ name: '@my/types', dir: '/root/packages/types' }]);
     mockLoadConfigFile.mockResolvedValue(null);
 
@@ -90,7 +90,7 @@ describe('runWorkspace', () => {
     expect(result.packages).toHaveLength(0);
   });
 
-  it('패키지 에러와 루트 에러를 합산한다', async () => {
+  it('sums package errors and root errors', async () => {
     mockDiscoverWorkspaces.mockResolvedValue([{ name: '@my/core', dir: '/root/packages/core' }]);
     mockLoadConfigFile.mockResolvedValue({ rules: {} });
 
@@ -104,7 +104,7 @@ describe('runWorkspace', () => {
     expect(result.totalWarnCount).toBe(5);
   });
 
-  it('reporter의 onPackageStart와 onPackageComplete를 호출한다', async () => {
+  it('calls reporter onPackageStart and onPackageComplete', async () => {
     mockDiscoverWorkspaces.mockResolvedValue([{ name: '@my/core', dir: '/root/packages/core' }]);
     mockLoadConfigFile.mockResolvedValue({ rules: {} });
 
@@ -125,12 +125,12 @@ describe('runWorkspace', () => {
     expect(reporter.onPackageStart.mock.calls[1][0].name).toBe('@my/core');
   });
 
-  it('totalDurationMs가 0 이상이다', async () => {
+  it('totalDurationMs is 0 or greater', async () => {
     const result = await runWorkspace({ rootDir: '/root', rootConfig: {} });
     expect(result.totalDurationMs).toBeGreaterThanOrEqual(0);
   });
 
-  it('rootSummary를 포함한다', async () => {
+  it('includes rootSummary', async () => {
     const summary = createMockSummary({ errorCount: 1 });
     mockRun.mockResolvedValue(summary);
 
@@ -138,7 +138,7 @@ describe('runWorkspace', () => {
     expect(result.rootSummary).toStrictEqual(summary);
   });
 
-  it('워크스페이스 패키지가 없으면 루트만 실행한다', async () => {
+  it('runs only root when no workspace packages exist', async () => {
     mockDiscoverWorkspaces.mockResolvedValue([]);
 
     const result = await runWorkspace({ rootDir: '/root', rootConfig: {} });
@@ -147,8 +147,8 @@ describe('runWorkspace', () => {
     expect(result.packages).toHaveLength(0);
   });
 
-  describe('병렬 실행', () => {
-    it('여러 패키지를 동시에 실행한다', async () => {
+  describe('parallel execution', () => {
+    it('runs multiple packages concurrently', async () => {
       const packages: WorkspacePackage[] = [
         { name: '@my/a', dir: '/root/packages/a' },
         { name: '@my/b', dir: '/root/packages/b' },
@@ -178,7 +178,7 @@ describe('runWorkspace', () => {
       expect(result.packages).toHaveLength(3);
     });
 
-    it('concurrency=1이면 순차 실행한다', async () => {
+    it('runs sequentially when concurrency=1', async () => {
       const packages: WorkspacePackage[] = [
         { name: '@my/a', dir: '/root/packages/a' },
         { name: '@my/b', dir: '/root/packages/b' },
@@ -209,7 +209,7 @@ describe('runWorkspace', () => {
       expect(pkgOrder[3]).toBe('end:/root/packages/b');
     });
 
-    it('reporter 이벤트를 패키지 순서대로 emit한다', async () => {
+    it('emits reporter events in package order', async () => {
       const packages: WorkspacePackage[] = [
         { name: '@my/a', dir: '/root/packages/a' },
         { name: '@my/b', dir: '/root/packages/b' },
@@ -252,7 +252,7 @@ describe('runWorkspace', () => {
       expect(startNames).toStrictEqual(['(root)', '@my/a', '@my/b']);
     });
 
-    it('concurrency가 0 이하이면 1로 보정한다', async () => {
+    it('corrects to 1 when concurrency is 0 or less', async () => {
       mockDiscoverWorkspaces.mockResolvedValue([{ name: '@my/a', dir: '/root/packages/a' }]);
       mockLoadConfigFile.mockResolvedValue({ rules: {} });
 
@@ -266,7 +266,7 @@ describe('runWorkspace', () => {
       expect(result.packages).toHaveLength(1);
     });
 
-    it('기본 concurrency는 4이다 (옵션 미지정)', async () => {
+    it('default concurrency is 4 (when option is not specified)', async () => {
       const packages: WorkspacePackage[] = Array.from({ length: 6 }, (_, i) => ({
         name: `@my/pkg-${i}`,
         dir: `/root/packages/pkg-${i}`,

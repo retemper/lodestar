@@ -107,14 +107,14 @@ describe('createWatcher', () => {
     vi.useRealTimers();
   });
 
-  it('fs.watch를 recursive 모드로 시작한다', () => {
+  it('starts fs.watch in recursive mode', () => {
     const handle = createWatcher({ config: baseConfig });
 
     expect(watch).toHaveBeenCalledWith('/project', { recursive: true }, expect.any(Function));
     handle.close();
   });
 
-  it('파일 변경 시 debounce 후 run을 호출한다', async () => {
+  it('calls run after debounce on file change', async () => {
     const handle = createWatcher({ config: baseConfig, debounceMs: 100 });
 
     watchCallback('change', 'src/a.ts');
@@ -133,7 +133,7 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('debounce 중 추가 변경이 있으면 하나로 합친다', async () => {
+  it('merges additional changes during debounce into one', async () => {
     const handle = createWatcher({ config: baseConfig, debounceMs: 100 });
 
     watchCallback('change', 'src/a.ts');
@@ -150,7 +150,7 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('node_modules, .git 등 무시 패턴을 건너뛴다', async () => {
+  it('skips ignore patterns like node_modules, .git, etc.', async () => {
     const handle = createWatcher({ config: baseConfig, debounceMs: 50 });
 
     watchCallback('change', 'node_modules/pkg/index.js');
@@ -163,14 +163,14 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('close() 호출 시 fs.watch를 닫는다', () => {
+  it('closes fs.watch on close() call', () => {
     const handle = createWatcher({ config: baseConfig });
     handle.close();
 
     expect(mockWatcher.close).toHaveBeenCalledTimes(1);
   });
 
-  it('close() 후 파일 변경을 무시한다', async () => {
+  it('ignores file changes after close()', async () => {
     const handle = createWatcher({ config: baseConfig, debounceMs: 50 });
     handle.close();
 
@@ -180,7 +180,7 @@ describe('createWatcher', () => {
     expect(mockRun).not.toHaveBeenCalled();
   });
 
-  it('onCycle 콜백을 호출한다', async () => {
+  it('calls onCycle callback', async () => {
     const onCycle = vi.fn();
     mockRun.mockResolvedValue(createMockSummary({ errorCount: 2, warnCount: 1 }));
     mockComputeImpactScope.mockReturnValue(new Set(['src/a.ts', 'src/b.ts']));
@@ -204,7 +204,7 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('filename이 null이면 무시한다', async () => {
+  it('ignores when filename is null', async () => {
     const handle = createWatcher({ config: baseConfig, debounceMs: 50 });
 
     watchCallback('change', null!);
@@ -214,7 +214,7 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('커스텀 ignore 패턴을 지원한다', async () => {
+  it('supports custom ignore patterns', async () => {
     const handle = createWatcher({
       config: baseConfig,
       debounceMs: 50,
@@ -229,7 +229,7 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('실행 중 에러가 발생해도 watcher가 중단되지 않는다', async () => {
+  it('watcher does not stop even when error occurs during execution', async () => {
     const mockLogger = { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() };
     mockCreateProviders.mockImplementationOnce(() => {
       throw new Error('graph build failed');
@@ -255,7 +255,7 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('기본 debounce는 300ms이다', async () => {
+  it('default debounce is 300ms', async () => {
     const handle = createWatcher({ config: baseConfig });
 
     watchCallback('change', 'src/a.ts');
@@ -269,7 +269,7 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('실행 중 파일이 변경되면 완료 후 재실행을 스케줄한다', async () => {
+  it('schedules re-run after completion when file changes during execution', async () => {
     let runResolve: (() => void) | undefined;
     mockRun.mockImplementationOnce(
       () =>
@@ -299,7 +299,7 @@ describe('createWatcher', () => {
     handle.close();
   });
 
-  it('Windows 스타일 백슬래시 경로를 정규화한다', async () => {
+  it('normalizes Windows-style backslash paths', async () => {
     const handle = createWatcher({ config: baseConfig, debounceMs: 50 });
 
     watchCallback('change', 'src\\utils\\helper.ts');

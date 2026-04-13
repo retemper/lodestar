@@ -3,15 +3,15 @@ import { createMockProviders, createTestContext } from '@retemper/lodestar-test-
 import { noLooseFiles } from './no-loose-files.rule';
 
 describe('structure/no-loose-files', () => {
-  describe('규칙 메타데이터', () => {
-    it('올바른 이름과 provider 의존성을 가진다', () => {
+  describe('rule metadata', () => {
+    it('has correct name and provider dependencies', () => {
       expect(noLooseFiles.name).toBe('structure/no-loose-files');
       expect(noLooseFiles.needs).toStrictEqual(['fs']);
     });
   });
 
-  describe('loose 파일이 없는 경우', () => {
-    it('디렉토리만 있으면 위반이 없다', async () => {
+  describe('when there are no loose files', () => {
+    it('no violation when only directories exist', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src/providers', 'src/resolvers']),
       });
@@ -26,7 +26,7 @@ describe('structure/no-loose-files', () => {
       expect(violations).toHaveLength(0);
     });
 
-    it('allow 목록 파일은 통과한다', async () => {
+    it('allows files in allow list', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src/index.ts']),
       });
@@ -42,8 +42,8 @@ describe('structure/no-loose-files', () => {
     });
   });
 
-  describe('loose 파일이 있는 경우', () => {
-    it('확장자가 있는 파일은 위반으로 보고한다', async () => {
+  describe('when loose files exist', () => {
+    it('reports files with extensions as violations', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src/engine.ts', 'src/cache.ts', 'src/providers']),
       });
@@ -60,7 +60,7 @@ describe('structure/no-loose-files', () => {
       expect(violations[1].message).toContain('cache.ts');
     });
 
-    it('allow 목록 파일을 제외하고 나머지를 보고한다', async () => {
+    it('reports remaining files excluding allow list', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src/index.ts', 'src/engine.ts', 'src/logger.ts']),
       });
@@ -78,8 +78,8 @@ describe('structure/no-loose-files', () => {
     });
   });
 
-  describe('여러 디렉토리 검사', () => {
-    it('여러 dirs를 각각 검사한다', async () => {
+  describe('multiple directory checks', () => {
+    it('checks each dir individually', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'packages/core/src/*') {
@@ -105,8 +105,8 @@ describe('structure/no-loose-files', () => {
     });
   });
 
-  describe('위반 위치 정보', () => {
-    it('위반에 파일 위치 정보를 포함한다', async () => {
+  describe('violation location info', () => {
+    it('includes file location info in violations', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src/cache.ts']),
       });
@@ -123,8 +123,8 @@ describe('structure/no-loose-files', () => {
     });
   });
 
-  describe('메타데이터', () => {
-    it('발견된 loose 파일 수를 메타에 출력한다', async () => {
+  describe('metadata', () => {
+    it('outputs found loose file count in meta', async () => {
       const metaSpy = vi.fn();
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src/a.ts', 'src/b.ts', 'src/providers']),
@@ -138,8 +138,8 @@ describe('structure/no-loose-files', () => {
     });
   });
 
-  describe('allow 기본값', () => {
-    it('allow를 지정하지 않으면 모든 파일이 위반이다', async () => {
+  describe('allow defaults', () => {
+    it('all files are violations when allow is not specified', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src/index.ts', 'src/engine.ts']),
       });

@@ -90,7 +90,7 @@ describe('runWorkspace() integration test', () => {
     return fixture;
   }
 
-  it('루트 config로 모노레포 루트를 검사한다', async () => {
+  it('inspects monorepo root with root config', async () => {
     const { rootDir } = await setup({
       'pnpm-workspace.yaml': 'packages:\n  - "packages/*"',
       'packages/core/package.json': JSON.stringify({ name: '@test/core' }),
@@ -105,7 +105,7 @@ describe('runWorkspace() integration test', () => {
     expect(result.rootSummary.errorCount).toBe(0);
   });
 
-  it('패키지를 발견하고 per-package config를 실행한다', async () => {
+  it('discovers packages and runs per-package config', async () => {
     const pkgConfig = `
       export default {
         plugins: ['@retemper/lodestar-plugin-architecture'],
@@ -152,7 +152,7 @@ describe('runWorkspace() integration test', () => {
     expect(result.totalErrorCount).toBeGreaterThanOrEqual(1);
   });
 
-  it('자체 config가 없는 패키지는 건너뛴다', async () => {
+  it('skips packages without their own config', async () => {
     const pkgConfig = `
       export default {
         plugins: ['@retemper/lodestar-plugin-architecture'],
@@ -191,7 +191,7 @@ describe('runWorkspace() integration test', () => {
     expect(result.packages[0].package.name).toBe('@test/with-config');
   });
 
-  it('workspace reporter 라이프사이클 메서드를 호출한다', async () => {
+  it('calls workspace reporter lifecycle methods', async () => {
     const pkgConfig = `
       export default {
         plugins: ['@retemper/lodestar-plugin-architecture'],

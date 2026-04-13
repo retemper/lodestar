@@ -27,7 +27,7 @@ function makeNodes(
 }
 
 describe('collectTransitiveDependents', () => {
-  it('직접 의존자를 depth 1로 반환한다', () => {
+  it('returns direct dependents at depth 1', () => {
     const nodes = makeNodes({
       'a.ts': ['b.ts', 'c.ts'],
       'b.ts': [],
@@ -42,7 +42,7 @@ describe('collectTransitiveDependents', () => {
     ]);
   });
 
-  it('간접 의존자를 depth 2 이상으로 반환하며 via를 기록한다', () => {
+  it('returns indirect dependents at depth 2+ and records via', () => {
     const nodes = makeNodes({
       'a.ts': ['b.ts'],
       'b.ts': ['c.ts'],
@@ -57,7 +57,7 @@ describe('collectTransitiveDependents', () => {
     ]);
   });
 
-  it('maxDepth를 지정하면 해당 깊이까지만 탐색한다', () => {
+  it('explores only up to the specified maxDepth', () => {
     const nodes = makeNodes({
       'a.ts': ['b.ts'],
       'b.ts': ['c.ts'],
@@ -70,7 +70,7 @@ describe('collectTransitiveDependents', () => {
     expect(result).toStrictEqual([{ file: 'b.ts', depth: 1, via: null }]);
   });
 
-  it('순환 의존성이 있어도 무한 루프 없이 처리한다', () => {
+  it('handles circular dependencies without infinite loop', () => {
     const nodes = makeNodes({
       'a.ts': ['b.ts'],
       'b.ts': ['a.ts', 'c.ts'],
@@ -85,7 +85,7 @@ describe('collectTransitiveDependents', () => {
     ]);
   });
 
-  it('그래프에 없는 파일을 대상으로 하면 빈 배열을 반환한다', () => {
+  it('returns empty array when targeting a file not in the graph', () => {
     const nodes = makeNodes({ 'a.ts': ['b.ts'] });
 
     const result = collectTransitiveDependents('unknown.ts', nodes, undefined);
@@ -93,7 +93,7 @@ describe('collectTransitiveDependents', () => {
     expect(result).toStrictEqual([]);
   });
 
-  it('의존자가 없으면 빈 배열을 반환한다', () => {
+  it('returns empty array when there are no dependents', () => {
     const nodes = makeNodes({ 'a.ts': [] });
 
     const result = collectTransitiveDependents('a.ts', nodes, undefined);
@@ -101,7 +101,7 @@ describe('collectTransitiveDependents', () => {
     expect(result).toStrictEqual([]);
   });
 
-  it('의존자가 그래프에 존재하지 않는 노드를 가리켜도 결과에 포함한다', () => {
+  it('includes in results even when dependents point to nodes not in the graph', () => {
     const nodes = makeNodes({
       'a.ts': ['b.ts'],
     });
@@ -111,7 +111,7 @@ describe('collectTransitiveDependents', () => {
     expect(result).toStrictEqual([{ file: 'b.ts', depth: 1, via: null }]);
   });
 
-  it('이미 방문한 노드는 중복 방문하지 않는다', () => {
+  it('does not visit already visited nodes again', () => {
     const nodes = makeNodes({
       'a.ts': ['b.ts', 'c.ts'],
       'b.ts': ['d.ts'],
@@ -138,7 +138,7 @@ describe('impactCommand', () => {
     process.exitCode = undefined;
   });
 
-  it('모듈 그래프에 파일이 없으면 에러 메시지를 출력하고 exitCode를 1로 설정한다', async () => {
+  it('outputs error message and sets exitCode to 1 when file is not in the module graph', async () => {
     mockCreateProviders.mockReturnValue({
       graph: {
         getModuleGraph: vi.fn().mockResolvedValue({
@@ -153,7 +153,7 @@ describe('impactCommand', () => {
     expect(process.exitCode).toBe(1);
   });
 
-  it('json 옵션이 없으면 human-readable 출력을 stderr에 표시한다', async () => {
+  it('outputs human-readable output to stderr when json option is absent', async () => {
     const nodes = new Map([
       ['target.ts', { dependents: ['dep.ts'], dependencies: [] }],
       ['dep.ts', { dependents: [], dependencies: [] }],
@@ -172,7 +172,7 @@ describe('impactCommand', () => {
     expect(calls.some((c) => c.includes('Total:'))).toBe(true);
   });
 
-  it('json 옵션이 true이면 JSON을 stdout에 출력한다', async () => {
+  it('outputs JSON to stdout when json option is true', async () => {
     const nodes = new Map([
       ['target.ts', { dependents: ['dep.ts'], dependencies: [] }],
       ['dep.ts', { dependents: [], dependencies: [] }],
@@ -192,7 +192,7 @@ describe('impactCommand', () => {
     expect(parsed.totalAffected).toBe(1);
   });
 
-  it('depth 옵션을 collectTransitiveDependents에 전달한다', async () => {
+  it('passes depth option to collectTransitiveDependents', async () => {
     const nodes = new Map([
       ['target.ts', { dependents: ['a.ts'], dependencies: [] }],
       ['a.ts', { dependents: ['b.ts'], dependencies: [] }],
@@ -218,7 +218,7 @@ describe('impactCommand', () => {
     expect(parsed.transitiveDependents).toStrictEqual([]);
   });
 
-  it('transitive 의존자가 있으면 human 출력에 via 정보를 포함한다', async () => {
+  it('includes via info in human output when transitive dependents exist', async () => {
     const nodes = new Map([
       ['target.ts', { dependents: ['a.ts'], dependencies: [] }],
       ['a.ts', { dependents: ['b.ts'], dependencies: [] }],
@@ -237,7 +237,7 @@ describe('impactCommand', () => {
     expect(calls.some((c) => c.includes('via a.ts'))).toBe(true);
   });
 
-  it('transitive 의존자가 없으면 Transitive 섹션을 출력하지 않는다', async () => {
+  it('does not output Transitive section when there are no transitive dependents', async () => {
     const nodes = new Map([
       ['target.ts', { dependents: ['a.ts'], dependencies: [] }],
       ['a.ts', { dependents: [], dependencies: [] }],
@@ -254,7 +254,7 @@ describe('impactCommand', () => {
     expect(calls.some((c) => c.includes('Transitive dependents'))).toBe(false);
   });
 
-  it('JSON 출력에서 transitive 의존자의 via 정보를 포함한다', async () => {
+  it('includes via info for transitive dependents in JSON output', async () => {
     const nodes = new Map([
       ['target.ts', { dependents: ['a.ts'], dependencies: [] }],
       ['a.ts', { dependents: ['b.ts'], dependencies: [] }],

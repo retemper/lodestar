@@ -51,7 +51,7 @@ describe('Config pipeline integration test', () => {
   }
 
   describe('loadConfigFile → resolveConfig', () => {
-    it('로드된 config을 ResolvedConfig으로 정규화한다', async () => {
+    it('normalizes loaded config to ResolvedConfig', async () => {
       const { rootDir } = await setup({
         'lodestar.config.mjs': `export default {
           plugins: ['@retemper/lodestar-plugin-architecture'],
@@ -73,7 +73,7 @@ describe('Config pipeline integration test', () => {
       });
     });
 
-    it('flat config 배열을 정규화한다', async () => {
+    it('normalizes flat config array', async () => {
       const { rootDir } = await setup({
         'lodestar.config.mjs': `export default [
           { rules: { 'a/rule': 'error' } },
@@ -89,7 +89,7 @@ describe('Config pipeline integration test', () => {
       expect(resolved.scopedRules[0].rules.has('b/rule')).toBe(true);
     });
 
-    it('config이 없는 디렉토리에서 빈 config을 정규화한다', () => {
+    it('normalizes empty config from directory without config', () => {
       const resolved = resolveConfig({}, '/tmp/empty');
 
       expect(resolved.rootDir).toBe('/tmp/empty');

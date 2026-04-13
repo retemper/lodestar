@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { stylelintAdapter, buildStylelintConfig } from './adapter';
 
 describe('buildStylelintConfig', () => {
-  it('설정된 옵션만 포함한다', () => {
+  it('includes only configured options', () => {
     const result = buildStylelintConfig({
       extends: ['stylelint-config-standard'],
     });
@@ -15,7 +15,7 @@ describe('buildStylelintConfig', () => {
     });
   });
 
-  it('모든 옵션을 매핑한다', () => {
+  it('maps all options', () => {
     const result = buildStylelintConfig({
       extends: ['stylelint-config-standard'],
       rules: { 'color-no-invalid-hex': true },
@@ -29,12 +29,12 @@ describe('buildStylelintConfig', () => {
     });
   });
 
-  it('빈 config은 빈 객체를 반환한다', () => {
+  it('returns empty object for empty config', () => {
     const result = buildStylelintConfig({});
     expect(result).toStrictEqual({});
   });
 
-  it('빈 배열과 빈 객체는 포함하지 않는다', () => {
+  it('does not include empty arrays and empty objects', () => {
     const result = buildStylelintConfig({
       extends: [],
       rules: {},
@@ -44,7 +44,7 @@ describe('buildStylelintConfig', () => {
     expect(result).toStrictEqual({});
   });
 
-  it('adapter 전용 옵션(bin, include)은 포함하지 않는다', () => {
+  it('does not include adapter-specific options (bin, include)', () => {
     const result = buildStylelintConfig({
       bin: '/usr/local/bin/stylelint',
       include: ['src/**/*.css'],
@@ -56,7 +56,7 @@ describe('buildStylelintConfig', () => {
     expect(result).not.toHaveProperty('include');
   });
 
-  it('ignore는 ignoreFiles로 매핑된다', () => {
+  it('maps ignore to ignoreFiles', () => {
     const result = buildStylelintConfig({
       ignore: ['node_modules/**', 'dist/**'],
     });
@@ -85,7 +85,7 @@ describe('stylelintAdapter verifySetup()', () => {
     return dir;
   }
 
-  it('.stylelintrc.json이 없으면 setup violation을 보고한다', async () => {
+  it('reports setup violation when .stylelintrc.json is missing', async () => {
     const rootDir = await createTempDir();
     const adapter = stylelintAdapter({ extends: ['stylelint-config-standard'] });
 
@@ -97,7 +97,7 @@ describe('stylelintAdapter verifySetup()', () => {
     expect(violations[0].fix).toBeDefined();
   });
 
-  it('.stylelintrc.json 내용이 config과 다르면 setup violation을 보고한다', async () => {
+  it('reports setup violation when .stylelintrc.json content differs from config', async () => {
     const rootDir = await createTempDir();
     await writeFile(join(rootDir, '.stylelintrc.json'), '{}\n', 'utf-8');
 
@@ -112,7 +112,7 @@ describe('stylelintAdapter verifySetup()', () => {
     expect(violations[0].message).toContain('actual:');
   });
 
-  it('.stylelintrc.json 내용이 일치하면 violation이 없다', async () => {
+  it('no violation when .stylelintrc.json content matches', async () => {
     const rootDir = await createTempDir();
     const cfg = { extends: ['stylelint-config-standard'] as const };
     const expected = JSON.stringify(buildStylelintConfig(cfg), null, 2) + '\n';
@@ -125,7 +125,7 @@ describe('stylelintAdapter verifySetup()', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('fix로 .stylelintrc.json을 생성한다', async () => {
+  it('creates .stylelintrc.json via fix', async () => {
     const rootDir = await createTempDir();
     const adapter = stylelintAdapter({
       extends: ['stylelint-config-standard'],

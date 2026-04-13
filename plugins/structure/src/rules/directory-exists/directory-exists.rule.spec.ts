@@ -6,15 +6,15 @@ import { createMockProviders, createTestContext } from '@retemper/lodestar-test-
 import { directoryExists } from './directory-exists.rule';
 
 describe('structure/directory-exists', () => {
-  describe('규칙 메타데이터', () => {
-    it('올바른 이름과 provider 의존성을 가진다', () => {
+  describe('rule metadata', () => {
+    it('has correct name and provider dependencies', () => {
       expect(directoryExists.name).toBe('structure/directory-exists');
       expect(directoryExists.needs).toStrictEqual(['fs']);
     });
   });
 
-  describe('필수 경로가 존재하는 경우', () => {
-    it('경로가 존재하면 위반이 없다', async () => {
+  describe('when required paths exist', () => {
+    it('no violation when path exists', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src') {
@@ -35,8 +35,8 @@ describe('structure/directory-exists', () => {
     });
   });
 
-  describe('필수 경로가 존재하지 않는 경우', () => {
-    it('경로가 존재하지 않으면 위반을 보고한다', async () => {
+  describe('when required paths do not exist', () => {
+    it('reports violation when path does not exist', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue([]),
       });
@@ -54,8 +54,8 @@ describe('structure/directory-exists', () => {
     });
   });
 
-  describe('glob 패턴 매칭', () => {
-    it('glob 패턴이 매칭되면 위반이 없다', async () => {
+  describe('glob pattern matching', () => {
+    it('no violation when glob pattern matches', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src/**/*.ts') {
@@ -76,8 +76,8 @@ describe('structure/directory-exists', () => {
     });
   });
 
-  describe('빈 required 목록', () => {
-    it('required가 비어있으면 위반이 없다', async () => {
+  describe('empty required list', () => {
+    it('no violation when required is empty', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue([]),
       });
@@ -93,8 +93,8 @@ describe('structure/directory-exists', () => {
     });
   });
 
-  describe('여러 경로 검사', () => {
-    it('일부 경로만 존재하면 누락된 경로에 대해 위반을 보고한다', async () => {
+  describe('multiple path checks', () => {
+    it('reports violations for missing paths when only some paths exist', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockImplementation((pattern: string) => {
           if (pattern === 'src') {
@@ -117,8 +117,8 @@ describe('structure/directory-exists', () => {
     });
   });
 
-  describe('fix 적용', () => {
-    it('fix가 적용되면 디렉토리를 생성한다', async () => {
+  describe('fix application', () => {
+    it('creates directory when fix is applied', async () => {
       const rootDir = await mkdtemp(join(tmpdir(), 'lodestar-dir-exists-'));
       try {
         const providers = createMockProviders({
@@ -145,7 +145,7 @@ describe('structure/directory-exists', () => {
       }
     });
 
-    it('glob 패턴이 누락되면 fix를 제공하지 않는다', async () => {
+    it('does not provide fix when glob pattern is missing', async () => {
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue([]),
       });
@@ -162,8 +162,8 @@ describe('structure/directory-exists', () => {
     });
   });
 
-  describe('메타데이터', () => {
-    it('올바른 경로 수를 메타에 출력한다', async () => {
+  describe('metadata', () => {
+    it('outputs correct path count in meta', async () => {
       const metaSpy = vi.fn();
       const providers = createMockProviders({
         glob: vi.fn().mockResolvedValue(['src']),

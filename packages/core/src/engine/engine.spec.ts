@@ -44,7 +44,7 @@ function makeFailingRule(name: string, message: string): RuleDefinition {
 }
 
 describe('createProviders', () => {
-  it('4개의 provider를 모두 생성한다', () => {
+  it('creates all 4 providers', () => {
     const providers = createProviders('/test');
 
     expect(providers).toHaveProperty('fs');
@@ -59,7 +59,7 @@ describe('createProviders', () => {
 });
 
 describe('run', () => {
-  it('알 수 없는 규칙이 있으면 config 유효성 검사에서 에러를 던진다', async () => {
+  it('throws error in config validation when unknown rules exist', async () => {
     const rule = makeRule('known/rule');
     const plugin = makePlugin('known', [rule]);
 
@@ -76,7 +76,7 @@ describe('run', () => {
     await expect(run({ config })).rejects.toThrow('Config validation failed');
   });
 
-  it('규칙이 없으면 빈 summary를 반환한다', async () => {
+  it('returns empty summary when there are no rules', async () => {
     const config = makeConfig();
 
     const summary = await run({ config });
@@ -89,7 +89,7 @@ describe('run', () => {
     expect(summary.durationMs).toBeGreaterThanOrEqual(0);
   });
 
-  it('ruleResults를 포함하는 run summary를 반환한다', async () => {
+  it('returns run summary containing ruleResults', async () => {
     const rule = makeFailingRule('test/fail', 'Something wrong');
     const plugin = makePlugin('test', [rule]);
 
@@ -114,7 +114,7 @@ describe('run', () => {
     expect(summary.warnCount).toBe(0);
   });
 
-  it('severity가 off인 규칙은 실행하지 않는다', async () => {
+  it('does not run rules with off severity', async () => {
     const rule = makeFailingRule('test/skip', 'Should not appear');
     const plugin = makePlugin('test', [rule]);
 
@@ -134,7 +134,7 @@ describe('run', () => {
     expect(summary.violations).toStrictEqual([]);
   });
 
-  it('warn severity의 violation을 warnCount에 포함한다', async () => {
+  it('includes warn severity violations in warnCount', async () => {
     const rule = makeFailingRule('test/warn-rule', 'A warning');
     const plugin = makePlugin('test', [rule]);
 
@@ -154,7 +154,7 @@ describe('run', () => {
     expect(summary.errorCount).toBe(0);
   });
 
-  it('verifySetup이 실패하면 해당 adapter의 check를 스킵한다', async () => {
+  it('skips adapter check when verifySetup fails', async () => {
     const checkFn = vi.fn().mockResolvedValue([]);
     const adapter: ToolAdapter = {
       name: 'test-tool',
@@ -178,7 +178,7 @@ describe('run', () => {
     expect(summary.violations[0].ruleId).toBe('test-tool/setup');
   });
 
-  it('verifySetup 실패 + --fix면 fix 적용 후 check를 실행한다', async () => {
+  it('applies fix then runs check when verifySetup fails with --fix', async () => {
     const fixApply = vi.fn();
     const adapter: ToolAdapter = {
       name: 'test-tool',
@@ -202,7 +202,7 @@ describe('run', () => {
     expect(summary.totalRules).toBeGreaterThanOrEqual(1);
   });
 
-  it('verifySetup이 통과하면 check를 정상 실행한다', async () => {
+  it('runs check normally when verifySetup passes', async () => {
     const checkFn = vi
       .fn()
       .mockResolvedValue([
@@ -223,7 +223,7 @@ describe('run', () => {
     expect(summary.violations[0].ruleId).toBe('test-tool/some-rule');
   });
 
-  it('fix 모드에서 adapter violation에 fix가 있으면 apply를 호출한다', async () => {
+  it('calls apply when adapter violation has fix in fix mode', async () => {
     const adapterFixApply = vi.fn();
     const adapter: ToolAdapter = {
       name: 'lint-tool',
@@ -244,7 +244,7 @@ describe('run', () => {
     expect(adapterFixApply).toHaveBeenCalledOnce();
   });
 
-  it('adapter.fix가 있으면 fix 모드에서 호출한다', async () => {
+  it('calls adapter.fix in fix mode when it exists', async () => {
     const adapterFix = vi.fn();
     const adapter: ToolAdapter = {
       name: 'format-tool',
@@ -260,7 +260,7 @@ describe('run', () => {
     expect(adapterFix).toHaveBeenCalledWith('/test', ['**/*.ts', '**/*.tsx']);
   });
 
-  it('scopedRules의 규칙 수를 totalRuleCount에 포함한다', async () => {
+  it('includes scopedRules rule count in totalRuleCount', async () => {
     const rule = makeFailingRule('test/scoped', 'Scoped issue');
     const plugin = makePlugin('test', [rule]);
 
@@ -292,7 +292,7 @@ describe('run', () => {
     expect(summary.violations[0].ruleId).toBe('test/scoped');
   });
 
-  it('verifySetup이 에러를 throw하면 해당 adapter를 스킵하고 에러를 기록한다', async () => {
+  it('skips adapter and logs error when verifySetup throws', async () => {
     const checkFn = vi.fn().mockResolvedValue([]);
     const adapter: ToolAdapter = {
       name: 'broken-setup',
@@ -310,7 +310,7 @@ describe('run', () => {
     expect(summary.totalRules).toBeGreaterThanOrEqual(1);
   });
 
-  it('adapter.check가 에러를 throw하면 에러를 기록한다', async () => {
+  it('logs error when adapter.check throws', async () => {
     const adapter: ToolAdapter = {
       name: 'error-adapter',
       config: {},
@@ -325,7 +325,7 @@ describe('run', () => {
     expect(summary.violations).toStrictEqual([]);
   });
 
-  it('fix 모드에서 네이티브 규칙 violation에 fix가 있으면 apply를 호출한다', async () => {
+  it('calls apply when native rule violation has fix in fix mode', async () => {
     const fixApply = vi.fn();
     const rule: RuleDefinition = {
       name: 'test/fixable',
@@ -355,7 +355,7 @@ describe('run', () => {
     expect(fixApply).toHaveBeenCalledOnce();
   });
 
-  it('fix 모드에서 setup violation에 fix가 없으면 skip한다', async () => {
+  it('skips when setup violation has no fix in fix mode', async () => {
     const adapter: ToolAdapter = {
       name: 'no-fix-setup',
       config: {},
@@ -375,7 +375,7 @@ describe('run', () => {
     expect(summary.violations).toHaveLength(1);
   });
 
-  it('fix 모드에서 네이티브 violation에 fix가 없으면 skip한다', async () => {
+  it('skips when native violation has no fix in fix mode', async () => {
     const rule = makeFailingRule('test/no-fix', 'No fix available');
     const plugin = makePlugin('test', [rule]);
 
@@ -394,7 +394,7 @@ describe('run', () => {
     expect(summary.violations).toHaveLength(1);
   });
 
-  it('fix 모드에서 adapter violation에 fix가 없으면 skip한다', async () => {
+  it('skips when adapter violation has no fix in fix mode', async () => {
     const adapter: ToolAdapter = {
       name: 'no-fix-adapter',
       config: {},
@@ -413,7 +413,7 @@ describe('run', () => {
     expect(summary.violations).toHaveLength(1);
   });
 
-  it('verifySetup이 비-Error 객체를 throw하면 Error로 래핑하고 reporter에 전달한다', async () => {
+  it('wraps non-Error object in Error and passes to reporter when verifySetup throws', async () => {
     const completeCalls: Array<{ ruleId: string; error?: Error }> = [];
     const reporter = {
       name: 'test',
@@ -440,7 +440,7 @@ describe('run', () => {
     expect(errorCall?.error?.message).toBe('string error');
   });
 
-  it('adapter.check가 비-Error 객체를 throw하면 Error로 래핑하고 reporter에 전달한다', async () => {
+  it('wraps non-Error object in Error and passes to reporter when adapter.check throws', async () => {
     const completeCalls: Array<{ ruleId: string; error?: Error }> = [];
     const reporter = {
       name: 'test',
@@ -466,7 +466,7 @@ describe('run', () => {
     expect(errorCall?.error?.message).toBe('string check error');
   });
 
-  it('check가 없는 adapter는 스킵한다', async () => {
+  it('skips adapters without check', async () => {
     const adapter: ToolAdapter = {
       name: 'no-check',
       config: {},
@@ -479,7 +479,7 @@ describe('run', () => {
     expect(summary.totalRules).toBe(1);
   });
 
-  it('verifySetup이 없는 adapter도 정상 처리한다', async () => {
+  it('handles adapters without verifySetup normally', async () => {
     const adapter: ToolAdapter = {
       name: 'no-setup',
       config: {},
@@ -492,7 +492,7 @@ describe('run', () => {
     expect(summary.totalRules).toBe(1);
   });
 
-  it('reporter의 onRuleStart와 onRuleComplete 콜백을 호출한다', async () => {
+  it('calls reporter onRuleStart and onRuleComplete callbacks', async () => {
     const rule = makeRule('test/rule');
     const plugin = makePlugin('test', [rule]);
 
@@ -524,7 +524,7 @@ describe('run', () => {
     expect(calls).toContain('complete');
   });
 
-  it('adapter.check 에러 시 reporter가 있으면 onRuleComplete에 에러를 전달한다', async () => {
+  it('passes error to onRuleComplete via reporter when adapter.check throws', async () => {
     const completeCalls: Array<{ ruleId: string; error?: Error }> = [];
     const reporter = {
       name: 'test',
@@ -550,7 +550,7 @@ describe('run', () => {
     expect(errorCall?.error?.message).toBe('Check exploded');
   });
 
-  it('verifySetup 에러 시 reporter가 있으면 onRuleComplete에 에러를 전달한다', async () => {
+  it('passes error to onRuleComplete via reporter when verifySetup throws', async () => {
     const completeCalls: Array<{ ruleId: string; error?: Error }> = [];
     const reporter = {
       name: 'test',
@@ -577,7 +577,7 @@ describe('run', () => {
     expect(errorCall?.error?.message).toBe('Setup exploded');
   });
 
-  it('reporter와 adapter를 함께 사용하면 모든 lifecycle 콜백을 호출한다', async () => {
+  it('calls all lifecycle callbacks when using reporter and adapter together', async () => {
     const calls: string[] = [];
     const reporter = {
       name: 'full',
@@ -604,7 +604,7 @@ describe('run', () => {
     expect(calls).toContain('complete');
   });
 
-  it('config.rules가 있을 때 adapter.check에 include 패턴을 전달한다', async () => {
+  it('passes include patterns to adapter.check when config.rules exists', async () => {
     const checkFn = vi.fn().mockResolvedValue([]);
     const rule = makeRule('test/rule');
     const plugin = makePlugin('test', [rule]);
@@ -630,7 +630,7 @@ describe('run', () => {
     expect(checkFn).toHaveBeenCalledWith('/test', ['**/*.ts', '**/*.tsx']);
   });
 
-  it('scopedRules에 reporter 콜백을 호출한다', async () => {
+  it('calls reporter callbacks for scopedRules', async () => {
     const rule = makeRule('test/scoped-reporter');
     const plugin = makePlugin('test', [rule]);
     const calls: string[] = [];

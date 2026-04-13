@@ -20,21 +20,21 @@ afterAll(async () => {
 });
 
 describe('contentHash', () => {
-  it('동일한 내용에 대해 같은 해시를 반환한다', () => {
+  it('returns same hash for identical content', () => {
     expect(contentHash('hello world')).toBe(contentHash('hello world'));
   });
 
-  it('다른 내용에 대해 다른 해시를 반환한다', () => {
+  it('returns different hash for different content', () => {
     expect(contentHash('hello')).not.toBe(contentHash('world'));
   });
 
-  it('16자 길이의 해시를 반환한다', () => {
+  it('returns a 16-character hash', () => {
     expect(contentHash('test')).toHaveLength(16);
   });
 });
 
 describe('createDiskCacheProvider', () => {
-  it('값을 저장하고 조회한다', async () => {
+  it('stores and retrieves values', async () => {
     const dir = await tempDir();
     const cache = createDiskCacheProvider(dir);
 
@@ -44,7 +44,7 @@ describe('createDiskCacheProvider', () => {
     expect(result).toStrictEqual({ data: 42 });
   });
 
-  it('존재하지 않는 키에 대해 null을 반환한다', async () => {
+  it('returns null for non-existent keys', async () => {
     const dir = await tempDir();
     const cache = createDiskCacheProvider(dir);
 
@@ -53,7 +53,7 @@ describe('createDiskCacheProvider', () => {
     expect(result).toBeNull();
   });
 
-  it('네임스페이스별로 값을 분리한다', async () => {
+  it('separates values by namespace', async () => {
     const dir = await tempDir();
     const cache = createDiskCacheProvider(dir);
 
@@ -64,7 +64,7 @@ describe('createDiskCacheProvider', () => {
     expect(await cache.get('ns-b', 'key')).toBe('value-b');
   });
 
-  it('특정 네임스페이스를 삭제한다', async () => {
+  it('clears specific namespace', async () => {
     const dir = await tempDir();
     const cache = createDiskCacheProvider(dir);
 
@@ -76,7 +76,7 @@ describe('createDiskCacheProvider', () => {
     expect(await cache.get('ns-b', 'key')).toBe('value-b');
   });
 
-  it('전체 캐시를 삭제한다', async () => {
+  it('clears entire cache', async () => {
     const dir = await tempDir();
     const cache = createDiskCacheProvider(dir);
 
@@ -88,7 +88,7 @@ describe('createDiskCacheProvider', () => {
     expect(await cache.get('ns-b', 'key')).toBeNull();
   });
 
-  it('배열 데이터를 저장하고 조회한다', async () => {
+  it('stores and retrieves array data', async () => {
     const dir = await tempDir();
     const cache = createDiskCacheProvider(dir);
     const data = [
@@ -107,7 +107,7 @@ describe('createDiskCacheProvider', () => {
     expect(result).toStrictEqual(data);
   });
 
-  it('같은 키에 값을 덮어쓴다', async () => {
+  it('overwrites value for same key', async () => {
     const dir = await tempDir();
     const cache = createDiskCacheProvider(dir);
 

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Violation, RunSummary } from '@retemper/lodestar-types';
 import { createSarifReporter, buildSarifLog, sarifReporter } from './sarif-reporter';
 
-/** 최소 RunSummary */
+/** Minimal RunSummary */
 function makeSummary(overrides: Partial<RunSummary> = {}): RunSummary {
   return {
     totalFiles: 0,
@@ -17,7 +17,7 @@ function makeSummary(overrides: Partial<RunSummary> = {}): RunSummary {
 }
 
 describe('buildSarifLog', () => {
-  it('빈 위반 목록에 대해 유효한 SARIF 구조를 생성한다', () => {
+  it('generates valid SARIF structure for empty violations', () => {
     const result = buildSarifLog([], new Map());
 
     expect(result.version).toBe('2.1.0');
@@ -28,7 +28,7 @@ describe('buildSarifLog', () => {
     expect(result.runs[0].tool.driver.rules).toStrictEqual([]);
   });
 
-  it('위반을 SARIF result로 변환한다', () => {
+  it('converts violations to SARIF results', () => {
     const violations: Violation[] = [
       {
         ruleId: 'architecture/layers',
@@ -52,14 +52,14 @@ describe('buildSarifLog', () => {
     expect(sarifResult.locations?.[0].physicalLocation.region?.startColumn).toBe(1);
   });
 
-  it('warn severity를 SARIF warning level로 매핑한다', () => {
+  it('maps warn severity to SARIF warning level', () => {
     const violations: Violation[] = [{ ruleId: 'test/rule', message: 'Warning', severity: 'warn' }];
 
     const result = buildSarifLog(violations, new Map());
     expect(result.runs[0].results[0].level).toBe('warning');
   });
 
-  it('location이 없는 위반은 locations 필드를 생략한다', () => {
+  it('omits locations field for violations without location', () => {
     const violations: Violation[] = [
       { ruleId: 'test/rule', message: 'No location', severity: 'error' },
     ];
@@ -68,7 +68,7 @@ describe('buildSarifLog', () => {
     expect(result.runs[0].results[0].locations).toBeUndefined();
   });
 
-  it('line만 있고 column이 없으면 startColumn을 생략한다', () => {
+  it('omits startColumn when line exists but column does not', () => {
     const violations: Violation[] = [
       {
         ruleId: 'test/rule',
@@ -84,7 +84,7 @@ describe('buildSarifLog', () => {
     expect(region?.startColumn).toBeUndefined();
   });
 
-  it('고유한 ruleId별로 rules 배열을 생성한다', () => {
+  it('creates rules array by unique ruleId', () => {
     const violations: Violation[] = [
       { ruleId: 'a/rule', message: 'msg1', severity: 'error' },
       { ruleId: 'b/rule', message: 'msg2', severity: 'error' },
@@ -97,7 +97,7 @@ describe('buildSarifLog', () => {
     expect(result.runs[0].tool.driver.rules[1].id).toBe('b/rule');
   });
 
-  it('ruleIndex가 rules 배열의 인덱스와 일치한다', () => {
+  it('ruleIndex matches the index of the rules array', () => {
     const violations: Violation[] = [
       { ruleId: 'a/rule', message: 'msg1', severity: 'error' },
       { ruleId: 'b/rule', message: 'msg2', severity: 'error' },
@@ -108,7 +108,7 @@ describe('buildSarifLog', () => {
     expect(result.runs[0].results[1].ruleIndex).toBe(1);
   });
 
-  it('ruleMetadata에 docsUrl이 있으면 helpUri로 포함한다', () => {
+  it('includes helpUri when ruleMetadata has docsUrl', () => {
     const violations: Violation[] = [{ ruleId: 'test/rule', message: 'msg', severity: 'error' }];
     const metadata = new Map([['test/rule', { docsUrl: 'https://docs.example.com/test' }]]);
 
@@ -123,12 +123,12 @@ describe('createSarifReporter', () => {
     vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   });
 
-  it('name이 "sarif"이다', () => {
+  it('name is "sarif"', () => {
     const reporter = createSarifReporter();
     expect(reporter.name).toBe('sarif');
   });
 
-  it('onComplete에서 SARIF JSON을 stdout에 출력한다', () => {
+  it('outputs SARIF JSON to stdout in onComplete', () => {
     const reporter = createSarifReporter();
     const violation: Violation = { ruleId: 'test/rule', message: 'Bad', severity: 'error' };
 
@@ -143,7 +143,7 @@ describe('createSarifReporter', () => {
     expect(parsed.runs[0].results[0].ruleId).toBe('test/rule');
   });
 
-  it('빈 위반이면 빈 results를 출력한다', () => {
+  it('outputs empty results for empty violations', () => {
     const reporter = createSarifReporter();
     reporter.onComplete(makeSummary());
 
@@ -153,7 +153,7 @@ describe('createSarifReporter', () => {
     expect(parsed.runs[0].results).toStrictEqual([]);
   });
 
-  it('onRuleComplete에서 docsUrl을 수집한다', () => {
+  it('collects docsUrl in onRuleComplete', () => {
     const reporter = createSarifReporter();
 
     reporter.onRuleComplete!({
@@ -173,12 +173,12 @@ describe('createSarifReporter', () => {
 });
 
 describe('sarifReporter', () => {
-  it('name이 "sarif"인 ReporterFactory를 반환한다', () => {
+  it('returns a ReporterFactory with name "sarif"', () => {
     const factory = sarifReporter();
     expect(factory.name).toBe('sarif');
   });
 
-  it('create()로 WorkspaceReporter를 생성한다', () => {
+  it('creates WorkspaceReporter via create()', () => {
     const factory = sarifReporter();
     const reporter = factory.create();
     expect(reporter.name).toBe('sarif');

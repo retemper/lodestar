@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { prettierAdapter, buildPrettierConfig, parseCheckOutput } from './adapter';
 
 describe('buildPrettierConfig', () => {
-  it('설정된 옵션만 포함한다', () => {
+  it('includes only configured options', () => {
     const result = buildPrettierConfig({
       semi: true,
       singleQuote: true,
@@ -17,7 +17,7 @@ describe('buildPrettierConfig', () => {
     });
   });
 
-  it('모든 옵션을 매핑한다', () => {
+  it('maps all options', () => {
     const result = buildPrettierConfig({
       printWidth: 100,
       tabWidth: 4,
@@ -43,12 +43,12 @@ describe('buildPrettierConfig', () => {
     });
   });
 
-  it('빈 config은 빈 객체를 반환한다', () => {
+  it('returns empty object for empty config', () => {
     const result = buildPrettierConfig({});
     expect(result).toStrictEqual({});
   });
 
-  it('adapter 전용 옵션(bin, ignore, include)은 포함하지 않는다', () => {
+  it('does not include adapter-specific options (bin, ignore, include)', () => {
     const result = buildPrettierConfig({
       bin: '/usr/local/bin/prettier',
       ignore: ['dist/**'],
@@ -80,7 +80,7 @@ describe('prettierAdapter verifySetup()', () => {
     return dir;
   }
 
-  it('.prettierrc가 없으면 setup violation을 보고한다', async () => {
+  it('reports setup violation when .prettierrc is missing', async () => {
     const rootDir = await createTempDir();
     const adapter = prettierAdapter({ semi: true });
 
@@ -92,7 +92,7 @@ describe('prettierAdapter verifySetup()', () => {
     expect(violations[0].fix).toBeDefined();
   });
 
-  it('.prettierrc 내용이 config과 다르면 setup violation을 보고한다', async () => {
+  it('reports setup violation when .prettierrc content differs from config', async () => {
     const rootDir = await createTempDir();
     await writeFile(join(rootDir, '.prettierrc'), '{"semi": false}\n', 'utf-8');
 
@@ -107,7 +107,7 @@ describe('prettierAdapter verifySetup()', () => {
     expect(violations[0].message).toContain('actual:');
   });
 
-  it('.prettierrc 내용이 일치하면 violation이 없다', async () => {
+  it('no violation when .prettierrc content matches', async () => {
     const rootDir = await createTempDir();
     const expected = JSON.stringify({ semi: true }, null, 2) + '\n';
     await writeFile(join(rootDir, '.prettierrc'), expected, 'utf-8');
@@ -119,7 +119,7 @@ describe('prettierAdapter verifySetup()', () => {
     expect(violations).toHaveLength(0);
   });
 
-  it('fix로 .prettierrc를 생성한다', async () => {
+  it('creates .prettierrc via fix', async () => {
     const rootDir = await createTempDir();
     const adapter = prettierAdapter({ semi: true, singleQuote: true });
 
@@ -135,7 +135,7 @@ describe('prettierAdapter verifySetup()', () => {
 });
 
 describe('parseCheckOutput', () => {
-  it('prettier stderr에서 포맷 안 된 파일 경로를 추출한다', () => {
+  it('extracts unformatted file paths from prettier stderr', () => {
     const stderr = [
       '[warn] src/index.ts',
       '[warn] src/utils/helper.ts',
@@ -147,19 +147,19 @@ describe('parseCheckOutput', () => {
     expect(result).toStrictEqual(['src/index.ts', 'src/utils/helper.ts']);
   });
 
-  it('절대 경로를 상대 경로로 변환한다', () => {
+  it('converts absolute path to relative path', () => {
     const stderr = '[warn] /project/src/index.ts\n';
     const result = parseCheckOutput(stderr, '/project');
 
     expect(result).toStrictEqual(['src/index.ts']);
   });
 
-  it('빈 출력이면 빈 배열을 반환한다', () => {
+  it('returns empty array for empty output', () => {
     const result = parseCheckOutput('', '/project');
     expect(result).toStrictEqual([]);
   });
 
-  it('Checking/Code style 라인은 무시한다', () => {
+  it('ignores Checking/Code style lines', () => {
     const stderr = 'Checking formatting...\n[warn] Code style issues found.\n';
     const result = parseCheckOutput(stderr, '/project');
     expect(result).toStrictEqual([]);

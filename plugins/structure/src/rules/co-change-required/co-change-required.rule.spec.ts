@@ -3,15 +3,15 @@ import { createMockProviders, createTestContext } from '@retemper/lodestar-test-
 import { coChangeRequired } from './co-change-required.rule';
 
 describe('structure/co-change-required', () => {
-  describe('규칙 메타데이터', () => {
-    it('올바른 이름과 provider 의존성을 가진다', () => {
+  describe('rule metadata', () => {
+    it('has correct name and provider dependencies', () => {
       expect(coChangeRequired.name).toBe('structure/co-change-required');
       expect(coChangeRequired.needs).toStrictEqual(['git']);
     });
   });
 
-  describe('git provider가 없는 경우', () => {
-    it('위반 없이 종료한다', async () => {
+  describe('when git provider is missing', () => {
+    it('exits without violations', async () => {
       const providers = createMockProviders();
       const providersWithoutGit = { ...providers, git: undefined };
       const { ctx, violations } = createTestContext(
@@ -26,8 +26,8 @@ describe('structure/co-change-required', () => {
     });
   });
 
-  describe('변경 파일이 없는 경우', () => {
-    it('위반이 없다', async () => {
+  describe('when there are no changed files', () => {
+    it('no violations', async () => {
       const providers = createMockProviders({
         stagedFiles: vi.fn().mockResolvedValue([]),
         diffFiles: vi.fn().mockResolvedValue([]),
@@ -44,8 +44,8 @@ describe('structure/co-change-required', () => {
     });
   });
 
-  describe('watch 대상이 변경되지 않은 경우', () => {
-    it('위반이 없다', async () => {
+  describe('when watch target is not changed', () => {
+    it('no violations', async () => {
       const providers = createMockProviders({
         stagedFiles: vi.fn().mockResolvedValue(['docs/README.md']),
       });
@@ -61,8 +61,8 @@ describe('structure/co-change-required', () => {
     });
   });
 
-  describe('watch 대상이 변경되고 require도 변경된 경우', () => {
-    it('위반이 없다', async () => {
+  describe('when both watch target and require are changed', () => {
+    it('no violations', async () => {
       const providers = createMockProviders({
         stagedFiles: vi.fn().mockResolvedValue(['src/app.ts', 'tests/app.spec.ts']),
       });
@@ -78,8 +78,8 @@ describe('structure/co-change-required', () => {
     });
   });
 
-  describe('watch 대상이 변경되었지만 require가 변경되지 않은 경우', () => {
-    it('위반을 보고한다', async () => {
+  describe('when watch target is changed but require is not changed', () => {
+    it('reports violations', async () => {
       const providers = createMockProviders({
         stagedFiles: vi.fn().mockResolvedValue(['src/app.ts']),
       });
@@ -97,8 +97,8 @@ describe('structure/co-change-required', () => {
     });
   });
 
-  describe('exclude 패턴', () => {
-    it('exclude에 해당하는 파일은 watch에서 제외한다', async () => {
+  describe('exclude patterns', () => {
+    it('excludes matching files from watch via exclude', async () => {
       const providers = createMockProviders({
         stagedFiles: vi.fn().mockResolvedValue(['src/app.spec.ts']),
       });
@@ -118,8 +118,8 @@ describe('structure/co-change-required', () => {
     });
   });
 
-  describe('커스텀 메시지', () => {
-    it('message 옵션이 있으면 해당 메시지로 보고한다', async () => {
+  describe('custom messages', () => {
+    it('reports with the specified message when message option is present', async () => {
       const providers = createMockProviders({
         stagedFiles: vi.fn().mockResolvedValue(['src/app.ts']),
       });
@@ -140,8 +140,8 @@ describe('structure/co-change-required', () => {
     });
   });
 
-  describe('diffFiles fallback (CI 컨텍스트)', () => {
-    it('staged가 비어있으면 diffFiles로 fallback한다', async () => {
+  describe('diffFiles fallback (CI context)', () => {
+    it('falls back to diffFiles when staged is empty', async () => {
       const diffFiles = vi.fn().mockResolvedValue(['src/app.ts']);
       const providers = createMockProviders({
         stagedFiles: vi.fn().mockResolvedValue([]),
@@ -159,7 +159,7 @@ describe('structure/co-change-required', () => {
       expect(violations).toHaveLength(1);
     });
 
-    it('diffFiles가 실패하면 빈 배열로 fallback한다', async () => {
+    it('falls back to empty array when diffFiles fails', async () => {
       const providers = createMockProviders({
         stagedFiles: vi.fn().mockResolvedValue([]),
         diffFiles: vi.fn().mockRejectedValue(new Error('git not available')),

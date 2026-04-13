@@ -26,7 +26,7 @@ describe('setupCommand', () => {
     process.exitCode = undefined;
   });
 
-  it('설정 파일이 없으면 에러 메시지를 출력하고 exitCode를 1로 설정한다', async () => {
+  it('outputs error message and sets exitCode to 1 when config file is missing', async () => {
     mockLoadConfigFile.mockResolvedValue(null);
 
     await setupCommand({ _: ['setup'], $0: 'lodestar' });
@@ -37,7 +37,7 @@ describe('setupCommand', () => {
     expect(process.exitCode).toBe(1);
   });
 
-  it('verifySetup이 있는 어댑터가 없으면 메시지를 출력한다', async () => {
+  it('prints message when no adapter with verifySetup is found', async () => {
     mockLoadConfigFile.mockResolvedValue({
       plugins: [],
       rules: {},
@@ -51,7 +51,7 @@ describe('setupCommand', () => {
     );
   });
 
-  it('어댑터 배열이 없는 config block도 처리한다', async () => {
+  it('handles config blocks without adapter array', async () => {
     mockLoadConfigFile.mockResolvedValue({
       plugins: [],
       rules: {},
@@ -64,7 +64,7 @@ describe('setupCommand', () => {
     );
   });
 
-  it('배열 형태의 config를 처리한다', async () => {
+  it('handles array-style config', async () => {
     mockLoadConfigFile.mockResolvedValue([
       { plugins: [], rules: {} },
       { plugins: [], rules: {}, adapters: [{ name: 'adapter-no-setup' }] },
@@ -77,7 +77,7 @@ describe('setupCommand', () => {
     );
   });
 
-  it('위반이 없으면 체크마크를 출력한다', async () => {
+  it('outputs checkmark when there are no violations', async () => {
     const mockVerifySetup = vi.fn().mockResolvedValue([]);
     mockLoadConfigFile.mockResolvedValue({
       plugins: [],
@@ -92,7 +92,7 @@ describe('setupCommand', () => {
     expect(calls.some((c) => c.includes('✓'))).toBe(true);
   });
 
-  it('fix가 있는 위반이면 fix를 적용하고 done을 출력한다', async () => {
+  it('applies fix and outputs done when violation has fix', async () => {
     const mockApply = vi.fn().mockResolvedValue(undefined);
     const mockVerifySetup = vi
       .fn()
@@ -111,7 +111,7 @@ describe('setupCommand', () => {
     expect(calls.some((c) => c.includes('done'))).toBe(true);
   });
 
-  it('fix가 없는 위반이면 메시지만 출력하고 done을 표시한다', async () => {
+  it('outputs only message and shows done when violation has no fix', async () => {
     const mockVerifySetup = vi.fn().mockResolvedValue([{ message: 'manual fix needed' }]);
     mockLoadConfigFile.mockResolvedValue({
       plugins: [],
@@ -126,7 +126,7 @@ describe('setupCommand', () => {
     expect(calls.some((c) => c.includes('done'))).toBe(true);
   });
 
-  it('여러 어댑터가 있으면 각각 verifySetup을 실행한다', async () => {
+  it('runs verifySetup for each adapter when multiple adapters exist', async () => {
     const mockVerifySetup1 = vi.fn().mockResolvedValue([]);
     const mockVerifySetup2 = vi.fn().mockResolvedValue([]);
     mockLoadConfigFile.mockResolvedValue({
