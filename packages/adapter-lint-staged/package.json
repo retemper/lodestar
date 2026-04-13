@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-adapter-lint-staged",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "lint-staged adapter for Lodestar — staged file linting from lodestar config",
   "license": "MIT",

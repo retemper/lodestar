@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-plugin-structure",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "File system structure enforcement — directory existence, forbidden paths, and paired file validation",
   "license": "MIT",
