@@ -31,18 +31,25 @@ async function loadConfigWithEslintAdapter(
   return loadConfigWithEslintAdapter(parent);
 }
 
+let deprecationWarned = false;
+
 /**
  * Generate ESLint flat config from lodestar.config.ts.
- * Used in eslint.config.js for IDE integration:
  *
- * ```js
- * import { fromLodestar } from '@retemper/lodestar-adapter-eslint';
- * export default await fromLodestar();
- * ```
+ * @deprecated Use static code generation via `generateConfigFile()` instead.
+ * This function will be removed in a future major version.
+ * Run `lodestar check --fix` to generate a static eslint.config.js.
  *
  * @param configDir - directory to search for lodestar.config.ts (default: cwd)
  */
 async function fromLodestar(configDir?: string): Promise<unknown[]> {
+  if (!deprecationWarned) {
+    deprecationWarned = true;
+    console.warn(
+      '[lodestar] fromLodestar() is deprecated. Run `lodestar check --fix` to generate a static eslint.config.js.',
+    );
+  }
+
   const startDir = configDir ? resolve(configDir) : process.cwd();
   const { adapter } = await loadConfigWithEslintAdapter(startDir);
 
