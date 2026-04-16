@@ -2,7 +2,8 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { eslintAdapter, generateConfigFile } from './adapter';
+import { pathToFileURL } from 'node:url';
+import { buildFlatConfig, eslintAdapter, generateConfigFile } from './adapter';
 import type { EslintAdapterConfig } from './adapter';
 
 describe('generateConfigFile', () => {
@@ -318,5 +319,153 @@ describe('eslintAdapter verifySetup()', () => {
 
     const violations = await adapter.verifySetup!(dir);
     expect(violations).toHaveLength(0);
+  });
+});
+
+describe('buildFlatConfig', () => {
+  const fixtures: string[] = [];
+
+  afterEach(async () => {
+    for (const dir of fixtures) {
+      await rm(dir, { recursive: true, force: true });
+    }
+    fixtures.length = 0;
+  });
+
+  async function createTempDir(): Promise<string> {
+    const dir = await mkdtemp(join(tmpdir(), 'eslint-buildflat-test-'));
+    fixtures.push(dir);
+    return dir;
+  }
+
+  async function writeFixture(dir: string, name: string, source: string): Promise<string> {
+    const filePath = join(dir, name);
+    await writeFile(filePath, source, 'utf-8');
+    return pathToFileURL(filePath).href;
+  }
+
+  it('resolves static extends into the flat config at runtime', async () => {
+    const dir = await createTempDir();
+    const specifier = await writeFixture(
+      dir,
+      'static.mjs',
+      `export default [
+        { files: ['**/*.ts', '**/*.tsx'], rules: { 'no-fixture-rule': 'error' } },
+      ];\n`,
+    );
+
+    const result = await buildFlatConfig({ extends: specifier }, dir);
+
+    // The fixture block should be spread into the resulting config.
+    expect(result).toEqual(
+      expect.arrayContaining([
+        { files: ['**/*.ts', '**/*.tsx'], rules: { 'no-fixture-rule': 'error' } },
+      ]),
+    );
+  });
+
+  it('skips @eslint/js recommended when extends is provided', async () => {
+    const dir = await createTempDir();
+    const specifier = await writeFixture(
+      dir,
+      'empty.mjs',
+      'export default [{ files: ["**/*.ts"], rules: {} }];\n',
+    );
+
+    const withExtends = await buildFlatConfig({ extends: specifier }, dir);
+    const withoutExtends = await buildFlatConfig({});
+
+    // Without `extends`, @eslint/js recommended is included; with `extends` it is not.
+    // @eslint/js recommended is a single object containing a `rules` record with ESLint's
+    // built-in rules (e.g. 'constructor-super'). Detect it by that shape.
+    const looksLikeRecommended = (block: unknown): boolean =>
+      typeof block === 'object' &&
+      block !== null &&
+      'rules' in block &&
+      typeof (block as { rules?: unknown }).rules === 'object' &&
+      (block as { rules?: Record<string, unknown> }).rules !== null &&
+      'constructor-super' in ((block as { rules: Record<string, unknown> }).rules);
+
+    expect(withoutExtends.some(looksLikeRecommended)).toBe(true);
+    expect(withExtends.some(looksLikeRecommended)).toBe(false);
+  });
+
+  it('invokes factory extends with rootDir', async () => {
+    const dir = await createTempDir();
+    const specifier = await writeFixture(
+      dir,
+      'factory.mjs',
+      `export default (rootDir) => [
+        { files: ['**/*.ts'], rules: { 'factory-saw-root': rootDir } },
+      ];\n`,
+    );
+
+    const result = await buildFlatConfig(
+      { extends: { specifier, factory: true } },
+      dir,
+    );
+
+    const block = result.find(
+      (b): b is { files: string[]; rules: { 'factory-saw-root': string } } =>
+        typeof b === 'object' &&
+        b !== null &&
+        'rules' in b &&
+        typeof (b as { rules?: Record<string, unknown> }).rules === 'object' &&
+        (b as { rules: Record<string, unknown> }).rules !== null &&
+        'factory-saw-root' in (b as { rules: Record<string, unknown> }).rules,
+    );
+
+    expect(block).toBeDefined();
+    expect(block!.rules['factory-saw-root']).toBe(dir);
+  });
+
+  it('throws when a factory extends is declared but the module is not a function', async () => {
+    const dir = await createTempDir();
+    const specifier = await writeFixture(
+      dir,
+      'not-a-factory.mjs',
+      'export default [{ rules: {} }];\n',
+    );
+
+    await expect(
+      buildFlatConfig({ extends: { specifier, factory: true } }, dir),
+    ).rejects.toThrow(/factory/);
+  });
+
+  it('throws a clear error when extends specifier cannot be loaded', async () => {
+    await expect(
+      buildFlatConfig({ extends: '@this-package/definitely-does-not-exist' }, '/tmp'),
+    ).rejects.toThrow(/Failed to load ESLint config/);
+  });
+
+  it('composes extends with overrides and ignores in the correct order', async () => {
+    const dir = await createTempDir();
+    const specifier = await writeFixture(
+      dir,
+      'multi.mjs',
+      `export default [
+        { files: ['**/*.ts'], rules: { 'from-extends': 'error' } },
+      ];\n`,
+    );
+
+    const result = await buildFlatConfig(
+      {
+        extends: specifier,
+        ignores: ['dist/**'],
+        overrides: [{ files: ['**/root.tsx'], rules: { 'from-override': 'off' } }],
+      },
+      dir,
+    );
+
+    // ignores block first, then extends blocks, then override block.
+    expect(result[0]).toEqual({ ignores: ['dist/**'] });
+    const lastBlock = result[result.length - 1] as { files: string[]; rules: Record<string, unknown> };
+    expect(lastBlock.files).toEqual(['**/root.tsx']);
+    expect(lastBlock.rules).toEqual({ 'from-override': 'off' });
+    expect(result).toEqual(
+      expect.arrayContaining([
+        { files: ['**/*.ts'], rules: { 'from-extends': 'error' } },
+      ]),
+    );
   });
 });

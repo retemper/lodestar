@@ -107,20 +107,86 @@ async function resolvePresets(presets: readonly string[]): Promise<unknown[]> {
 }
 
 /**
+ * Resolve `extends` entries into concrete flat-config blocks.
+ * Mirrors the resolution that `generateConfigFile()` encodes into its output:
+ *   - static entries spread the imported array
+ *   - factory entries are invoked with `rootDir`
+ */
+async function resolveExtends(
+  ext: EslintAdapterConfig['extends'],
+  rootDir: string | undefined,
+): Promise<unknown[]> {
+  const entries = normalizeExtends(ext);
+  if (entries.length === 0) return [];
+
+  const configs: unknown[] = [];
+  for (const entry of entries) {
+    const { specifier, factory } = parseExtendsEntry(entry);
+    const mod = await importDefault(specifier);
+    if (mod === null) {
+      throw new Error(
+        `Failed to load ESLint config from '${specifier}'. ` +
+          'Ensure the package is installed and resolvable from the target directory.',
+      );
+    }
+
+    let resolved: unknown;
+    if (factory) {
+      if (typeof mod !== 'function') {
+        throw new Error(
+          `\`extends\` entry '${specifier}' was declared as a factory but does not export a function.`,
+        );
+      }
+      if (!rootDir) {
+        throw new Error(
+          `\`extends\` factory entry '${specifier}' requires a rootDir but none was provided.`,
+        );
+      }
+      resolved = (mod as (dir: string) => unknown)(rootDir);
+    } else {
+      resolved = mod;
+    }
+
+    if (Array.isArray(resolved)) {
+      configs.push(...resolved);
+    } else if (resolved) {
+      configs.push(resolved);
+    }
+  }
+
+  return configs;
+}
+
+/**
  * Build ESLint flat config array from adapter config.
  * @param adapterConfig - the ESLint adapter configuration
+ * @param rootDir - the package root; required when `extends` includes factory entries
  */
-async function buildFlatConfig(adapterConfig: EslintAdapterConfig): Promise<unknown[]> {
+async function buildFlatConfig(
+  adapterConfig: EslintAdapterConfig,
+  rootDir?: string,
+): Promise<unknown[]> {
   const configs: unknown[] = [];
 
   if (adapterConfig.ignores && adapterConfig.ignores.length > 0) {
     configs.push({ ignores: [...adapterConfig.ignores] });
   }
 
-  const baseEslint = await importDefault('@eslint/js');
-  const recommended = (baseEslint as { configs?: { recommended?: unknown } })?.configs?.recommended;
-  if (recommended) {
-    configs.push(recommended);
+  const hasExtends =
+    adapterConfig.extends !== undefined && normalizeExtends(adapterConfig.extends).length > 0;
+
+  if (hasExtends) {
+    // When the user provides `extends`, delegate baseline rule choice to the shared config.
+    // Mirrors `generateConfigFile()`, which never emits @eslint/js recommended in that case.
+    const extendsConfigs = await resolveExtends(adapterConfig.extends, rootDir);
+    configs.push(...extendsConfigs);
+  } else {
+    const baseEslint = await importDefault('@eslint/js');
+    const recommended = (baseEslint as { configs?: { recommended?: unknown } })?.configs
+      ?.recommended;
+    if (recommended) {
+      configs.push(recommended);
+    }
   }
 
   if (adapterConfig.presets) {
@@ -333,7 +399,7 @@ function eslintAdapter(config: EslintAdapterConfig): ToolAdapter<EslintAdapterCo
         );
       }
 
-      const flatConfig = await buildFlatConfig(config);
+      const flatConfig = await buildFlatConfig(config, rootDir);
 
       const eslint = new eslintModule.ESLint({
         overrideConfigFile: true,
@@ -368,7 +434,7 @@ function eslintAdapter(config: EslintAdapterConfig): ToolAdapter<EslintAdapterCo
       const eslintModule = await import('eslint').catch(() => null);
       if (!eslintModule) return;
 
-      const flatConfig = await buildFlatConfig(config);
+      const flatConfig = await buildFlatConfig(config, rootDir);
       const eslint = new eslintModule.ESLint({
         overrideConfigFile: true,
         overrideConfig: flatConfig as never,
