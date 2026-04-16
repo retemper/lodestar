@@ -432,19 +432,28 @@ async function loadEslint(rootDir: string): Promise<LoadedEslint | null> {
   return (await tryLoadEslintFromRoot(rootDir)) ?? (await tryLoadEslintFromAdapter());
 }
 
+/** True only when a module-resolution failure indicates "not installed",
+ * rather than a load-time problem (syntax error, bad exports, permissions, …).
+ * Same predicate as the extends importer uses above — keep them in sync. */
+function isModuleNotFound(err: unknown): boolean {
+  const code = (err as NodeJS.ErrnoException | undefined)?.code;
+  return code === 'MODULE_NOT_FOUND' || code === 'ERR_MODULE_NOT_FOUND';
+}
+
 async function tryLoadEslintFromRoot(rootDir: string): Promise<LoadedEslint | null> {
   try {
     const req = createRequire(join(rootDir, 'package.json'));
     const resolvedPath = req.resolve('eslint');
-    const mod = (await import(pathToFileURL(resolvedPath).href)) as EslintModule;
+    const mod = (await import(pathToFileURL(resolvedPath).href)) as unknown as EslintModule;
     return {
       mod,
       resolvedPath,
       version: mod.Linter?.version,
       resolvedFrom: 'project',
     };
-  } catch {
-    return null;
+  } catch (err) {
+    if (isModuleNotFound(err)) return null;
+    throw err;
   }
 }
 
@@ -455,7 +464,7 @@ async function tryLoadEslintFromAdapter(): Promise<LoadedEslint | null> {
     try {
       resolvedPath = createRequire(import.meta.url).resolve('eslint');
     } catch {
-      /* keep placeholder */
+      /* keep placeholder — only used for diagnostic output */
     }
     return {
       mod,
@@ -463,8 +472,9 @@ async function tryLoadEslintFromAdapter(): Promise<LoadedEslint | null> {
       version: mod.Linter?.version,
       resolvedFrom: 'adapter',
     };
-  } catch {
-    return null;
+  } catch (err) {
+    if (isModuleNotFound(err)) return null;
+    throw err;
   }
 }
 
@@ -498,9 +508,8 @@ function augmentSkewError(err: unknown, loaded: LoadedEslint): Error {
     `  npm:   { "overrides":            { "eslint": "<your-version>" } }\n` +
     `  yarn:  { "resolutions":          { "eslint": "<your-version>" } }\n`;
 
-  const augmented = new Error(`${message}${hint}`);
+  const augmented = new Error(`${message}${hint}`, { cause: original });
   augmented.stack = original.stack;
-  (augmented as { cause?: unknown }).cause = original;
   return augmented;
 }
 

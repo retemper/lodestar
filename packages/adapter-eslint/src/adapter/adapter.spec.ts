@@ -595,4 +595,25 @@ describe('ESLint runtime resolution (regression for issue #34)', () => {
     const adapter = eslintAdapter({ extends: specifier });
     await expect(adapter.check!(dir, [])).rejects.toThrow(/^some unrelated failure$/);
   });
+
+  it('falls back to adapter-local ESLint when the project has none', async () => {
+    // No fake ESLint installed in rootDir — the adapter should resolve via
+    // its own transitive deps. A real violation from the hoisted ESLint proves
+    // the fallback path is wired up (and not masked by silent exception-eating).
+    const dir = await createTempDir();
+    await writeFile(join(dir, 'index.ts'), 'var answer = 42;\nconsole.log(answer);\n', 'utf-8');
+
+    const specifier = pathToFileURL(join(dir, 'shared.mjs')).href;
+    await writeFile(
+      join(dir, 'shared.mjs'),
+      `export default [{ files: ['**/*.ts'], rules: { 'no-var': 'error' } }];\n`,
+      'utf-8',
+    );
+
+    const adapter = eslintAdapter({ extends: specifier });
+    const violations = await adapter.check!(dir, []);
+
+    // The hoisted ESLint ran; our `no-var` rule fired on the fixture file.
+    expect(violations.some((v) => v.ruleId === 'eslint/no-var')).toBe(true);
+  });
 });

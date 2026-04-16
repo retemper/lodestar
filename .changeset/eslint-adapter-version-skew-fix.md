@@ -10,5 +10,5 @@ The adapter used to load `eslint` via `import('eslint')`, which pnpm resolved ag
 Three layered changes:
 
 - **Load ESLint from the user's project.** `check()` and `fix()` now resolve `eslint` via `createRequire(<rootDir>/package.json).resolve('eslint')` so the adapter and the user's plugins/configs run the same ESLint instance. Falls back to adapter-local resolution only when the project has no ESLint installed.
-- **Tighten the `eslint` peer range** to `"^9.0.0 || ^10.0.0"` on both `@retemper/lodestar-adapter-eslint` and `@retemper/lodestar-core`. Signals supported majors explicitly instead of accepting arbitrarily newer releases.
+- **Tighten the `eslint` peer range** to `"^9.0.0 || ^10.0.0"` on both `@retemper/lodestar-adapter-eslint` and `@retemper/lodestar-core`. Signals supported majors explicitly instead of accepting arbitrarily newer releases. No currently-published ESLint is excluded by this change; the old `">=9.0.0"` was meant to mean "all supported majors at release time" and this spelling makes that intent enforceable.
 - **Augment known skew errors.** When `lintFiles()` throws a signature known to indicate runtime/plugin version mismatch (currently `scopeManager.addGlobals is not a function`), the adapter rethrows with the resolved ESLint path, `Linter.version`, and pnpm/npm/yarn override recipes so the fix is obvious from the error alone.
