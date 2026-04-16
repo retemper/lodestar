@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import type { ToolAdapter, Violation } from '@retemper/lodestar-types';
 
 /**
@@ -224,9 +226,7 @@ async function buildFlatConfig(
 }
 
 /** Normalize extends option to array */
-function normalizeExtends(
-  ext: EslintAdapterConfig['extends'],
-): readonly ExtendsEntry[] {
+function normalizeExtends(ext: EslintAdapterConfig['extends']): readonly ExtendsEntry[] {
   if (!ext) return [];
   if (typeof ext === 'string' || ('specifier' in ext && !Array.isArray(ext))) {
     return [ext];
@@ -372,7 +372,6 @@ function contentHash(content: string): string {
   return createHash('sha256').update(content).digest('hex').slice(0, 16);
 }
 
-
 /** Strip the hash comment line from generated file content for comparison */
 function stripHash(content: string): string {
   const lines = content.trimEnd().split('\n');
@@ -387,6 +386,133 @@ function isGeneratedFile(content: string): boolean {
   return content.startsWith(GENERATED_HEADER);
 }
 
+/** Minimal shape of the ESLint module the adapter relies on at runtime. */
+interface LintMessage {
+  readonly ruleId: string | null;
+  readonly message: string;
+  readonly severity: number;
+  readonly line?: number;
+  readonly column?: number;
+}
+interface LintResult {
+  readonly filePath: string;
+  readonly messages: readonly LintMessage[];
+}
+interface EslintInstance {
+  lintFiles(patterns: readonly string[]): Promise<readonly LintResult[]>;
+}
+interface EslintModule {
+  readonly ESLint: {
+    new (options: Record<string, unknown>): EslintInstance;
+    outputFixes(results: readonly LintResult[]): Promise<void>;
+  };
+  readonly Linter?: { readonly version?: string };
+}
+
+interface LoadedEslint {
+  readonly mod: EslintModule;
+  readonly resolvedPath: string;
+  readonly version: string | undefined;
+  readonly resolvedFrom: 'project' | 'adapter';
+}
+
+/**
+ * Load the ESLint module the adapter should execute.
+ *
+ * Prefers resolving `eslint` from the user's project rootDir so the adapter and
+ * the user's plugins/configs run the *same* ESLint instance. This avoids
+ * dual-resolution when a package manager satisfies the adapter's open-ended
+ * peer range against a newer ESLint major than the user's project has pinned
+ * (see retemper/lodestar#34).
+ *
+ * Falls back to adapter-local resolution when no ESLint is reachable from the
+ * project (e.g. in unit-test fixtures or packages that rely on hoisted deps).
+ */
+async function loadEslint(rootDir: string): Promise<LoadedEslint | null> {
+  return (await tryLoadEslintFromRoot(rootDir)) ?? (await tryLoadEslintFromAdapter());
+}
+
+/** True only when a module-resolution failure indicates "not installed",
+ * rather than a load-time problem (syntax error, bad exports, permissions, …).
+ * Same predicate as the extends importer uses above — keep them in sync. */
+function isModuleNotFound(err: unknown): boolean {
+  const code = (err as NodeJS.ErrnoException | undefined)?.code;
+  return code === 'MODULE_NOT_FOUND' || code === 'ERR_MODULE_NOT_FOUND';
+}
+
+async function tryLoadEslintFromRoot(rootDir: string): Promise<LoadedEslint | null> {
+  try {
+    const req = createRequire(join(rootDir, 'package.json'));
+    const resolvedPath = req.resolve('eslint');
+    const mod = (await import(pathToFileURL(resolvedPath).href)) as unknown as EslintModule;
+    return {
+      mod,
+      resolvedPath,
+      version: mod.Linter?.version,
+      resolvedFrom: 'project',
+    };
+  } catch (err) {
+    if (isModuleNotFound(err)) return null;
+    throw err;
+  }
+}
+
+async function tryLoadEslintFromAdapter(): Promise<LoadedEslint | null> {
+  try {
+    const mod = (await import('eslint')) as unknown as EslintModule;
+    let resolvedPath = '(adapter-local)';
+    try {
+      resolvedPath = createRequire(import.meta.url).resolve('eslint');
+    } catch {
+      /* keep placeholder — only used for diagnostic output */
+    }
+    return {
+      mod,
+      resolvedPath,
+      version: mod.Linter?.version,
+      resolvedFrom: 'adapter',
+    };
+  } catch (err) {
+    if (isModuleNotFound(err)) return null;
+    throw err;
+  }
+}
+
+/**
+ * Error signatures that typically indicate ESLint version skew between the
+ * adapter's runtime and the plugins/configs the user's project was authored
+ * against. Kept narrow to avoid false positives — when new signatures surface,
+ * add them here alongside the issue link that motivated the addition.
+ */
+const ESLINT_SKEW_SIGNATURES: readonly string[] = [
+  // retemper/lodestar#34 — eslint-scope 8+ API visible on eslint@10 but not on @9.
+  'scopeManager.addGlobals is not a function',
+];
+
+/**
+ * Wrap a skew-suspect error with a clear hint pointing at pinning via package-
+ * manager overrides. Non-skew errors are returned untouched.
+ */
+function augmentSkewError(err: unknown, loaded: LoadedEslint): Error {
+  const original = err instanceof Error ? err : new Error(String(err));
+  const message = original.message ?? '';
+  if (!ESLINT_SKEW_SIGNATURES.some((sig) => message.includes(sig))) return original;
+
+  const hint =
+    `\n\n[lodestar-adapter-eslint] This error typically indicates an ESLint version\n` +
+    `mismatch between the runtime and the plugins/configs in your project.\n` +
+    `  Resolved ESLint: ${loaded.resolvedPath}\n` +
+    `  Linter.version:  ${loaded.version ?? '(unknown)'} (loaded from ${loaded.resolvedFrom})\n\n` +
+    `Pin ESLint to a single version via your package manager:\n` +
+    `  pnpm:  { "pnpm": { "overrides": { "eslint": "<your-version>" } } }\n` +
+    `  npm:   { "overrides":            { "eslint": "<your-version>" } }\n` +
+    `  yarn:  { "resolutions":          { "eslint": "<your-version>" } }\n`;
+
+  const augmented = new Error(`${message}${hint}`, { cause: original });
+  augmented.stack = original.stack;
+  return augmented;
+}
+
 /**
  * Create an ESLint adapter for Lodestar.
  * Implements ToolAdapter — runs ESLint via Node API and generates flat config for IDE.
@@ -398,24 +524,30 @@ function eslintAdapter(config: EslintAdapterConfig): ToolAdapter<EslintAdapterCo
     config,
 
     async check(rootDir: string, include: readonly string[]): Promise<readonly Violation[]> {
-      const eslintModule = await import('eslint').catch(() => null);
-      if (!eslintModule) {
+      const loaded = await loadEslint(rootDir);
+      if (!loaded) {
         throw new Error(
-          'ESLint is required for the eslint adapter. Install it: npm install -D eslint typescript-eslint',
+          'ESLint is required for the eslint adapter. Install it in your project: ' +
+            'npm install -D eslint typescript-eslint',
         );
       }
 
       const flatConfig = await buildFlatConfig(config, rootDir);
 
-      const eslint = new eslintModule.ESLint({
+      const eslint = new loaded.mod.ESLint({
         overrideConfigFile: true,
-        overrideConfig: flatConfig as never,
+        overrideConfig: flatConfig,
         cwd: rootDir,
         errorOnUnmatchedPattern: false,
       });
 
       const patterns = include.length > 0 ? [...include] : ['**/*.ts', '**/*.tsx'];
-      const results = await eslint.lintFiles(patterns);
+      let results: readonly LintResult[];
+      try {
+        results = await eslint.lintFiles(patterns);
+      } catch (err) {
+        throw augmentSkewError(err, loaded);
+      }
 
       const violations: Violation[] = [];
       for (const result of results) {
@@ -437,21 +569,26 @@ function eslintAdapter(config: EslintAdapterConfig): ToolAdapter<EslintAdapterCo
     },
 
     async fix(rootDir: string, include: readonly string[]): Promise<void> {
-      const eslintModule = await import('eslint').catch(() => null);
-      if (!eslintModule) return;
+      const loaded = await loadEslint(rootDir);
+      if (!loaded) return;
 
       const flatConfig = await buildFlatConfig(config, rootDir);
-      const eslint = new eslintModule.ESLint({
+      const eslint = new loaded.mod.ESLint({
         overrideConfigFile: true,
-        overrideConfig: flatConfig as never,
+        overrideConfig: flatConfig,
         cwd: rootDir,
         fix: true,
         errorOnUnmatchedPattern: false,
       });
 
       const patterns = include.length > 0 ? [...include] : ['**/*.ts', '**/*.tsx'];
-      const results = await eslint.lintFiles(patterns);
-      await eslintModule.ESLint.outputFixes(results);
+      let results: readonly LintResult[];
+      try {
+        results = await eslint.lintFiles(patterns);
+      } catch (err) {
+        throw augmentSkewError(err, loaded);
+      }
+      await loaded.mod.ESLint.outputFixes(results);
     },
 
     async verifySetup(rootDir: string): Promise<readonly Violation[]> {

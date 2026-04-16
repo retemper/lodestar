@@ -235,7 +235,7 @@ importers:
         specifier: workspace:*
         version: link:../types
       eslint:
-        specifier: '>=9.0.0'
+        specifier: ^9.0.0 || ^10.0.0
         version: 10.1.0(jiti@2.6.1)
       typescript-eslint:
         specifier: '>=8.0.0'
@@ -399,7 +399,7 @@ importers:
         specifier: ^1.11.0
         version: 1.15.21
       eslint:
-        specifier: '>=9.0.0'
+        specifier: ^9.0.0 || ^10.0.0
         version: 10.1.0(jiti@2.6.1)
       typescript-eslint:
         specifier: '>=8.0.0'
