@@ -1,6 +1,6 @@
 {
   "name": "@retemper/lodestar-plugin-architecture",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "description": "Architecture as Code — layers, module boundaries, and circular dependency detection",
   "license": "MIT",

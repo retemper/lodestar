@@ -1,5 +1,13 @@
 # @retemper/lodestar
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`8e73a10`](https://github.com/retemper/lodestar/commit/8e73a103b11a549675d94d1748b9923c5688e732)]:
+  - @retemper/lodestar-core@0.0.4
+  - @retemper/lodestar-cli@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes
