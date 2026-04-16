@@ -1,5 +1,11 @@
 # @retemper/lodestar-adapter-eslint
 
+## 0.1.1
+
+### Patch Changes
+
+- [#32](https://github.com/retemper/lodestar/pull/32) [`0735ba5`](https://github.com/retemper/lodestar/commit/0735ba5ba3e9bc49a448631ece0f1bd70bd7a079) Thanks [@devKangMinHyeok](https://github.com/devKangMinHyeok)! - Fix `extends` being ignored by `check()`/`fix()` at runtime. `buildFlatConfig()` now resolves `extends` entries (both static and factory forms) and threads `rootDir` through, matching the blocks emitted by `generateConfigFile()`. Also skip `@eslint/js` recommended when `extends` is set, so the shared config controls the baseline rule set. Previously, projects relying on `extends` silently linted zero files (because no flat-config block carried a `files` glob) or surfaced parse errors when an override glob accidentally matched a file the shared parser was supposed to handle.
+
 ## 0.1.0
 
 ### Minor Changes
