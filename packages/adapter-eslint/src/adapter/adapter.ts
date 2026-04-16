@@ -69,13 +69,20 @@ const PRESET_MAP: Readonly<Record<string, { module: string; export: string }>> =
   stylistic: { module: 'typescript-eslint', export: 'configs.stylistic' },
 };
 
-/** Dynamically import a default export */
+/**
+ * Dynamically import a default export.
+ * Returns `null` only when the module cannot be resolved (e.g. not installed).
+ * Runtime errors inside the loaded module (syntax errors, throws during evaluation)
+ * are rethrown so callers can surface the real cause to the user.
+ */
 async function importDefault(moduleName: string): Promise<unknown> {
   try {
     const mod = await import(moduleName);
     return mod.default ?? mod;
-  } catch {
-    return null;
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException | undefined)?.code;
+    if (code === 'ERR_MODULE_NOT_FOUND' || code === 'MODULE_NOT_FOUND') return null;
+    throw err;
   }
 }
 
@@ -107,16 +114,15 @@ async function resolvePresets(presets: readonly string[]): Promise<unknown[]> {
 }
 
 /**
- * Resolve `extends` entries into concrete flat-config blocks.
+ * Resolve pre-normalized `extends` entries into concrete flat-config blocks.
  * Mirrors the resolution that `generateConfigFile()` encodes into its output:
  *   - static entries spread the imported array
- *   - factory entries are invoked with `rootDir`
+ *   - factory entries are invoked with `rootDir` (supports both sync and async factories)
  */
 async function resolveExtends(
-  ext: EslintAdapterConfig['extends'],
+  entries: readonly ExtendsEntry[],
   rootDir: string | undefined,
 ): Promise<unknown[]> {
-  const entries = normalizeExtends(ext);
   if (entries.length === 0) return [];
 
   const configs: unknown[] = [];
@@ -142,7 +148,8 @@ async function resolveExtends(
           `\`extends\` factory entry '${specifier}' requires a rootDir but none was provided.`,
         );
       }
-      resolved = (mod as (dir: string) => unknown)(rootDir);
+      // `await` on a plain value is a no-op; unwraps async factories transparently.
+      resolved = await (mod as (dir: string) => unknown | Promise<unknown>)(rootDir);
     } else {
       resolved = mod;
     }
@@ -172,13 +179,12 @@ async function buildFlatConfig(
     configs.push({ ignores: [...adapterConfig.ignores] });
   }
 
-  const hasExtends =
-    adapterConfig.extends !== undefined && normalizeExtends(adapterConfig.extends).length > 0;
+  const extendsEntries = normalizeExtends(adapterConfig.extends);
 
-  if (hasExtends) {
+  if (extendsEntries.length > 0) {
     // When the user provides `extends`, delegate baseline rule choice to the shared config.
     // Mirrors `generateConfigFile()`, which never emits @eslint/js recommended in that case.
-    const extendsConfigs = await resolveExtends(adapterConfig.extends, rootDir);
+    const extendsConfigs = await resolveExtends(extendsEntries, rootDir);
     configs.push(...extendsConfigs);
   } else {
     const baseEslint = await importDefault('@eslint/js');

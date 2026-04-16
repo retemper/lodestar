@@ -372,22 +372,17 @@ describe('buildFlatConfig', () => {
       'export default [{ files: ["**/*.ts"], rules: {} }];\n',
     );
 
-    const withExtends = await buildFlatConfig({ extends: specifier }, dir);
+    // Resolve the same object the adapter would pick up, then assert reference equality.
+    // If @eslint/js cannot be resolved in the test env, this import throws and the test
+    // fails loudly — preferable to a silently-passing object-shape probe.
+    const eslintJs = (await import('@eslint/js')).default;
+    const recommended = eslintJs.configs.recommended;
+
     const withoutExtends = await buildFlatConfig({});
+    const withExtends = await buildFlatConfig({ extends: specifier }, dir);
 
-    // Without `extends`, @eslint/js recommended is included; with `extends` it is not.
-    // @eslint/js recommended is a single object containing a `rules` record with ESLint's
-    // built-in rules (e.g. 'constructor-super'). Detect it by that shape.
-    const looksLikeRecommended = (block: unknown): boolean =>
-      typeof block === 'object' &&
-      block !== null &&
-      'rules' in block &&
-      typeof (block as { rules?: unknown }).rules === 'object' &&
-      (block as { rules?: Record<string, unknown> }).rules !== null &&
-      'constructor-super' in ((block as { rules: Record<string, unknown> }).rules);
-
-    expect(withoutExtends.some(looksLikeRecommended)).toBe(true);
-    expect(withExtends.some(looksLikeRecommended)).toBe(false);
+    expect(withoutExtends).toContain(recommended);
+    expect(withExtends).not.toContain(recommended);
   });
 
   it('invokes factory extends with rootDir', async () => {
@@ -436,6 +431,31 @@ describe('buildFlatConfig', () => {
     await expect(
       buildFlatConfig({ extends: '@this-package/definitely-does-not-exist' }, '/tmp'),
     ).rejects.toThrow(/Failed to load ESLint config/);
+  });
+
+  it('check() reports violations defined by extends (regression for issue #31)', async () => {
+    // End-to-end regression test: before the fix, extends was ignored by check(),
+    // so no `files` glob matched any real file and `lintFiles` returned no results.
+    // After the fix, a rule declared in the extended config should flag a real violation.
+    const dir = await createTempDir();
+
+    // Source file that violates `no-var`.
+    await writeFile(join(dir, 'index.ts'), 'var answer = 42;\nconsole.log(answer);\n', 'utf-8');
+
+    // Shared config fixture: globs `**/*.ts` and errors on `no-var`.
+    const specifier = await writeFixture(
+      dir,
+      'shared.mjs',
+      `export default [
+        { files: ['**/*.ts'], rules: { 'no-var': 'error' } },
+      ];\n`,
+    );
+
+    const adapter = eslintAdapter({ extends: specifier });
+    const violations = await adapter.check!(dir, []);
+
+    expect(violations.length).toBeGreaterThan(0);
+    expect(violations.some((v) => v.ruleId === 'eslint/no-var')).toBe(true);
   });
 
   it('composes extends with overrides and ignores in the correct order', async () => {
