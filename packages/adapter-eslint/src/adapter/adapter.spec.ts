@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
@@ -54,9 +54,7 @@ describe('generateConfigFile', () => {
 
     expect(result).toContain("import { dirname } from 'node:path'");
     expect(result).toContain("import { fileURLToPath } from 'node:url'");
-    expect(result).toContain(
-      "import createConfig0 from '@repo/eslint-config/react-app.config.js'",
-    );
+    expect(result).toContain("import createConfig0 from '@repo/eslint-config/react-app.config.js'");
     expect(result).toContain('const __dirname = dirname(fileURLToPath(import.meta.url))');
     expect(result).toContain('...createConfig0(__dirname),');
     expect(result).toContain('export default [');
@@ -88,9 +86,7 @@ describe('generateConfigFile', () => {
 
     const result = await generateConfigFile(config, dir);
 
-    expect(result).toContain(
-      "const createConfig0 = require('@repo/eslint-config/expo.config.js')",
-    );
+    expect(result).toContain("const createConfig0 = require('@repo/eslint-config/expo.config.js')");
     expect(result).toContain('module.exports = [');
     expect(result).toContain('...createConfig0(__dirname),');
     // CJS uses __dirname natively, no fileURLToPath needed
@@ -109,9 +105,7 @@ describe('generateConfigFile', () => {
     const result = await generateConfigFile(config, dir);
 
     expect(result).toContain("import config0 from '@repo/eslint-config/base.config.js'");
-    expect(result).toContain(
-      "import createConfig1 from '@repo/eslint-config/react-app.config.js'",
-    );
+    expect(result).toContain("import createConfig1 from '@repo/eslint-config/react-app.config.js'");
     expect(result).toContain('...config0,');
     expect(result).toContain('...createConfig1(__dirname),');
   });
@@ -121,9 +115,7 @@ describe('generateConfigFile', () => {
     const config: EslintAdapterConfig = {
       extends: '@repo/eslint-config/react-app.config.js',
       ignores: ['src/__generated__/**'],
-      overrides: [
-        { files: ['src/platform/router/**'], rules: { 'no-restricted-imports': 'off' } },
-      ],
+      overrides: [{ files: ['src/platform/router/**'], rules: { 'no-restricted-imports': 'off' } }],
     };
 
     const result = await generateConfigFile(config, dir);
@@ -311,11 +303,7 @@ describe('eslintAdapter verifySetup()', () => {
     });
 
     // Write a user-managed eslint.config.js (no generated header)
-    await writeFile(
-      join(dir, 'eslint.config.js'),
-      'export default [{ rules: {} }];\n',
-      'utf-8',
-    );
+    await writeFile(join(dir, 'eslint.config.js'), 'export default [{ rules: {} }];\n', 'utf-8');
 
     const violations = await adapter.verifySetup!(dir);
     expect(violations).toHaveLength(0);
@@ -395,10 +383,7 @@ describe('buildFlatConfig', () => {
       ];\n`,
     );
 
-    const result = await buildFlatConfig(
-      { extends: { specifier, factory: true } },
-      dir,
-    );
+    const result = await buildFlatConfig({ extends: { specifier, factory: true } }, dir);
 
     const block = result.find(
       (b): b is { files: string[]; rules: { 'factory-saw-root': string } } =>
@@ -422,9 +407,9 @@ describe('buildFlatConfig', () => {
       'export default [{ rules: {} }];\n',
     );
 
-    await expect(
-      buildFlatConfig({ extends: { specifier, factory: true } }, dir),
-    ).rejects.toThrow(/factory/);
+    await expect(buildFlatConfig({ extends: { specifier, factory: true } }, dir)).rejects.toThrow(
+      /factory/,
+    );
   });
 
   it('throws a clear error when extends specifier cannot be loaded', async () => {
@@ -479,13 +464,135 @@ describe('buildFlatConfig', () => {
 
     // ignores block first, then extends blocks, then override block.
     expect(result[0]).toEqual({ ignores: ['dist/**'] });
-    const lastBlock = result[result.length - 1] as { files: string[]; rules: Record<string, unknown> };
+    const lastBlock = result[result.length - 1] as {
+      files: string[];
+      rules: Record<string, unknown>;
+    };
     expect(lastBlock.files).toEqual(['**/root.tsx']);
     expect(lastBlock.rules).toEqual({ 'from-override': 'off' });
     expect(result).toEqual(
-      expect.arrayContaining([
-        { files: ['**/*.ts'], rules: { 'from-extends': 'error' } },
-      ]),
+      expect.arrayContaining([{ files: ['**/*.ts'], rules: { 'from-extends': 'error' } }]),
     );
+  });
+});
+
+describe('ESLint runtime resolution (regression for issue #34)', () => {
+  const fixtures: string[] = [];
+
+  afterEach(async () => {
+    for (const dir of fixtures) {
+      await rm(dir, { recursive: true, force: true });
+    }
+    fixtures.length = 0;
+  });
+
+  async function createTempDir(): Promise<string> {
+    const dir = await mkdtemp(join(tmpdir(), 'eslint-resolve-test-'));
+    fixtures.push(dir);
+    return dir;
+  }
+
+  /**
+   * Install a fake ESLint module at `<dir>/node_modules/eslint` so that
+   * `createRequire(<dir>/package.json).resolve('eslint')` finds *this* copy
+   * before any adapter-local one. The module body is plain ESM; use placeholders
+   * like `__LINT_FILES_BODY__` to customize per-test behavior.
+   */
+  async function installFakeEslint(
+    dir: string,
+    opts: { version: string; lintFilesBody: string },
+  ): Promise<void> {
+    const pkgDir = join(dir, 'node_modules', 'eslint');
+    await mkdir(pkgDir, { recursive: true });
+    await writeFile(
+      join(pkgDir, 'package.json'),
+      JSON.stringify({
+        name: 'eslint',
+        version: opts.version,
+        main: 'index.js',
+        type: 'module',
+      }),
+      'utf-8',
+    );
+    await writeFile(
+      join(pkgDir, 'index.js'),
+      `export class ESLint {
+         constructor(options) { this.options = options; }
+         async lintFiles(patterns) { ${opts.lintFilesBody} }
+         static async outputFixes() {}
+       }
+       export const Linter = { version: ${JSON.stringify(opts.version)} };
+      `,
+      'utf-8',
+    );
+  }
+
+  it('prefers ESLint resolved from the user project rootDir', async () => {
+    const dir = await createTempDir();
+    await installFakeEslint(dir, {
+      version: '9.32.0',
+      lintFilesBody: `return [{
+        filePath: 'fake.ts',
+        messages: [{
+          ruleId: 'from-project-eslint',
+          message: 'marker from project-local eslint',
+          severity: 2,
+          line: 1,
+          column: 1,
+        }],
+      }];`,
+    });
+
+    // An extends specifier is required so buildFlatConfig has something to load,
+    // but the fake ESLint ignores the config — lintFiles returns a canned result.
+    const specifier = pathToFileURL(join(dir, 'cfg.mjs')).href;
+    await writeFile(join(dir, 'cfg.mjs'), 'export default [{ rules: {} }];\n', 'utf-8');
+
+    const adapter = eslintAdapter({ extends: specifier });
+    const violations = await adapter.check!(dir, []);
+
+    // If the adapter picked up the real (adapter-local) ESLint, this rule id
+    // would not appear. Finding it proves the project-local copy was used.
+    expect(violations.some((v) => v.ruleId === 'eslint/from-project-eslint')).toBe(true);
+  });
+
+  it('augments scopeManager.addGlobals errors with a version-skew hint', async () => {
+    const dir = await createTempDir();
+    await installFakeEslint(dir, {
+      version: '10.2.0',
+      lintFilesBody: `throw new TypeError('scopeManager.addGlobals is not a function');`,
+    });
+
+    const specifier = pathToFileURL(join(dir, 'cfg.mjs')).href;
+    await writeFile(join(dir, 'cfg.mjs'), 'export default [{ rules: {} }];\n', 'utf-8');
+
+    const adapter = eslintAdapter({ extends: specifier });
+    let caught: Error | null = null;
+    try {
+      await adapter.check!(dir, []);
+    } catch (err) {
+      caught = err as Error;
+    }
+
+    expect(caught).not.toBeNull();
+    expect(caught!.message).toContain('scopeManager.addGlobals is not a function');
+    // Skew-aware guidance — issue #34 workaround recipes.
+    expect(caught!.message).toMatch(/pnpm[^]*overrides/);
+    expect(caught!.message).toMatch(/10\.2\.0/); // resolved Linter.version surfaces
+    expect((caught as { cause?: unknown }).cause).toBeInstanceOf(Error);
+  });
+
+  it('leaves non-skew errors untouched', async () => {
+    const dir = await createTempDir();
+    await installFakeEslint(dir, {
+      version: '9.32.0',
+      lintFilesBody: `throw new Error('some unrelated failure');`,
+    });
+
+    const specifier = pathToFileURL(join(dir, 'cfg.mjs')).href;
+    await writeFile(join(dir, 'cfg.mjs'), 'export default [{ rules: {} }];\n', 'utf-8');
+
+    const adapter = eslintAdapter({ extends: specifier });
+    await expect(adapter.check!(dir, [])).rejects.toThrow(/^some unrelated failure$/);
   });
 });
