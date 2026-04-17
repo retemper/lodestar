@@ -97,6 +97,11 @@ G. **Compatibility**
    - ESM-only — no CommonJS patterns
    - No platform-specific code without fallbacks
 
+H. **Documentation sync**
+   - Public API changes (new/removed/renamed exports, changed function signatures, new config options) have corresponding updates in `docs/`
+   - Read the relevant docs pages and verify they still match the changed code
+   - If no docs exist yet for the changed API, flag that documentation is missing
+
 #### Profile: docs
 
 **Perspective:** Developer experience writer
