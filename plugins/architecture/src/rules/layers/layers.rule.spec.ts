@@ -1,3 +1,6 @@
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, it, expect, vi } from 'vitest';
 import type { ImportInfo } from '@retemper/lodestar-types';
 import { createMockProviders, createTestContext } from '@retemper/lodestar-test-utils';
@@ -59,6 +62,72 @@ describe('architecture/layers', () => {
         providers,
         'architecture/layers',
       );
+
+      await layers.check(ctx);
+
+      expect(violations).toHaveLength(0);
+    });
+  });
+
+  describe('tsconfig path alias imports', () => {
+    /** Writes a tsconfig.json that maps "@/*" to the project root */
+    function makeProjectWithAlias(): string {
+      const dir = mkdtempSync(join(tmpdir(), 'lodestar-layers-'));
+      writeFileSync(
+        join(dir, 'tsconfig.json'),
+        JSON.stringify({ compilerOptions: { baseUrl: '.', paths: { '@/*': ['./*'] } } }),
+      );
+      return dir;
+    }
+
+    /** Providers for a ui -> infra alias import */
+    function makeAliasProviders() {
+      return createMockProviders({
+        glob: vi.fn().mockImplementation((pattern: string) => {
+          if (pattern === 'app/**') return Promise.resolve(['app/page.tsx']);
+          if (pattern === 'server/db/**') return Promise.resolve(['server/db/index.ts']);
+          return Promise.resolve([]);
+        }),
+        getImports: vi.fn().mockImplementation((file: string) => {
+          if (file === 'app/page.tsx') {
+            return Promise.resolve([makeImport('@/server/db', 'app/page.tsx')]);
+          }
+          return Promise.resolve([]);
+        }),
+      });
+    }
+
+    it('reports a violation when an alias import crosses a forbidden layer boundary', async () => {
+      const { ctx, violations } = createTestContext(
+        {
+          layers: [
+            { name: 'ui', path: 'app/**', canImport: [] },
+            { name: 'infra', path: 'server/db/**' },
+          ] as readonly LayerDefinition[],
+        },
+        makeAliasProviders(),
+        'architecture/layers',
+      );
+      Object.defineProperty(ctx, 'rootDir', { value: makeProjectWithAlias() });
+
+      await layers.check(ctx);
+
+      expect(violations).toHaveLength(1);
+      expect(violations[0]?.message).toContain('cannot import from "infra"');
+    });
+
+    it('no violation when the alias import target is declared in canImport', async () => {
+      const { ctx, violations } = createTestContext(
+        {
+          layers: [
+            { name: 'ui', path: 'app/**', canImport: ['infra'] },
+            { name: 'infra', path: 'server/db/**' },
+          ] as readonly LayerDefinition[],
+        },
+        makeAliasProviders(),
+        'architecture/layers',
+      );
+      Object.defineProperty(ctx, 'rootDir', { value: makeProjectWithAlias() });
 
       await layers.check(ctx);
 

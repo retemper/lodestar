@@ -1,5 +1,5 @@
 import { defineRule } from '@retemper/lodestar-types';
-import { createRelativeResolver } from '@retemper/lodestar-core';
+import { createDefaultResolverChain } from '@retemper/lodestar-core';
 
 /** A named layer with a file pattern and allowed import targets */
 interface LayerDefinition {
@@ -63,7 +63,11 @@ const layers = defineRule<{
       allowedLayers.set(layer.name, new Set(layer.canImport ?? []));
     }
 
-    const resolver = createRelativeResolver();
+    // The graph provider resolves imports with the full chain (tsconfig paths -> relative).
+    // This rule must resolve identically, otherwise alias imports such as '@/server/db'
+    // silently fail to resolve and every cross-layer violation goes unreported.
+    const { resolver, setup } = createDefaultResolverChain({ rootDir: ctx.rootDir });
+    await setup();
 
     for (const [file, sourceLayer] of fileToLayer) {
       const imports = await ctx.providers.ast.getImports(file);
