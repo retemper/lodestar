@@ -28,18 +28,20 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          # No dependency cache in release builds (npm trusted-publishing guidance).
           registry-url: 'https://registry.npmjs.org'
+
+      # OIDC trusted publishing requires npm CLI >= 11.5.1; Node 22 ships npm 10.
+      - run: npm install --global npm@latest
 
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm turbo build
 
       - name: Publish to npm
+        # Authentication uses GitHub OIDC via the trusted publisher configured on
+        # npmjs.com for each package (see id-token: write above). No npm token needed.
         run: pnpm changeset:publish --no-git-tag
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create git tags and GitHub Releases
         run: |
