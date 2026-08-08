@@ -53,6 +53,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # npm trusted publishing allows only one trusted publisher per package, which is
+      # reserved for the release workflow (publish.yml). Snapshot publishing therefore
+      # still authenticates with NPM_TOKEN.
       - name: Publish snapshot to npm
         run: pnpm changeset:publish --tag "pr${{ github.event.issue.number }}" --no-git-tag
         env:
